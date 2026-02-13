@@ -45,7 +45,7 @@ export const UserList: React.FC<UserListProps> = ({ users, onEdit, onDelete, onC
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {users.map(u => (
+            {users.filter(u => u.email !== 'suporte@unityautomacoes.com.br').map(u => (
               <tr key={u.id} className="hover:bg-slate-50/50 transition-all group">
                 <td className="px-8 py-5">
                   <div className="flex items-center gap-4">
@@ -247,7 +247,7 @@ export const UserForm: React.FC<UserFormProps> = ({ onSave, onCancel, initialDat
               <div className="space-y-4">
                 <div><label className="label-style">Nome Completo</label><input required value={formData.nome} onChange={e => setFormData({...formData, nome: e.target.value})} className="input-style" placeholder="Ex: Maria José de Souza" /></div>
                 <div><label className="label-style">E-mail de Login</label><input required type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="input-style" placeholder="usuario@catequese.com" /></div>
-                <div><label className="label-style">Senha de Acesso</label><input required type="text" value={formData.senha} onChange={e => setFormData({...formData, senha: e.target.value})} className="input-style font-mono" placeholder="••••••••" /></div>
+                <div><label className="label-style">Senha de Acesso</label><input required type="password" value={formData.senha} onChange={e => setFormData({...formData, senha: e.target.value})} className="input-style font-mono" placeholder="••••••••" /></div>
                 <div>
                   <label className="label-style">Nível de Hierarquia</label>
                   <select value={formData.role} onChange={e => setFormData({...formData, role: e.target.value as any})} className="input-style font-bold">
