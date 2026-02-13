@@ -185,6 +185,19 @@ const App: React.FC = () => {
     return classes.filter(c => allowed.includes(c.id));
   }, [classes, currentUser, catequistas]);
 
+  // FILTRAGEM DA GALERIA POR PERMISSÃO DE TURMA
+  const filteredGalleryByPermission = useMemo(() => {
+    if (!currentUser || currentUser.role === 'coordenador_paroquial') return gallery;
+
+    // Obtém os IDs das turmas permitidas para o usuário atual
+    const allowedClassIds = filteredClasses.map(c => c.id);
+
+    // Filtra a galeria:
+    // 1. Imagens sem turma vinculada (gerais) são visíveis a todos
+    // 2. Imagens com turma vinculada só são visíveis se a turma estiver na lista de permitidas
+    return gallery.filter(img => !img.turmaId || allowedClassIds.includes(img.turmaId));
+  }, [gallery, filteredClasses, currentUser]);
+
   const filteredStudentsByPermission = useMemo(() => {
     if (!currentUser || currentUser.role === 'coordenador_paroquial') return students;
     
@@ -551,12 +564,13 @@ const App: React.FC = () => {
       
       {currentView === 'gallery' && p.gallery_view && (
         <GalleryView 
-          images={gallery} 
+          images={filteredGalleryByPermission} 
           onUpload={handleUploadGallery} 
           onDelete={handleDeleteGallery}
           onDeleteMultiple={handleDeleteMultipleGallery}
           canUpload={p.gallery_upload}
           canDelete={p.gallery_delete}
+          availableClasses={currentUser?.role === 'coordenador_paroquial' ? classes : filteredClasses}
         />
       )}
 

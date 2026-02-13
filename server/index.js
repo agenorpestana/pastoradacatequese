@@ -46,15 +46,22 @@ const runMigrations = async () => {
     try {
         conn = await pool.getConnection();
         
-        // Check if 'linked_catequista_id' exists in 'users' table
-        const [columns] = await conn.query("SHOW COLUMNS FROM users LIKE 'linked_catequista_id'");
-        
-        if (columns.length === 0) {
+        // Migration 1: linked_catequista_id in users
+        const [columnsUsers] = await conn.query("SHOW COLUMNS FROM users LIKE 'linked_catequista_id'");
+        if (columnsUsers.length === 0) {
             console.log("⚠️ Migration Required: Adding 'linked_catequista_id' to 'users' table...");
             await conn.query("ALTER TABLE users ADD COLUMN linked_catequista_id VARCHAR(50)");
-            console.log("✅ Migration Successful: Column added.");
+            console.log("✅ Migration Successful: Column added to users.");
+        }
+
+        // Migration 2: turma_id in gallery
+        const [columnsGallery] = await conn.query("SHOW COLUMNS FROM gallery LIKE 'turma_id'");
+        if (columnsGallery.length === 0) {
+            console.log("⚠️ Migration Required: Adding 'turma_id' to 'gallery' table...");
+            await conn.query("ALTER TABLE gallery ADD COLUMN turma_id VARCHAR(50)");
+            console.log("✅ Migration Successful: Column added to gallery.");
         } else {
-            console.log("✅ Database Schema Check: 'users' table is up to date.");
+            console.log("✅ Database Schema Check: 'gallery' table is up to date.");
         }
 
     } catch (err) {
@@ -100,10 +107,13 @@ const parseRow = (row) => {
   });
 
   // Handle camelCase conversion for specific fields if needed, or rely on Frontend to match DB
-  // Mapping linked_catequista_id to linkedCatequistaId for frontend consistency
   if (newRow.linked_catequista_id !== undefined) {
       newRow.linkedCatequistaId = newRow.linked_catequista_id;
       delete newRow.linked_catequista_id;
+  }
+  if (newRow.turma_id !== undefined) {
+      newRow.turmaId = newRow.turma_id;
+      delete newRow.turma_id;
   }
 
   if (newRow.config_json) return newRow.config_json;
@@ -202,8 +212,8 @@ app.post('/api/:resource', async (req, res) => {
         params = [data.id, data.tema, data.inicio, data.fim, json(data.presentes), json(data)];
         break;
       case 'gallery':
-        query = 'INSERT INTO gallery (id, title, url, date) VALUES (?, ?, ?, ?)';
-        params = [data.id, data.title, data.url, data.date];
+        query = 'INSERT INTO gallery (id, title, url, date, turma_id) VALUES (?, ?, ?, ?, ?)';
+        params = [data.id, data.title, data.url, data.date, data.turmaId || null];
         break;
       case 'library':
         query = 'INSERT INTO library (id, name, category, url, type, upload_date) VALUES (?, ?, ?, ?, ?, ?)';

@@ -93,7 +93,8 @@ CREATE TABLE IF NOT EXISTS gallery (
     id VARCHAR(50) PRIMARY KEY,
     title VARCHAR(255),
     url LONGTEXT,
-    date DATETIME
+    date DATETIME,
+    turma_id VARCHAR(50)
 );
 
 CREATE TABLE IF NOT EXISTS library (

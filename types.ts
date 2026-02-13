@@ -115,6 +115,7 @@ export interface GalleryImage {
   url: string;
   title: string;
   date: string;
+  turmaId?: string;
 }
 
 export interface LibraryFile {

@@ -13,9 +13,10 @@ import {
   Sparkles,
   Loader2,
   CheckSquare,
-  Square
+  Square,
+  BookOpen
 } from 'lucide-react';
-import { GalleryImage } from '../types';
+import { GalleryImage, Turma } from '../types';
 
 interface GalleryViewProps {
   images: GalleryImage[];
@@ -24,9 +25,10 @@ interface GalleryViewProps {
   onDeleteMultiple?: (ids: string[]) => void;
   canUpload: boolean;
   canDelete: boolean;
+  availableClasses?: Turma[];
 }
 
-export const GalleryView: React.FC<GalleryViewProps> = ({ images, onUpload, onDelete, onDeleteMultiple, canUpload, canDelete }) => {
+export const GalleryView: React.FC<GalleryViewProps> = ({ images, onUpload, onDelete, onDeleteMultiple, canUpload, canDelete, availableClasses = [] }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -35,6 +37,7 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ images, onUpload, onDe
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [newImageTitle, setNewImageTitle] = useState('');
+  const [selectedTurmaId, setSelectedTurmaId] = useState('');
   const [tempImageData, setTempImageData] = useState<string | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,13 +63,15 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ images, onUpload, onDe
       id: Math.random().toString(36).substr(2, 9),
       url: tempImageData,
       title: newImageTitle,
-      date: formattedDate
+      date: formattedDate,
+      turmaId: selectedTurmaId || undefined
     };
 
     setTimeout(() => {
       onUpload(newImg);
       setTempImageData(null);
       setNewImageTitle('');
+      setSelectedTurmaId('');
       setIsUploading(false);
       setIsProcessing(false);
     }, 800);
@@ -91,6 +96,12 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ images, onUpload, onDe
         setSelectedIds([]);
       }
     }
+  };
+
+  const getTurmaName = (id?: string) => {
+    if (!id) return null;
+    const turma = availableClasses.find(t => t.id === id);
+    return turma ? turma.nome : null;
   };
 
   const filteredImages = images.filter(img => 
@@ -152,6 +163,8 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ images, onUpload, onDe
         {filteredImages.length > 0 ? (
           filteredImages.map(img => {
             const isSelected = selectedIds.includes(img.id);
+            const turmaName = getTurmaName(img.turmaId);
+            
             return (
               <div key={img.id} className={`group bg-white rounded-[2.5rem] border shadow-sm overflow-hidden flex flex-col hover:shadow-2xl transition-all duration-500 relative ${isSelected ? 'border-sky-400 ring-2 ring-sky-100' : 'border-sky-50'}`}>
                 <div 
@@ -160,6 +173,16 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ images, onUpload, onDe
                 >
                   <img src={img.url} alt={img.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                   
+                  {/* BADGE DA TURMA */}
+                  {turmaName && (
+                    <div className="absolute top-4 right-4 z-10 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/20 shadow-lg">
+                      <p className="text-[9px] font-black text-white uppercase tracking-widest flex items-center gap-1.5">
+                        <BookOpen size={10} className="text-amber-400" />
+                        {turmaName}
+                      </p>
+                    </div>
+                  )}
+
                   {/* CHECKBOX UI */}
                   <div 
                     className={`absolute top-4 left-4 z-20 transition-all duration-300 ${isSelected ? 'opacity-100 scale-110' : 'opacity-0 group-hover:opacity-100 scale-100'}`}
@@ -231,8 +254,8 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ images, onUpload, onDe
       {/* MODAL UPLOAD MARIANO */}
       {isUploading && canUpload && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
-          <div className="bg-white w-full max-w-xl rounded-[3rem] shadow-[0_32px_64px_-15px_rgba(0,0,0,0.3)] overflow-hidden animate-in zoom-in-95 duration-300 border border-sky-100">
-            <div className="bg-sky-600 p-8 flex justify-between items-center relative overflow-hidden">
+          <div className="bg-white w-full max-w-xl rounded-[3rem] shadow-[0_32px_64px_-15px_rgba(0,0,0,0.3)] overflow-hidden animate-in zoom-in-95 duration-300 border border-sky-100 flex flex-col max-h-[90vh]">
+            <div className="bg-sky-600 p-8 flex justify-between items-center relative overflow-hidden shrink-0">
               <div className="absolute top-0 right-0 p-4 opacity-10"><Sparkles size={120} /></div>
               <div className="flex items-center gap-4 relative z-10">
                 <div className="bg-white/20 backdrop-blur-md p-3 rounded-2xl border border-white/20">
@@ -248,7 +271,7 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ images, onUpload, onDe
               </button>
             </div>
 
-            <div className="p-8 space-y-6">
+            <div className="p-8 space-y-6 overflow-y-auto">
               <div className="space-y-4">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Selecione o Arquivo</label>
                 <div 
@@ -281,6 +304,23 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ images, onUpload, onDe
                   placeholder="Ex: Primeira Eucaristia da Turma São João..."
                   className="w-full px-6 py-4 bg-sky-50/30 border border-sky-100 rounded-2xl outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-400 transition-all font-bold text-slate-800"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Vincular a uma Turma (Opcional)</label>
+                <div className="relative">
+                  <BookOpen className="absolute left-4 top-1/2 -translate-y-1/2 text-sky-300 w-5 h-5" />
+                  <select
+                    value={selectedTurmaId}
+                    onChange={e => setSelectedTurmaId(e.target.value)}
+                    className="w-full pl-12 pr-6 py-4 bg-sky-50/30 border border-sky-100 rounded-2xl outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-400 transition-all font-bold text-slate-700 appearance-none"
+                  >
+                    <option value="">-- Sem Turma Específica (Geral) --</option>
+                    {availableClasses.map(turma => (
+                      <option key={turma.id} value={turma.id}>{turma.nome}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               <div className="flex gap-4 pt-4">
@@ -320,9 +360,16 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ images, onUpload, onDe
             </div>
             <div className="bg-white/10 backdrop-blur-xl px-16 py-8 rounded-[3.5rem] border border-white/10 text-center max-w-2xl relative z-10 shadow-2xl">
                <h3 className="text-3xl font-black text-white mb-3 tracking-tight">{previewImage.title}</h3>
-               <div className="flex items-center justify-center gap-3 text-amber-300 text-xs font-black uppercase tracking-[0.4em]">
-                  <Sparkles size={16} />
-                  {new Date(previewImage.date).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' })}
+               <div className="flex flex-col items-center gap-2">
+                 <div className="flex items-center justify-center gap-3 text-amber-300 text-xs font-black uppercase tracking-[0.4em]">
+                    <Sparkles size={16} />
+                    {new Date(previewImage.date).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                 </div>
+                 {getTurmaName(previewImage.turmaId) && (
+                   <span className="text-white/60 text-[10px] font-bold uppercase tracking-widest mt-2 border border-white/20 px-3 py-1 rounded-full">
+                     Turma: {getTurmaName(previewImage.turmaId)}
+                   </span>
+                 )}
                </div>
             </div>
           </div>
