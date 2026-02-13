@@ -16,14 +16,15 @@ const dbConfig = {
   database: process.env.DB_NAME || 'catequese_db',
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0
+  queueLimit: 0,
+  dateStrings: true, // IMPORTANT: Return dates as strings (YYYY-MM-DD) not JS Date objects
+  connectTimeout: 60000 // Increase timeout for slower VPS
 };
 
 console.log(`Attempting DB connection to: ${dbConfig.host} / DB: ${dbConfig.database} / User: ${dbConfig.user}`);
 
 const pool = mysql.createPool(dbConfig);
 
-// Fixed: Added 'formations' to allowed tables to support App.tsx usage
 const ALLOWED_TABLES = ['users', 'turmas', 'catequistas', 'students', 'attendance_sessions', 'events', 'gallery', 'library', 'formations'];
 
 // Utility to parse JSON columns from DB
@@ -55,6 +56,11 @@ const parseRow = (row) => {
   return newRow;
 };
 
+// Health Check
+app.get('/', (req, res) => {
+    res.json({ status: 'API Online', timestamp: new Date() });
+});
+
 // GET ALL
 app.get('/api/:resource', async (req, res) => {
   try {
@@ -67,13 +73,19 @@ app.get('/api/:resource', async (req, res) => {
       return res.json(parseRow(rows[0]));
     }
 
-    if (!ALLOWED_TABLES.includes(resource)) return res.status(400).send('Invalid resource');
+    if (!ALLOWED_TABLES.includes(resource)) return res.status(400).json({ error: 'Invalid resource', allowed: ALLOWED_TABLES });
 
     const [rows] = await pool.query(`SELECT * FROM ${resource}`);
     res.json(rows.map(parseRow));
   } catch (err) {
     console.error(`Error fetching ${req.params.resource}:`, err);
-    res.status(500).json({ error: err.message, details: "Database fetch error" });
+    // Return detailed error to help debugging on frontend
+    res.status(500).json({ 
+        error: err.message, 
+        code: err.code, 
+        errno: err.errno,
+        details: "Database fetch error. Check DB credentials and table existence." 
+    });
   }
 });
 

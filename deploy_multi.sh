@@ -138,9 +138,12 @@ if [ ! -z "$DB_PASSWORD" ]; then
     echo -e "${GREEN}Configurando MySQL para $SYSTEM_NAME...${NC}"
     # Cria o banco se não existir
     mysql -u root -e "CREATE DATABASE IF NOT EXISTS ${DB_NAME};"
-    # Cria usuário se não existir ou atualiza senha
-    mysql -u root -e "CREATE USER IF NOT EXISTS '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASSWORD}';"
-    mysql -u root -e "ALTER USER '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASSWORD}';"
+    
+    # Cria usuário FORÇANDO mysql_native_password para compatibilidade com Node.js
+    mysql -u root -e "CREATE USER IF NOT EXISTS '${DB_USER}'@'localhost' IDENTIFIED WITH mysql_native_password BY '${DB_PASSWORD}';"
+    # Se já existir, altera a senha e o plugin
+    mysql -u root -e "ALTER USER '${DB_USER}'@'localhost' IDENTIFIED WITH mysql_native_password BY '${DB_PASSWORD}';"
+    
     # Dá permissões
     mysql -u root -e "GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'localhost';"
     mysql -u root -e "FLUSH PRIVILEGES;"
@@ -191,7 +194,7 @@ if [ "$IS_CATEQUESE" -eq 1 ]; then
     echo "PORT=${APP_PORT}" >> .env
     if [ ! -z "$GEMINI_KEY" ]; then echo "API_KEY=$GEMINI_KEY" >> .env; fi
 
-    # Rodar Schema (Criação de Tabelas)
+    # Rodar Schema (Criação de Tabelas) - Forçando execução para garantir tabelas
     if [ -f "schema.sql" ]; then
         echo "Atualizando estrutura do Banco de Dados..."
         mysql -u root -p"${DB_PASSWORD}" "${DB_NAME}" < schema.sql
