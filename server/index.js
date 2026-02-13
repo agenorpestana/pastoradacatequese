@@ -1,5 +1,8 @@
 
-require('dotenv').config();
+const path = require('path');
+// Force load .env from the same directory as index.js
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
+
 const express = require('express');
 const mysql = require('mysql2/promise');
 const cors = require('cors');
@@ -9,6 +12,12 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 
+// Validate critical environment variables
+if (!process.env.DB_PASSWORD && !process.env.DB_USER) {
+    console.error("CRITICAL ERROR: Database credentials missing from environment variables.");
+    console.error("Make sure .env file exists in: " + path.resolve(__dirname, '.env'));
+}
+
 const dbConfig = {
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'catequese_user',
@@ -17,22 +26,37 @@ const dbConfig = {
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  dateStrings: true, // IMPORTANT: Return dates as strings (YYYY-MM-DD) not JS Date objects
-  connectTimeout: 60000 // Increase timeout for slower VPS
+  dateStrings: true,
+  connectTimeout: 60000
 };
 
-console.log(`Attempting DB connection to: ${dbConfig.host} / DB: ${dbConfig.database} / User: ${dbConfig.user}`);
+console.log(`----------------------------------------------------------------`);
+console.log(`Starting Server...`);
+console.log(`DB Host: ${dbConfig.host}`);
+console.log(`DB User: ${dbConfig.user}`);
+console.log(`DB Name: ${dbConfig.database}`);
+console.log(`DB Password Configured: ${dbConfig.password ? 'YES (Length: ' + dbConfig.password.length + ')' : 'NO'}`);
+console.log(`----------------------------------------------------------------`);
 
 const pool = mysql.createPool(dbConfig);
 
-const ALLOWED_TABLES = ['users', 'turmas', 'catequistas', 'students', 'attendance_sessions', 'events', 'gallery', 'library', 'formations'];
+// Test Connection Immediately
+pool.getConnection()
+    .then(conn => {
+        console.log("✅ Database connected successfully!");
+        conn.release();
+    })
+    .catch(err => {
+        console.error("❌ Database connection FAILED:", err.message);
+        console.error("Error Code:", err.code);
+    });
 
-// Utility to parse JSON columns from DB
+const ALLOWED_TABLES = ['users', 'turmas', 'catequistas', 'students', 'attendance_sessions', 'events', 'gallery', 'library', 'formations', 'parish_config'];
+
 const parseRow = (row) => {
   if (!row) return row;
   const newRow = { ...row };
   
-  // Merge full_data if exists
   if (newRow.full_data) {
     try {
       const fullData = typeof newRow.full_data === 'string' ? JSON.parse(newRow.full_data) : newRow.full_data;
@@ -43,14 +67,12 @@ const parseRow = (row) => {
     delete newRow.full_data;
   }
 
-  // Parse specific JSON columns
   ['permissions', 'entries', 'config_json', 'presentes'].forEach(field => {
     if (newRow[field] && typeof newRow[field] === 'string') {
       try { newRow[field] = JSON.parse(newRow[field]); } catch(e) {}
     }
   });
 
-  // Special case for Parish Config (stored as one row in parish_config)
   if (newRow.config_json) return newRow.config_json;
 
   return newRow;
@@ -58,7 +80,7 @@ const parseRow = (row) => {
 
 // Health Check
 app.get('/', (req, res) => {
-    res.json({ status: 'API Online', timestamp: new Date() });
+    res.json({ status: 'API Online', timestamp: new Date(), db_user: dbConfig.user });
 });
 
 // GET ALL
@@ -66,25 +88,21 @@ app.get('/api/:resource', async (req, res) => {
   try {
     const { resource } = req.params;
     
-    // Special case for config
     if (resource === 'parish_config') {
       const [rows] = await pool.query('SELECT * FROM parish_config LIMIT 1');
       if (rows.length === 0) return res.json({});
       return res.json(parseRow(rows[0]));
     }
 
-    if (!ALLOWED_TABLES.includes(resource)) return res.status(400).json({ error: 'Invalid resource', allowed: ALLOWED_TABLES });
+    if (!ALLOWED_TABLES.includes(resource)) return res.status(400).json({ error: 'Invalid resource' });
 
     const [rows] = await pool.query(`SELECT * FROM ${resource}`);
     res.json(rows.map(parseRow));
   } catch (err) {
     console.error(`Error fetching ${req.params.resource}:`, err);
-    // Return detailed error to help debugging on frontend
     res.status(500).json({ 
         error: err.message, 
-        code: err.code, 
-        errno: err.errno,
-        details: "Database fetch error. Check DB credentials and table existence." 
+        details: "Check server logs for DB connection errors." 
     });
   }
 });
@@ -95,9 +113,8 @@ app.post('/api/:resource', async (req, res) => {
   const data = req.body;
 
   if (resource === 'parish_config') {
-    // Upsert for config
     try {
-        await pool.query('DELETE FROM parish_config'); // Reset config
+        await pool.query('DELETE FROM parish_config');
         await pool.query('INSERT INTO parish_config (config_json) VALUES (?)', [JSON.stringify(data)]);
         return res.json({ success: true });
     } catch (err) { return res.status(500).json(err); }
@@ -106,14 +123,10 @@ app.post('/api/:resource', async (req, res) => {
   if (!ALLOWED_TABLES.includes(resource)) return res.status(400).send('Invalid resource');
 
   try {
-    // Generate ID if not present
     if (!data.id) data.id = Math.random().toString(36).substr(2, 9);
 
-    // Prepare query based on table structure
     let query = '';
     let params = [];
-
-    // Helper to stringify JSON
     const json = (v) => JSON.stringify(v || {});
 
     switch (resource) {
@@ -214,7 +227,7 @@ app.put('/api/:resource/:id', async (req, res) => {
         await pool.query(query, params);
         res.json({ success: true });
     } else {
-        res.status(400).send('Update not mapped for this resource');
+        res.status(400).send('Update not mapped');
     }
   } catch (err) {
     console.error(`Error updating ${req.params.resource}:`, err);

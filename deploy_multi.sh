@@ -214,8 +214,10 @@ if [ "$IS_CATEQUESE" -eq 1 ]; then
     echo "Compilando Frontend (Build)..."
     npm run build || { echo -e "${RED}Falha no Build do Frontend${NC}"; exit 1; }
 
-    # Variável para o arquivo de entrada do PM2
-    PM2_SCRIPT="$APP_DIR/server/index.js"
+    # Variável para o arquivo de entrada do PM2 - IMPORTANTE: Caminho relativo
+    # Mas para o Catequese, vamos iniciar DENTRO da pasta server para o PM2
+    PM2_START_DIR="$APP_DIR/server"
+    PM2_SCRIPT="index.js"
 
 else
     # --- LÓGICA GENÉRICA (Opa / Unity) ---
@@ -236,7 +238,8 @@ EOL
     npm install || { echo -e "${RED}Falha ao instalar dependências${NC}"; exit 1; }
     npm run build || { echo -e "${RED}Falha no Build${NC}"; exit 1; }
 
-    # Variável para o arquivo de entrada do PM2 (Geralmente server.js na raiz)
+    # Variável para o arquivo de entrada do PM2
+    PM2_START_DIR="$APP_DIR"
     PM2_SCRIPT="server.js"
 fi
 
@@ -252,10 +255,8 @@ fi
 echo -e "${GREEN}Reiniciando Backend ($PM2_NAME)...${NC}"
 pm2 delete $PM2_NAME 2>/dev/null
 
-# Inicia o processo
-# Para Catequese, o script é server/index.js. Para outros, geralmente server.js na raiz.
-# PORT é passado inline para garantir
-cd $APP_DIR
+# Inicia o processo no diretório correto
+cd $PM2_START_DIR
 PORT=$APP_PORT pm2 start "$PM2_SCRIPT" --name "$PM2_NAME"
 pm2 save
 
