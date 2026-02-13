@@ -367,7 +367,10 @@ const App: React.FC = () => {
     try {
       await api.post('gallery', img);
       setGallery(prev => [img, ...prev]);
-    } catch (e) { alert('Erro ao enviar imagem'); }
+    } catch (e) { 
+      console.error(e);
+      alert('Erro ao enviar imagem. Verifique o console para mais detalhes.'); 
+    }
   };
 
   const handleDeleteGallery = async (id: string) => {
@@ -604,7 +607,7 @@ const App: React.FC = () => {
       {currentView === 'attendance_report' && p.attendance_report && <AttendanceReport classes={filteredClasses} attendanceSessions={attendanceSessions} catequistas={catequistas} config={parishConfig} />}
       {currentView === 'certificates' && p.certificates && <CertificateGenerator config={parishConfig} students={filteredStudentsByPermission} />}
       {currentView === 'profile' && <ProfileForm currentUser={currentUser!} onSave={handleSaveProfile} onCancel={() => setView('dashboard')} />}
-      {currentView === 'users_list' && p.users_management && <UserList users={users} currentUser={currentUser!} onEdit={u => { setEditingUser(u); setView('users_create'); }} onDelete={async (id) => { if(confirm('Excluir usuário?')) { await api.delete('users', id); setUsers(prev => prev.filter(u => u.id !== id)); }}} onCreateNew={() => setView('users_create')} />}
+      {currentView === 'users_list' && p.users_management && <UserList users={users} currentUser={currentUser!} onEdit={u => { setEditingUser(u); setView('users_create'); }} onDelete={async (id) => { if(confirm('Excluir usuário?')) { await api.delete('users', id); setUsers(prev => prev.filter(u => u.id !== id)); }}} onCreateNew={() => handleSetView('users_create')} />}
       {currentView === 'users_create' && p.users_management && <UserForm onSave={handleSaveUser} onCancel={() => setView('users_list')} initialData={editingUser || undefined} availableClasses={classes} catequistas={catequistas} />}
       
       {currentView === 'config' && currentUser?.role === 'coordenador_paroquial' && <ConfigForm config={parishConfig} onSave={handleSaveConfig} />}

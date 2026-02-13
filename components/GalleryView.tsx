@@ -52,11 +52,15 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ images, onUpload, onDe
     if (!tempImageData || !newImageTitle) return;
     setIsProcessing(true);
 
+    const now = new Date();
+    // Format date as 'YYYY-MM-DD HH:MM:SS' compatible with MySQL DATETIME
+    const formattedDate = now.toISOString().slice(0, 19).replace('T', ' ');
+
     const newImg: GalleryImage = {
       id: Math.random().toString(36).substr(2, 9),
       url: tempImageData,
       title: newImageTitle,
-      date: new Date().toISOString()
+      date: formattedDate
     };
 
     setTimeout(() => {
