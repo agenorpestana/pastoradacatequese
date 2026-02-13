@@ -1,0 +1,231 @@
+
+import React from 'react';
+import { X, Calendar, BookOpenText, Users, Clock, CheckCircle2, XCircle, FileSpreadsheet, Printer, Church } from 'lucide-react';
+import { Turma, AttendanceSession, Student, ParishConfig } from '../types';
+
+interface ClassHistoryModalProps {
+  turma: Turma;
+  sessions: AttendanceSession[];
+  members: Student[];
+  onClose: () => void;
+  config: ParishConfig;
+}
+
+export const ClassHistoryModal: React.FC<ClassHistoryModalProps> = ({ turma, sessions, members, onClose, config }) => {
+  const sortedSessions = [...sessions]
+    .filter(s => s.turmaId === turma.id)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+  // Ordenar membros alfabeticamente para a planilha
+  const sortedMembers = [...members].sort((a, b) => a.nomeCompleto.localeCompare(b.nomeCompleto));
+
+  const handlePrint = () => {
+    window.print();
+  };
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
+      
+      {/* PRINT ONLY SECTION - CONSOLIDADO DO DIÁRIO */}
+      <div className="print-only p-10 w-full bg-white text-slate-900 font-sans absolute inset-0 z-[100]">
+        <div className="border-b-4 border-slate-900 pb-4 mb-8 flex justify-between items-end">
+          <div className="flex items-center gap-4">
+             {config.logo ? <img src={config.logo} className="w-16 h-16 object-contain" /> : <Church className="w-12 h-12" />}
+             <div>
+                <h1 className="text-2xl font-black uppercase tracking-tighter">Diário Consolidado de Frequência</h1>
+                <p className="text-sm font-bold text-slate-600">{config.parishName}</p>
+                <p className="text-xs text-slate-500">Turma: {turma.nome} | Catequista: {turma.catequista}</p>
+             </div>
+          </div>
+          <div className="text-right">
+            <p className="text-xs font-bold uppercase">Ano Letivo: {turma.ano}</p>
+            <p className="text-[10px] text-slate-400 mt-1">Extraído em: {new Date().toLocaleDateString('pt-BR')}</p>
+          </div>
+        </div>
+
+        {sortedSessions.length > 0 ? (
+          <div className="space-y-12">
+            {sortedSessions.map((session, idx) => (
+              <div key={session.id} className={`${idx > 0 && idx % 2 === 0 ? 'page-break mt-10' : ''}`}>
+                <div className="bg-slate-50 p-2 border-l-4 border-slate-900 mb-2 flex justify-between items-center">
+                  <h3 className="text-sm font-black uppercase">
+                    Data: {new Date(session.date + 'T00:00:00').toLocaleDateString('pt-BR')} | Tema: {session.tema || "---"}
+                  </h3>
+                  <span className="text-[10px] font-bold">Resumo: {session.entries.filter(e => e.status === 'present').length} Presentes</span>
+                </div>
+                <table className="w-full border-collapse border border-slate-300">
+                  <thead>
+                    <tr className="bg-slate-100">
+                      <th className="border border-slate-300 px-3 py-1 text-left text-[10px] font-black uppercase w-12">Nº</th>
+                      <th className="border border-slate-300 px-3 py-1 text-left text-[10px] font-black uppercase">Catequizando</th>
+                      <th className="border border-slate-300 px-3 py-1 text-center text-[10px] font-black uppercase w-32">Presença</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sortedMembers.map((m, index) => {
+                      const entry = session.entries.find(e => e.studentId === m.id);
+                      return (
+                        <tr key={m.id}>
+                          <td className="border border-slate-300 px-3 py-1 text-xs font-bold text-center">{index + 1}</td>
+                          <td className="border border-slate-300 px-3 py-1 text-xs font-medium">{m.nomeCompleto}</td>
+                          <td className="border border-slate-300 px-3 py-1 text-xs font-black text-center uppercase">
+                            {entry?.status === 'present' ? 'P' : 'F'}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-center py-20 italic">Nenhum registro de chamada encontrado para esta turma.</p>
+        )}
+
+        <div className="mt-16 pt-8 border-t-2 border-slate-200 grid grid-cols-2 gap-20">
+          <div className="text-center">
+            <div className="h-px bg-slate-900 w-full mb-2"></div>
+            <p className="text-[10px] font-bold uppercase">Assinatura do Catequista</p>
+          </div>
+          <div className="text-center">
+            <div className="h-px bg-slate-900 w-full mb-2"></div>
+            <p className="text-[10px] font-bold uppercase">Visto da Coordenação</p>
+          </div>
+        </div>
+      </div>
+
+      {/* UI MODAL SECTION */}
+      <div className="no-print bg-white w-full max-w-4xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300 flex flex-col max-h-[90vh]">
+        
+        {/* Header */}
+        <div className="bg-amber-600 p-8 flex justify-between items-center shrink-0">
+          <div className="flex items-center gap-4">
+            <div className="bg-white/20 p-3 rounded-2xl text-white">
+              <FileSpreadsheet className="w-6 h-6" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-black text-white tracking-tight">Diário da Turma</h2>
+              <p className="text-xs text-white/70 font-bold uppercase tracking-wider">{turma.nome} • Planilha de Chamadas</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={handlePrint}
+              className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all"
+              title="Imprimir Relatório"
+            >
+              <Printer className="w-6 h-6" />
+            </button>
+            <button onClick={onClose} className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all">
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-8 space-y-12">
+          {sortedSessions.length > 0 ? (
+            sortedSessions.map((session) => {
+              const presentCount = session.entries.filter(e => e.status === 'present').length;
+              const absentCount = sortedMembers.length - presentCount;
+
+              return (
+                <div key={session.id} className="bg-slate-50 border border-slate-100 rounded-[2rem] overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                  {/* Session Sub-header */}
+                  <div className="p-6 bg-white border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="bg-amber-50 p-3 rounded-xl">
+                        <Calendar className="w-6 h-6 text-amber-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-black text-amber-600">{new Date(session.date + 'T00:00:00').toLocaleDateString('pt-BR')}</p>
+                        <h4 className="text-lg font-bold text-slate-800 leading-tight">
+                          Tema: {session.tema || "Tema não registrado"}
+                        </h4>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                       <span className="bg-green-100 text-green-700 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest">{presentCount} Presentes</span>
+                       <span className="bg-red-100 text-red-700 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest">{absentCount} Ausentes</span>
+                    </div>
+                  </div>
+
+                  {/* Spreadsheet Grid */}
+                  <div className="p-0 overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="bg-slate-100/50">
+                          <th className="px-6 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">Nº</th>
+                          <th className="px-6 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">Catequizando</th>
+                          <th className="px-6 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {sortedMembers.map((member, idx) => {
+                          const entry = session.entries.find(e => e.studentId === member.id);
+                          const isPresent = entry?.status === 'present';
+                          
+                          return (
+                            <tr key={member.id} className="bg-white hover:bg-slate-50/50 transition-colors">
+                              <td className="px-6 py-3 text-xs font-bold text-slate-400">{idx + 1}</td>
+                              <td className="px-6 py-3">
+                                <span className={`text-sm font-bold ${isPresent ? 'text-slate-700' : 'text-slate-400 italic'}`}>
+                                  {member.nomeCompleto}
+                                </span>
+                              </td>
+                              <td className="px-6 py-3 text-center">
+                                {isPresent ? (
+                                  <div className="inline-flex items-center gap-1.5 text-green-600 bg-green-50 px-3 py-1 rounded-lg border border-green-100">
+                                    <CheckCircle2 className="w-3.5 h-3.5" />
+                                    <span className="text-[10px] font-black uppercase tracking-widest">Presente</span>
+                                  </div>
+                                ) : (
+                                  <div className="inline-flex items-center gap-1.5 text-red-500 bg-red-50 px-3 py-1 rounded-lg border border-red-100">
+                                    <XCircle className="w-3.5 h-3.5" />
+                                    <span className="text-[10px] font-black uppercase tracking-widest">Ausente</span>
+                                  </div>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <div className="py-24 text-center">
+              <div className="bg-slate-50 w-20 h-20 rounded-[2rem] flex items-center justify-center mx-auto mb-6">
+                <FileSpreadsheet className="w-10 h-10 text-slate-200" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-800 mb-2">Sem registros de chamada</h3>
+              <p className="text-slate-400 italic">Nenhum encontro foi registrado no diário desta turma ainda.</p>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="p-8 border-t border-slate-100 bg-slate-50 flex justify-between items-center shrink-0">
+          <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Total de Encontros: {sortedSessions.length}</p>
+          <div className="flex gap-3">
+             <button 
+               onClick={handlePrint} 
+               className="px-6 py-4 bg-slate-100 text-slate-700 font-black rounded-2xl hover:bg-slate-200 transition-all flex items-center gap-2 uppercase tracking-widest text-xs"
+             >
+               <Printer className="w-4 h-4" /> Imprimir Diário
+             </button>
+             <button 
+               onClick={onClose} 
+               className="px-10 py-4 bg-slate-900 text-white font-black rounded-2xl hover:bg-slate-800 transition-all shadow-xl shadow-slate-200 uppercase tracking-widest text-xs"
+             >
+               Fechar Janela
+             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};

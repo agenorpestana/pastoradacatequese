@@ -1,0 +1,7 @@
+{
+  "name": "PASTORAL DA CATEQUESE",
+  "description": "Um aplicativo completo para cadastro de catequizandos, organização por turmas, geração de fichas de inscrição e acompanhamento sacramental com auxílio de IA.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
