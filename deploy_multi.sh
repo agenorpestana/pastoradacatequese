@@ -83,16 +83,22 @@ else
 fi
 
 # ==========================================
-# 3. Dados de Conexão (Só pede se necessário)
+# 3. Dados de Conexão
 # ==========================================
 
-# Se for nova instalação OU se o arquivo .env (ou server/.env) não existir
 CHECK_ENV_FILE="$APP_DIR/.env"
 if [ "$IS_CATEQUESE" -eq 1 ]; then CHECK_ENV_FILE="$APP_DIR/server/.env"; fi
 
-if [ $IS_UPDATE -eq 0 ] || [ ! -f "$CHECK_ENV_FILE" ]; then
-    echo -e "${YELLOW}Digite a URL do repositório GitHub:${NC}"
-    read REPO_URL
+# Lógica alterada: Para o Catequese, SEMPRE pede credenciais para permitir correção de erro 500
+if [ $IS_UPDATE -eq 0 ] || [ ! -f "$CHECK_ENV_FILE" ] || [ "$IS_CATEQUESE" -eq 1 ]; then
+    if [ "$IS_CATEQUESE" -eq 1 ] && [ $IS_UPDATE -eq 1 ]; then
+        echo -e "${YELLOW}ATENÇÃO: Reinsira as credenciais do banco para garantir a conexão correta.${NC}"
+    fi
+
+    if [ $IS_UPDATE -eq 0 ]; then
+        echo -e "${YELLOW}Digite a URL do repositório GitHub:${NC}"
+        read REPO_URL
+    fi
 
     echo -e "${YELLOW}Configuração do Banco de Dados MySQL:${NC}"
     echo -e "Nome do Banco de Dados [${DEFAULT_DB_NAME}]:"
@@ -106,13 +112,12 @@ if [ $IS_UPDATE -eq 0 ] || [ ! -f "$CHECK_ENV_FILE" ]; then
     echo
 
     if [ "$IS_CATEQUESE" -eq 1 ]; then
-        echo -e "Chave API Google Gemini (Opcional, enter para pular):"
+        echo -e "Chave API Google Gemini (Opcional, enter para manter a atual se existir):"
         read GEMINI_KEY
     fi
 fi
 
-# GARANTIR VARIÁVEIS DE BANCO DE DADOS (Mesmo em update)
-# Se estiver vazio (porque pulou o read), usa o padrão
+# GARANTIR VARIÁVEIS DE BANCO DE DADOS
 DB_NAME=${DB_NAME:-$DEFAULT_DB_NAME}
 DB_USER=${DB_USER:-$DEFAULT_DB_USER}
 
@@ -189,44 +194,35 @@ if [ "$IS_CATEQUESE" -eq 1 ]; then
     echo "Instalando dependências do Backend..."
     npm install || { echo -e "${RED}Falha ao instalar dependências do Backend${NC}"; exit 1; }
 
-    # Criar .env do Backend SE não existir ou se tivermos senha nova
-    if [ ! -f ".env" ] || [ ! -z "$DB_PASSWORD" ]; then
+    # Criar/Atualizar .env do Backend
+    if [ ! -z "$DB_PASSWORD" ]; then
         echo "DB_HOST=localhost" > .env
         echo "DB_USER=${DB_USER}" >> .env
-        if [ ! -z "$DB_PASSWORD" ]; then echo "DB_PASSWORD=${DB_PASSWORD}" >> .env; fi
+        echo "DB_PASSWORD=${DB_PASSWORD}" >> .env
         echo "DB_NAME=${DB_NAME}" >> .env
         echo "PORT=${APP_PORT}" >> .env
-        if [ ! -z "$GEMINI_KEY" ]; then echo "API_KEY=$GEMINI_KEY" >> .env; fi
+        if [ ! -z "$GEMINI_KEY" ]; then 
+            echo "API_KEY=$GEMINI_KEY" >> .env
+        else
+            # Preservar chave antiga se não informada na atualização
+            OLD_KEY=$(grep API_KEY .env.old 2>/dev/null | cut -d= -f2)
+            if [ ! -z "$OLD_KEY" ]; then echo "API_KEY=$OLD_KEY" >> .env; fi
+        fi
     fi
 
     # Rodar Schema (Criação de Tabelas)
     if [ -f "schema.sql" ]; then
         echo "Atualizando estrutura do Banco de Dados (${DB_NAME})..."
-        
-        # Correção Crítica: Adicionar o nome do banco no comando mysql
         if [ ! -z "$DB_PASSWORD" ]; then
-            # Tenta conectar sem senha primeiro (caso ~/.my.cnf exista), senão usa senha
-            mysql -u root -p"${DB_PASSWORD}" "${DB_NAME}" < schema.sql || echo "Erro ao rodar schema com senha. Tentando sem senha..."
+            mysql -u root -p"${DB_PASSWORD}" "${DB_NAME}" < schema.sql || echo "Erro ao rodar schema (senha root?). Tentando sem senha..."
         else
-            echo -e "${YELLOW}Senha não detectada. Tentando rodar schema sem senha...${NC}"
             mysql -u root "${DB_NAME}" < schema.sql
-        fi
-        
-        # Verificação se as tabelas foram criadas
-        TABLE_COUNT=$(mysql -u root -p"${DB_PASSWORD}" "${DB_NAME}" -e "SHOW TABLES;" | wc -l)
-        if [ "$TABLE_COUNT" -lt 2 ]; then
-             echo -e "${RED}ERRO CRÍTICO: As tabelas não parecem ter sido criadas.${NC}"
-             echo -e "${YELLOW}Tentando rodar novamente forçando o banco...${NC}"
-             mysql -u root -p"${DB_PASSWORD}" -e "USE ${DB_NAME}; SOURCE schema.sql;"
-        else
-             echo -e "${GREEN}Tabelas verificadas com sucesso.${NC}"
         fi
     fi
 
     # 7.2 Frontend Setup
     cd "$APP_DIR"
     echo "Instalando dependências do Frontend..."
-    # Remover package-lock antigo se existir para evitar conflitos de versão
     rm -f package-lock.json
     npm install || { echo -e "${RED}Falha ao instalar dependências do Frontend${NC}"; exit 1; }
 
@@ -237,8 +233,6 @@ if [ "$IS_CATEQUESE" -eq 1 ]; then
     echo "Compilando Frontend (Build)..."
     npm run build || { echo -e "${RED}Falha no Build do Frontend${NC}"; exit 1; }
 
-    # Variável para o arquivo de entrada do PM2 - IMPORTANTE: Caminho relativo
-    # Mas para o Catequese, vamos iniciar DENTRO da pasta server para o PM2
     PM2_START_DIR="$APP_DIR/server"
     PM2_SCRIPT="index.js"
 
@@ -261,12 +255,11 @@ EOL
     npm install || { echo -e "${RED}Falha ao instalar dependências${NC}"; exit 1; }
     npm run build || { echo -e "${RED}Falha no Build${NC}"; exit 1; }
 
-    # Variável para o arquivo de entrada do PM2
     PM2_START_DIR="$APP_DIR"
     PM2_SCRIPT="server.js"
 fi
 
-# Verifica se a pasta dist foi criada (Comum a todos)
+# Verifica se a pasta dist foi criada
 if [ ! -d "$APP_DIR/dist" ] && [ ! -d "$APP_DIR/build" ]; then
     echo -e "${RED}Erro Crítico: Pasta 'dist' ou 'build' não encontrada após build.${NC}"
     exit 1
@@ -280,19 +273,15 @@ pm2 delete $PM2_NAME 2>/dev/null
 
 # Inicia o processo no diretório correto
 cd $PM2_START_DIR
-PORT=$APP_PORT pm2 start "$PM2_SCRIPT" --name "$PM2_NAME"
+PORT=$APP_PORT pm2 start "$PM2_SCRIPT" --name "$PM2_NAME" --update-env
 pm2 save
 
 # ==========================================
 # 9. Nginx e SSL
 # ==========================================
 NGINX_CONF="/etc/nginx/sites-available/$DOMAIN"
-
-# Determina pasta de build (Catequese usa 'dist')
 WEB_ROOT="$APP_DIR/dist"
-if [ ! -d "$WEB_ROOT" ] && [ -d "$APP_DIR/build" ]; then
-    WEB_ROOT="$APP_DIR/build"
-fi
+if [ ! -d "$WEB_ROOT" ] && [ -d "$APP_DIR/build" ]; then WEB_ROOT="$APP_DIR/build"; fi
 
 if [ ! -f "$NGINX_CONF" ]; then
     echo -e "${GREEN}Configurando Nginx para porta $APP_PORT...${NC}"
@@ -300,13 +289,9 @@ if [ ! -f "$NGINX_CONF" ]; then
 server {
     listen 80;
     server_name $DOMAIN;
-
-    # Aponta para a pasta de build (dist/build)
     root $WEB_ROOT;
     index index.html;
 
-    # Proxy para a API (Backend Node) na porta específica
-    # Para Catequese, as rotas começam com /api
     location /api {
         proxy_pass http://localhost:$APP_PORT;
         proxy_http_version 1.1;
@@ -316,7 +301,6 @@ server {
         proxy_cache_bypass \$http_upgrade;
     }
 
-    # SPA Frontend (React Router)
     location / {
         try_files \$uri \$uri/ /index.html;
     }
@@ -327,16 +311,10 @@ server {
     }
 }
 EOL
-
     ln -sf $NGINX_CONF /etc/nginx/sites-enabled/
-
-    # Remove default apenas se existir
     [ -f /etc/nginx/sites-enabled/default ] && rm -f /etc/nginx/sites-enabled/default
-
-    # Testa configuração
     nginx -t
     systemctl restart nginx
-
     echo -e "${YELLOW}Configurando SSL (Let's Encrypt)...${NC}"
     certbot --nginx -d $DOMAIN --non-interactive --agree-tos -m admin@$DOMAIN --redirect
 else
@@ -347,5 +325,3 @@ fi
 echo -e "${GREEN}=== Processo Concluído! ===${NC}"
 echo -e "Sistema: $SYSTEM_NAME"
 echo -e "URL: https://$DOMAIN"
-echo -e "Porta Interna: $APP_PORT"
-echo -e "Nome PM2: $PM2_NAME"

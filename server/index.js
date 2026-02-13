@@ -89,14 +89,12 @@ app.get('/api/:resource', async (req, res) => {
     const { resource } = req.params;
     
     if (resource === 'parish_config') {
-      // Check if table exists first to avoid 500 error on fresh install
       try {
           const [rows] = await pool.query('SELECT * FROM parish_config LIMIT 1');
           if (rows.length === 0) return res.json({});
           return res.json(parseRow(rows[0]));
       } catch (tableErr) {
           if (tableErr.code === 'ER_NO_SUCH_TABLE') {
-              console.warn("Table parish_config missing. Returning empty.");
               return res.json({});
           }
           throw tableErr;
@@ -109,14 +107,12 @@ app.get('/api/:resource', async (req, res) => {
     res.json(rows.map(parseRow));
   } catch (err) {
     console.error(`Error fetching ${req.params.resource}:`, err);
-    if (err.code === 'ER_NO_SUCH_TABLE') {
-        res.status(500).json({ error: `Table '${req.params.resource}' does not exist in database '${dbConfig.database}'. Please run schema update.` });
-    } else {
-        res.status(500).json({ 
-            error: err.message, 
-            details: "Check server logs for DB connection errors." 
-        });
-    }
+    res.status(500).json({ 
+        error: "Database Error", 
+        message: err.message, 
+        code: err.code,
+        sqlState: err.sqlState
+    });
   }
 });
 
@@ -130,7 +126,7 @@ app.post('/api/:resource', async (req, res) => {
         await pool.query('DELETE FROM parish_config');
         await pool.query('INSERT INTO parish_config (config_json) VALUES (?)', [JSON.stringify(data)]);
         return res.json({ success: true });
-    } catch (err) { return res.status(500).json(err); }
+    } catch (err) { return res.status(500).json({ error: err.message }); }
   }
 
   if (!ALLOWED_TABLES.includes(resource)) return res.status(400).send('Invalid resource');
@@ -189,7 +185,7 @@ app.post('/api/:resource', async (req, res) => {
     }
   } catch (err) {
     console.error(`Error creating in ${req.params.resource}:`, err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: err.message, code: err.code });
   }
 });
 
@@ -244,7 +240,7 @@ app.put('/api/:resource/:id', async (req, res) => {
     }
   } catch (err) {
     console.error(`Error updating ${req.params.resource}:`, err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: err.message, code: err.code });
   }
 });
 
@@ -258,7 +254,7 @@ app.delete('/api/:resource/:id', async (req, res) => {
         res.json({ success: true });
     } catch (err) {
         console.error(`Error deleting from ${req.params.resource}:`, err);
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: err.message, code: err.code });
     }
 });
 
