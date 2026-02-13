@@ -13,9 +13,9 @@ app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 
 // Validate critical environment variables
-if (!process.env.DB_PASSWORD && !process.env.DB_USER) {
-    console.error("CRITICAL ERROR: Database credentials missing from environment variables.");
-    console.error("Make sure .env file exists in: " + path.resolve(__dirname, '.env'));
+if (!process.env.DB_USER) {
+    console.error("CRITICAL ERROR: DB_USER is missing from environment variables.");
+    console.error("Scanning for .env at: " + path.resolve(__dirname, '.env'));
 }
 
 const dbConfig = {

@@ -97,12 +97,10 @@ if [ $IS_UPDATE -eq 0 ] || [ ! -f "$CHECK_ENV_FILE" ]; then
     echo -e "${YELLOW}Configuração do Banco de Dados MySQL:${NC}"
     echo -e "Nome do Banco de Dados [${DEFAULT_DB_NAME}]:"
     read DB_NAME
-    DB_NAME=${DB_NAME:-$DEFAULT_DB_NAME}
-
+    
     echo -e "Usuário do Banco [${DEFAULT_DB_USER}]:"
     read DB_USER
-    DB_USER=${DB_USER:-$DEFAULT_DB_USER}
-
+    
     echo -e "Senha do Banco:"
     read -s DB_PASSWORD
     echo
@@ -112,6 +110,11 @@ if [ $IS_UPDATE -eq 0 ] || [ ! -f "$CHECK_ENV_FILE" ]; then
         read GEMINI_KEY
     fi
 fi
+
+# GARANTIR VARIÁVEIS DE BANCO DE DADOS (Mesmo em update)
+# Se estiver vazio (porque pulou o read), usa o padrão
+DB_NAME=${DB_NAME:-$DEFAULT_DB_NAME}
+DB_USER=${DB_USER:-$DEFAULT_DB_USER}
 
 # ==========================================
 # 4. Pacotes do Sistema
@@ -186,18 +189,26 @@ if [ "$IS_CATEQUESE" -eq 1 ]; then
     echo "Instalando dependências do Backend..."
     npm install || { echo -e "${RED}Falha ao instalar dependências do Backend${NC}"; exit 1; }
 
-    # Criar .env do Backend
-    echo "DB_HOST=localhost" > .env
-    echo "DB_USER=${DB_USER}" >> .env
-    echo "DB_PASSWORD=${DB_PASSWORD}" >> .env
-    echo "DB_NAME=${DB_NAME}" >> .env
-    echo "PORT=${APP_PORT}" >> .env
-    if [ ! -z "$GEMINI_KEY" ]; then echo "API_KEY=$GEMINI_KEY" >> .env; fi
+    # Criar .env do Backend SE não existir ou se tivermos senha nova
+    if [ ! -f ".env" ] || [ ! -z "$DB_PASSWORD" ]; then
+        echo "DB_HOST=localhost" > .env
+        echo "DB_USER=${DB_USER}" >> .env
+        if [ ! -z "$DB_PASSWORD" ]; then echo "DB_PASSWORD=${DB_PASSWORD}" >> .env; fi
+        echo "DB_NAME=${DB_NAME}" >> .env
+        echo "PORT=${APP_PORT}" >> .env
+        if [ ! -z "$GEMINI_KEY" ]; then echo "API_KEY=$GEMINI_KEY" >> .env; fi
+    fi
 
-    # Rodar Schema (Criação de Tabelas) - Forçando execução para garantir tabelas
+    # Rodar Schema (Criação de Tabelas)
     if [ -f "schema.sql" ]; then
-        echo "Atualizando estrutura do Banco de Dados..."
-        mysql -u root -p"${DB_PASSWORD}" "${DB_NAME}" < schema.sql
+        echo "Atualizando estrutura do Banco de Dados (${DB_NAME})..."
+        # Se temos a senha em memória, usa ela. Senão, pede interativamente.
+        if [ ! -z "$DB_PASSWORD" ]; then
+            mysql -u root -p"${DB_PASSWORD}" "${DB_NAME}" < schema.sql
+        else
+            echo -e "${YELLOW}Para atualizar as tabelas, digite a senha de ROOT do MySQL:${NC}"
+            mysql -u root -p "${DB_NAME}" < schema.sql
+        fi
     fi
 
     # 7.2 Frontend Setup
