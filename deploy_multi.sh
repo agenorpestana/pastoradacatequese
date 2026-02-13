@@ -202,12 +202,24 @@ if [ "$IS_CATEQUESE" -eq 1 ]; then
     # Rodar Schema (Criação de Tabelas)
     if [ -f "schema.sql" ]; then
         echo "Atualizando estrutura do Banco de Dados (${DB_NAME})..."
-        # Se temos a senha em memória, usa ela. Senão, pede interativamente.
+        
+        # Correção Crítica: Adicionar o nome do banco no comando mysql
         if [ ! -z "$DB_PASSWORD" ]; then
-            mysql -u root -p"${DB_PASSWORD}" "${DB_NAME}" < schema.sql
+            # Tenta conectar sem senha primeiro (caso ~/.my.cnf exista), senão usa senha
+            mysql -u root -p"${DB_PASSWORD}" "${DB_NAME}" < schema.sql || echo "Erro ao rodar schema com senha. Tentando sem senha..."
         else
-            echo -e "${YELLOW}Para atualizar as tabelas, digite a senha de ROOT do MySQL:${NC}"
-            mysql -u root -p "${DB_NAME}" < schema.sql
+            echo -e "${YELLOW}Senha não detectada. Tentando rodar schema sem senha...${NC}"
+            mysql -u root "${DB_NAME}" < schema.sql
+        fi
+        
+        # Verificação se as tabelas foram criadas
+        TABLE_COUNT=$(mysql -u root -p"${DB_PASSWORD}" "${DB_NAME}" -e "SHOW TABLES;" | wc -l)
+        if [ "$TABLE_COUNT" -lt 2 ]; then
+             echo -e "${RED}ERRO CRÍTICO: As tabelas não parecem ter sido criadas.${NC}"
+             echo -e "${YELLOW}Tentando rodar novamente forçando o banco...${NC}"
+             mysql -u root -p"${DB_PASSWORD}" -e "USE ${DB_NAME}; SOURCE schema.sql;"
+        else
+             echo -e "${GREEN}Tabelas verificadas com sucesso.${NC}"
         fi
     fi
 

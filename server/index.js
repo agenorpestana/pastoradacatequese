@@ -89,9 +89,18 @@ app.get('/api/:resource', async (req, res) => {
     const { resource } = req.params;
     
     if (resource === 'parish_config') {
-      const [rows] = await pool.query('SELECT * FROM parish_config LIMIT 1');
-      if (rows.length === 0) return res.json({});
-      return res.json(parseRow(rows[0]));
+      // Check if table exists first to avoid 500 error on fresh install
+      try {
+          const [rows] = await pool.query('SELECT * FROM parish_config LIMIT 1');
+          if (rows.length === 0) return res.json({});
+          return res.json(parseRow(rows[0]));
+      } catch (tableErr) {
+          if (tableErr.code === 'ER_NO_SUCH_TABLE') {
+              console.warn("Table parish_config missing. Returning empty.");
+              return res.json({});
+          }
+          throw tableErr;
+      }
     }
 
     if (!ALLOWED_TABLES.includes(resource)) return res.status(400).json({ error: 'Invalid resource' });
@@ -100,10 +109,14 @@ app.get('/api/:resource', async (req, res) => {
     res.json(rows.map(parseRow));
   } catch (err) {
     console.error(`Error fetching ${req.params.resource}:`, err);
-    res.status(500).json({ 
-        error: err.message, 
-        details: "Check server logs for DB connection errors." 
-    });
+    if (err.code === 'ER_NO_SUCH_TABLE') {
+        res.status(500).json({ error: `Table '${req.params.resource}' does not exist in database '${dbConfig.database}'. Please run schema update.` });
+    } else {
+        res.status(500).json({ 
+            error: err.message, 
+            details: "Check server logs for DB connection errors." 
+        });
+    }
   }
 });
 
