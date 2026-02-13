@@ -51,6 +51,16 @@ import {
 } from 'lucide-react';
 import { api } from './services/api';
 
+const defaultPermissions: UserPermissions = {
+  dashboard: true, students_view: false, students_create: false, students_edit: false,
+  students_delete: false, students_print: false, students_confirmed_view: false, students_confirmed_manage: false,
+  classes: false, catequistas: false, 
+  formations: false, reports: false, attendance_report: false, certificates: false, attendance: false, users_management: false,
+  library_view: false, library_upload: false, library_delete: false,
+  gallery_view: false, gallery_upload: false, gallery_delete: false,
+  allowedClassIds: []
+};
+
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -475,16 +485,6 @@ const App: React.FC = () => {
 
   const handleDateChange = (date: string) => {
     setSuggestedDate(date);
-  };
-
-  const defaultPermissions: UserPermissions = {
-    dashboard: true, students_view: false, students_create: false, students_edit: false,
-    students_delete: false, students_print: false, students_confirmed_view: false, students_confirmed_manage: false,
-    classes: false, catequistas: false, 
-    formations: false, reports: false, attendance_report: false, certificates: false, attendance: false, users_management: false,
-    library_view: false, library_upload: false, library_delete: false,
-    gallery_view: false, gallery_upload: false, gallery_delete: false,
-    allowedClassIds: []
   };
 
   if (isLoading) {
