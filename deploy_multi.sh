@@ -181,7 +181,7 @@ if [ "$IS_CATEQUESE" -eq 1 ]; then
     # 7.1 Backend Setup
     cd "$APP_DIR/server"
     echo "Instalando dependências do Backend..."
-    npm install
+    npm install || { echo -e "${RED}Falha ao instalar dependências do Backend${NC}"; exit 1; }
 
     # Criar .env do Backend
     echo "DB_HOST=localhost" > .env
@@ -200,14 +200,16 @@ if [ "$IS_CATEQUESE" -eq 1 ]; then
     # 7.2 Frontend Setup
     cd "$APP_DIR"
     echo "Instalando dependências do Frontend..."
-    npm install
+    # Remover package-lock antigo se existir para evitar conflitos de versão
+    rm -f package-lock.json
+    npm install || { echo -e "${RED}Falha ao instalar dependências do Frontend${NC}"; exit 1; }
 
     # Criar .env do Frontend
     echo "VITE_API_URL=https://$DOMAIN/api" > .env
     if [ ! -z "$GEMINI_KEY" ]; then echo "VITE_GOOGLE_API_KEY=$GEMINI_KEY" >> .env; fi
 
     echo "Compilando Frontend (Build)..."
-    npm run build
+    npm run build || { echo -e "${RED}Falha no Build do Frontend${NC}"; exit 1; }
 
     # Variável para o arquivo de entrada do PM2
     PM2_SCRIPT="$APP_DIR/server/index.js"
@@ -228,8 +230,8 @@ NODE_ENV=production
 EOL
 
     echo -e "${GREEN}Instalando dependências e compilando...${NC}"
-    npm install
-    npm run build
+    npm install || { echo -e "${RED}Falha ao instalar dependências${NC}"; exit 1; }
+    npm run build || { echo -e "${RED}Falha no Build${NC}"; exit 1; }
 
     # Variável para o arquivo de entrada do PM2 (Geralmente server.js na raiz)
     PM2_SCRIPT="server.js"
@@ -237,7 +239,8 @@ fi
 
 # Verifica se a pasta dist foi criada (Comum a todos)
 if [ ! -d "$APP_DIR/dist" ] && [ ! -d "$APP_DIR/build" ]; then
-    echo -e "${RED}Aviso: Pasta 'dist' ou 'build' não encontrada. Verifique se o build ocorreu corretamente.${NC}"
+    echo -e "${RED}Erro Crítico: Pasta 'dist' ou 'build' não encontrada após build.${NC}"
+    exit 1
 fi
 
 # ==========================================
