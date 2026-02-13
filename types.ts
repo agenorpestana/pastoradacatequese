@@ -62,6 +62,7 @@ export interface User {
   senha: string;
   role: UserRole;
   permissions: UserPermissions;
+  linkedCatequistaId?: string; // ID do perfil de catequista vinculado
 }
 
 export interface Turma {

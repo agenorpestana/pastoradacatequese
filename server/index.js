@@ -49,8 +49,6 @@ pool.getConnection()
     .catch(err => {
         console.error("❌ Database connection FAILED:", err.message);
         console.error("Error Code:", err.code);
-        // We do not exit process so that PM2 doesn't restart in a loop instantly, 
-        // but API calls will fail until DB is fixed.
     });
 
 const ALLOWED_TABLES = ['users', 'turmas', 'catequistas', 'students', 'attendance_sessions', 'events', 'gallery', 'library', 'formations', 'parish_config'];
@@ -75,6 +73,13 @@ const parseRow = (row) => {
     }
   });
 
+  // Handle camelCase conversion for specific fields if needed, or rely on Frontend to match DB
+  // Mapping linked_catequista_id to linkedCatequistaId for frontend consistency
+  if (newRow.linked_catequista_id !== undefined) {
+      newRow.linkedCatequistaId = newRow.linked_catequista_id;
+      delete newRow.linked_catequista_id;
+  }
+
   if (newRow.config_json) return newRow.config_json;
 
   return newRow;
@@ -90,7 +95,6 @@ app.get('/api/:resource', async (req, res) => {
   try {
     const { resource } = req.params;
     
-    // Configurações Especiais para parish_config (tabela única)
     if (resource === 'parish_config') {
       try {
           const [rows] = await pool.query('SELECT * FROM parish_config LIMIT 1');
@@ -114,8 +118,8 @@ app.get('/api/:resource', async (req, res) => {
     res.status(500).json({ 
         error: "Database Error", 
         message: err.message, 
-        code: err.code,
-        sqlState: err.sqlState
+        code: err.code, 
+        sqlState: err.sqlState 
     });
   }
 });
@@ -144,8 +148,8 @@ app.post('/api/:resource', async (req, res) => {
 
     switch (resource) {
       case 'users':
-        query = 'INSERT INTO users (id, nome, email, senha, role, permissions) VALUES (?, ?, ?, ?, ?, ?)';
-        params = [data.id, data.nome, data.email, data.senha, data.role, json(data.permissions)];
+        query = 'INSERT INTO users (id, nome, email, senha, role, permissions, linked_catequista_id) VALUES (?, ?, ?, ?, ?, ?, ?)';
+        params = [data.id, data.nome, data.email, data.senha, data.role, json(data.permissions), data.linkedCatequistaId || null];
         break;
       case 'turmas':
         query = 'INSERT INTO turmas (id, nome, nivel, catequista, dia_semana, horario, ano, ativa) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
@@ -207,8 +211,8 @@ app.put('/api/:resource/:id', async (req, res) => {
 
     switch (resource) {
         case 'users':
-          query = 'UPDATE users SET nome=?, email=?, senha=?, role=?, permissions=? WHERE id=?';
-          params = [data.nome, data.email, data.senha, data.role, json(data.permissions), id];
+          query = 'UPDATE users SET nome=?, email=?, senha=?, role=?, permissions=?, linked_catequista_id=? WHERE id=?';
+          params = [data.nome, data.email, data.senha, data.role, json(data.permissions), data.linkedCatequistaId || null, id];
           break;
         case 'turmas':
           query = 'UPDATE turmas SET nome=?, nivel=?, catequista=?, dia_semana=?, horario=?, ano=?, ativa=? WHERE id=?';

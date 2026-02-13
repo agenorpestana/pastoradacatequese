@@ -118,7 +118,7 @@ const App: React.FC = () => {
           api.get('students'),
           api.get('turmas'),
           api.get('catequistas'),
-          api.get('formations'), // formations might be mapped to 'events' if table shared, but we have separate endpoints
+          api.get('formations'), 
           api.get('attendance_sessions'),
           api.get('events'),
           api.get('gallery'),
@@ -130,36 +130,7 @@ const App: React.FC = () => {
         setStudents(fetchedStudents);
         setClasses(fetchedClasses);
         setCatequistas(fetchedCatequistas);
-        // Formations were saved in 'formations' or events? Assuming separate resource 'formations' doesn't exist in generic backend, using 'events' for all or separate.
-        // Backend doesn't explicitly list 'formations' in allowed tables list in index.js (my bad), let's assume formations are stored or add it.
-        // *Correction*: Backend index.js handles 'events'. Let's assume 'formations' are just events with type 'Formation' or specific table.
-        // Actually, schema has events table. Let's assume separate table or use events. The schema shows 'events'.
-        // Wait, schema has 'events', but no separate 'formations' table. However, Frontend treats them separately.
-        // Let's create a 'formation_events' abstraction or just filter events.
-        // For now, let's assume 'formations' endpoint works if I add it to backend allowed list, BUT I didn't.
-        // Let's assume formations are handled via a specific type in events or I need to update backend.
-        // Update: I missed adding 'formations' to backend allowed tables. I will add 'formations' table logic implicitly via 'events' type filtering OR
-        // better yet, backend 'events' table handles all. 
-        // FIX: I will use 'events' for both in backend if needed, but schema shows `events`. 
-        // Wait, schema.sql ONLY shows `events`. It doesn't have `formations`. 
-        // Ah, `FormationEvent` type exists in types.ts.
-        // I will use `api.get('events')` and filter in frontend for formations? No, let's treat them as separate resources in API calls if possible, but simplest is to have a dedicated endpoint.
-        // Since I can't easily change schema structure deep down now without risk, let's assume `formations` are stored in `events` table or I add a table.
-        // CHECK schema.sql -> `CREATE TABLE IF NOT EXISTS events`.
-        // Let's assume I missed `formations` table in schema. I will add it to the ALLOWED list in index.js (I did not).
-        // QUICK FIX: I will map 'formations' to 'events' with type='Formação' in my mind, OR better:
-        // I will add `formations` table to backend logic implicitly? No.
-        // *Self-Correction*: The easiest path for "Production Ready" is to ensure `formations` has its own table or use `events`.
-        // I will add `formations` to the ALLOWED_TABLES in `server/index.js` (I will update that file in the XML).
-        // And I will add the table to schema.sql if it's missing. *Checking schema.sql again*... it is missing.
-        // I will add `CREATE TABLE IF NOT EXISTS formations ...` to schema.sql in this turn.
-        
-        // Let's assume for now I will add `formations` to schema and backend.
-        // So `api.get('formations')` works.
-        
-        if (Array.isArray(fetchedFormations)) setFormations(fetchedFormations); // Safety check
-        else setFormations([]);
-
+        if (Array.isArray(fetchedFormations)) setFormations(fetchedFormations); else setFormations([]);
         setAttendanceSessions(fetchedAttendance);
         setEvents(fetchedEvents);
         setGallery(fetchedGallery);
@@ -182,13 +153,27 @@ const App: React.FC = () => {
     fetchData();
   }, []);
 
-  // FILTRAGEM POR PERMISSÃO DE TURMA
+  // FILTRAGEM POR PERMISSÃO DE TURMA (Automática por Catequista Vinculado ou Manual)
   const filteredClasses = useMemo(() => {
     if (!currentUser || currentUser.role === 'coordenador_paroquial') return classes;
+
+    // 1. Verificação Automática por Catequista Vinculado
+    if (currentUser.linkedCatequistaId) {
+      const linkedProfile = catequistas.find(c => c.id === currentUser.linkedCatequistaId);
+      if (linkedProfile) {
+        // Filtra turmas onde o nome do catequista aparece no campo 'catequista' da turma
+        // Normaliza para lowercase para evitar problemas de case sensitive
+        return classes.filter(c => 
+          c.catequista && c.catequista.toLowerCase().includes(linkedProfile.nome.toLowerCase())
+        );
+      }
+    }
+
+    // 2. Verificação Manual por IDs permitidos (Fallback ou Adicional)
     const allowed = currentUser.permissions.allowedClassIds || [];
-    if (allowed.length === 0) return classes;
+    if (allowed.length === 0) return classes; // Se não houver restrição explícita e nem catequista vinculado, mostra tudo? Normalmente sim, ou nada. Mantendo comportamento anterior.
     return classes.filter(c => allowed.includes(c.id));
-  }, [classes, currentUser]);
+  }, [classes, currentUser, catequistas]);
 
   const filteredStudentsByPermission = useMemo(() => {
     if (!currentUser || currentUser.role === 'coordenador_paroquial') return students;
@@ -199,12 +184,19 @@ const App: React.FC = () => {
       list = list.filter(s => s.status !== 'Concluido');
     }
 
+    // Se tiver catequista vinculado, usa as turmas filtradas acima
+    if (currentUser.linkedCatequistaId) {
+       const allowedClassNames = filteredClasses.map(c => c.nome);
+       return list.filter(s => !s.turma || allowedClassNames.includes(s.turma));
+    }
+
+    // Fallback para IDs manuais
     const allowed = p.allowedClassIds || [];
     if (allowed.length === 0) return list;
     
     const allowedClassNames = classes.filter(c => allowed.includes(c.id)).map(c => c.nome);
     return list.filter(s => !s.turma || allowedClassNames.includes(s.turma));
-  }, [students, classes, currentUser]);
+  }, [students, classes, currentUser, filteredClasses]);
 
   const handleLogin = (usernameOrEmail: string, pass: string) => {
     const found = users.find(u => (u.email === usernameOrEmail || u.nome === usernameOrEmail) && u.senha === pass);
@@ -313,9 +305,6 @@ const App: React.FC = () => {
         setClasses(prev => [...prev, newTurma]);
       }
       
-      // Update students class association
-      // This might require multiple API calls if not handled by backend logic.
-      // For production simplicity here, we iterate. In a large scale app, backend should handle bulk update.
       const promises = students.map(s => {
         let changed = false;
         let updatedStudent = { ...s };
@@ -336,7 +325,6 @@ const App: React.FC = () => {
 
       await Promise.all(promises);
       
-      // Refresh local student state to match
       setStudents(prev => prev.map(s => {
         if (studentIds.includes(s.id)) return { ...s, turma: newTurma.nome };
         if (s.turma === newTurma.nome && !studentIds.includes(s.id)) return { ...s, turma: '' };
@@ -350,8 +338,6 @@ const App: React.FC = () => {
 
   const handleSaveAttendance = async (session: AttendanceSession) => {
     try {
-      // Check if update or new? Logic usually implies new or overwrite based on ID (date+classId)
-      // The modal generates ID.
       const exists = attendanceSessions.find(s => s.id === session.id);
       if (exists) {
         await api.put('attendance_sessions', session.id, session);
@@ -457,7 +443,7 @@ const App: React.FC = () => {
       try {
           const exists = formations.find(x => x.id === f.id);
           if (exists) {
-              await api.put('formations', f.id, f); // Needs endpoint or mapped to events
+              await api.put('formations', f.id, f); 
               setFormations(prev => prev.map(x => x.id === f.id ? f : x));
           } else {
               await api.post('formations', f);
@@ -527,9 +513,8 @@ const App: React.FC = () => {
       onLogout={handleLogout} 
       parishConfig={parishConfig} 
     >
-      {/* ... Views rendering logic remains mostly the same, ensuring handlers use the new async functions ... */}
       
-      {currentView === 'dashboard' && p.dashboard && <div className="animate-in fade-in">{/* Dashboard Logic here - extracted to separate component ideally or inline */}<DashboardContent events={events} students={students} classes={classes} catequistas={catequistas} suggestedDate={suggestedDate} onDateChange={handleDateChange} onAddEvent={(d) => { setSuggestedDate(d || suggestedDate); setIsAddingEvent(true); }} user={currentUser} onTakeEventAttendance={setTakingEventAttendance} /></div>}
+      {currentView === 'dashboard' && p.dashboard && <div className="animate-in fade-in"><DashboardContent events={events} students={students} classes={filteredClasses} catequistas={catequistas} suggestedDate={suggestedDate} onDateChange={handleDateChange} onAddEvent={(d: string) => { setSuggestedDate(d || suggestedDate); setIsAddingEvent(true); }} user={currentUser} onTakeEventAttendance={setTakingEventAttendance} /></div>}
       
       {currentView === 'register' && p.students_create && <RegistrationForm config={parishConfig} onSave={handleSaveStudent} onCancel={() => handleSetView('list')} initialData={editingStudent} allClasses={classes} />}
       
@@ -556,7 +541,7 @@ const App: React.FC = () => {
           onViewMembers={setViewingClassMembers} 
           onTakeAttendance={setTakingAttendance} 
           onViewHistory={setViewingClassHistory} 
-          onAddNew={() => handleSetView('classes_create')}
+          onAddNew={currentUser?.role === 'coordenador_paroquial' || currentUser?.role === 'coordenador_comunidade' ? () => handleSetView('classes_create') : undefined}
         />
       )}
       {currentView === 'classes_create' && p.classes && <ClassForm onSave={handleSaveClass} onCancel={() => setView('classes_list')} initialData={editingClass || undefined} allStudents={students} catequistas={catequistas} />}
@@ -620,7 +605,7 @@ const App: React.FC = () => {
       {currentView === 'certificates' && p.certificates && <CertificateGenerator config={parishConfig} students={filteredStudentsByPermission} />}
       {currentView === 'profile' && <ProfileForm currentUser={currentUser!} onSave={handleSaveProfile} onCancel={() => setView('dashboard')} />}
       {currentView === 'users_list' && p.users_management && <UserList users={users} currentUser={currentUser!} onEdit={u => { setEditingUser(u); setView('users_create'); }} onDelete={async (id) => { if(confirm('Excluir usuário?')) { await api.delete('users', id); setUsers(prev => prev.filter(u => u.id !== id)); }}} onCreateNew={() => setView('users_create')} />}
-      {currentView === 'users_create' && p.users_management && <UserForm onSave={handleSaveUser} onCancel={() => setView('users_list')} initialData={editingUser || undefined} availableClasses={classes} />}
+      {currentView === 'users_create' && p.users_management && <UserForm onSave={handleSaveUser} onCancel={() => setView('users_list')} initialData={editingUser || undefined} availableClasses={classes} catequistas={catequistas} />}
       
       {currentView === 'config' && currentUser?.role === 'coordenador_paroquial' && <ConfigForm config={parishConfig} onSave={handleSaveConfig} />}
 
@@ -663,7 +648,6 @@ const DashboardContent = ({ events, students, classes, catequistas, suggestedDat
     const crismadosCount = students.filter((s:any) => s.status === 'Concluido').length;
     const activeCatequistasCount = catequistas.filter((c:any) => c.status === 'Ativo').length;
 
-    // Simplified Dashboard for Brevity in this specific edit, relies on same UI structure as before
     return (
       <div className="space-y-10 pb-10">
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -677,7 +661,7 @@ const DashboardContent = ({ events, students, classes, catequistas, suggestedDat
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
            <div className="bg-white p-7 rounded-[2rem] border border-sky-50 shadow-sm flex flex-col justify-between group transition-all hover:shadow-lg">
-             <div><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Catequizandos</p><h3 className="text-3xl font-bold text-slate-800">{students.length}</h3></div>
+             <div><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Catequizandos</p><h3 className="text-3xl font-bold text-slate-800">{viewableStudents.length}</h3></div>
              <div className="flex gap-4 pt-4 border-t border-slate-50"><div><p className="text-[9px] font-black text-green-600 uppercase">Ativos: {activeStudentsCount}</p></div></div>
            </div>
            <div className="bg-white p-7 rounded-[2rem] border border-sky-50 shadow-sm flex flex-col justify-between group transition-all hover:shadow-lg">

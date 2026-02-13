@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
-import { Users, UserPlus, Shield, ShieldCheck, Mail, Lock, Edit, Trash2, CheckCircle2, ArrowLeft, Save, ShieldAlert, Key, BookOpen, Check, UserCircle, X } from 'lucide-react';
-import { User, UserPermissions, Turma, UserRole } from '../types';
+import { Users, UserPlus, Shield, ShieldCheck, Mail, Lock, Edit, Trash2, CheckCircle2, ArrowLeft, Save, ShieldAlert, Key, BookOpen, Check, UserCircle, X, Link } from 'lucide-react';
+import { User, UserPermissions, Turma, UserRole, Catequista } from '../types';
 
 interface UserListProps {
   users: User[];
@@ -104,14 +104,16 @@ interface UserFormProps {
   onCancel: () => void;
   initialData?: User;
   availableClasses: Turma[];
+  catequistas: Catequista[];
 }
 
-export const UserForm: React.FC<UserFormProps> = ({ onSave, onCancel, initialData, availableClasses }) => {
+export const UserForm: React.FC<UserFormProps> = ({ onSave, onCancel, initialData, availableClasses, catequistas }) => {
   const [formData, setFormData] = useState<Partial<User>>(initialData || {
     nome: '',
     email: '',
     senha: '',
     role: 'catequista',
+    linkedCatequistaId: '',
     permissions: {
       dashboard: true,
       students_view: true,
@@ -208,6 +210,8 @@ export const UserForm: React.FC<UserFormProps> = ({ onSave, onCancel, initialDat
     ]}
   ];
 
+  const activeCatequistas = catequistas.filter(c => c.status === 'Ativo');
+
   return (
     <div className="max-w-5xl mx-auto animate-in slide-in-from-bottom-4 duration-500 pb-20">
       <div className="bg-white shadow-2xl rounded-[2.5rem] border border-slate-100 overflow-hidden">
@@ -253,6 +257,27 @@ export const UserForm: React.FC<UserFormProps> = ({ onSave, onCancel, initialDat
                     <option value="catequista_auxiliar">Catequista Auxiliar</option>
                   </select>
                 </div>
+
+                {(formData.role === 'catequista' || formData.role === 'catequista_auxiliar') && (
+                  <div className="animate-in fade-in slide-in-from-top-2 duration-300 bg-sky-50 border border-sky-100 p-4 rounded-2xl">
+                    <label className="label-style text-sky-700 flex items-center gap-2">
+                      <Link className="w-3 h-3" /> Vincular a Cadastro de Catequista
+                    </label>
+                    <select 
+                      value={formData.linkedCatequistaId || ''} 
+                      onChange={e => setFormData({...formData, linkedCatequistaId: e.target.value})} 
+                      className="input-style bg-white border-sky-200 mt-1"
+                    >
+                      <option value="">-- Selecione o Catequista --</option>
+                      {activeCatequistas.map(c => (
+                        <option key={c.id} value={c.id}>{c.nome}</option>
+                      ))}
+                    </select>
+                    <p className="text-[9px] text-sky-500 mt-2 font-medium leading-tight">
+                      Ao selecionar, este usuário verá automaticamente apenas as turmas onde <strong>{activeCatequistas.find(c => c.id === formData.linkedCatequistaId)?.nome || 'o catequista'}</strong> é responsável.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -284,12 +309,12 @@ export const UserForm: React.FC<UserFormProps> = ({ onSave, onCancel, initialDat
                               {active ? <CheckCircle2 className="w-5 h-5 text-blue-600" /> : <div className="w-5 h-5 border-2 border-slate-200 rounded-full"></div>}
                             </button>
 
-                            {/* SEÇÃO DE TURMAS ESPECÍFICAS */}
-                            {isWritingPerm && active && (
+                            {/* SEÇÃO DE TURMAS ESPECÍFICAS (Exibida apenas se não houver catequista vinculado) */}
+                            {isWritingPerm && active && !formData.linkedCatequistaId && (
                               <div className="mt-2 ml-4 p-4 bg-white rounded-2xl border-2 border-dashed border-blue-100 animate-in slide-in-from-top-2 duration-300 shadow-inner">
                                 <div className="flex items-center gap-2 mb-3">
                                   <BookOpen className="w-3.5 h-3.5 text-blue-600" />
-                                  <span className="text-[9px] font-black uppercase text-slate-400 tracking-widest">Vincular às Turmas Abaixo:</span>
+                                  <span className="text-[9px] font-black uppercase text-slate-400 tracking-widest">Vincular Manualmente às Turmas:</span>
                                 </div>
                                 <div className="grid grid-cols-1 gap-1.5 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
                                   {availableClasses.map(turma => {
@@ -308,7 +333,7 @@ export const UserForm: React.FC<UserFormProps> = ({ onSave, onCancel, initialDat
                                   })}
                                   {availableClasses.length === 0 && <p className="text-[10px] italic text-slate-400 text-center py-2">Nenhuma turma cadastrada.</p>}
                                 </div>
-                                <p className="text-[9px] text-slate-400 mt-3 italic">* Se nenhuma for selecionada, o usuário terá acesso a todas as turmas cadastradas.</p>
+                                <p className="text-[9px] text-slate-400 mt-3 italic">* Se nenhuma for selecionada, o usuário terá acesso a todas as turmas.</p>
                               </div>
                             )}
                           </div>

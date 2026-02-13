@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS users (
     senha VARCHAR(255) NOT NULL,
     role VARCHAR(50) NOT NULL,
     permissions JSON,
+    linked_catequista_id VARCHAR(50),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
