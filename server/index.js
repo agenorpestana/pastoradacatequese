@@ -40,11 +40,37 @@ console.log(`----------------------------------------------------------------`);
 
 const pool = mysql.createPool(dbConfig);
 
-// Test Connection Immediately
+// Database Auto-Migration Function
+const runMigrations = async () => {
+    let conn;
+    try {
+        conn = await pool.getConnection();
+        
+        // Check if 'linked_catequista_id' exists in 'users' table
+        const [columns] = await conn.query("SHOW COLUMNS FROM users LIKE 'linked_catequista_id'");
+        
+        if (columns.length === 0) {
+            console.log("⚠️ Migration Required: Adding 'linked_catequista_id' to 'users' table...");
+            await conn.query("ALTER TABLE users ADD COLUMN linked_catequista_id VARCHAR(50)");
+            console.log("✅ Migration Successful: Column added.");
+        } else {
+            console.log("✅ Database Schema Check: 'users' table is up to date.");
+        }
+
+    } catch (err) {
+        console.error("❌ Migration Failed:", err.message);
+        // Don't crash, purely log the error as it might be a connection issue handled later
+    } finally {
+        if (conn) conn.release();
+    }
+};
+
+// Test Connection and Run Migrations Immediately
 pool.getConnection()
     .then(conn => {
         console.log("✅ Database connected successfully!");
         conn.release();
+        runMigrations(); // Run migration check
     })
     .catch(err => {
         console.error("❌ Database connection FAILED:", err.message);
