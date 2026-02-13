@@ -49,6 +49,8 @@ pool.getConnection()
     .catch(err => {
         console.error("❌ Database connection FAILED:", err.message);
         console.error("Error Code:", err.code);
+        // We do not exit process so that PM2 doesn't restart in a loop instantly, 
+        // but API calls will fail until DB is fixed.
     });
 
 const ALLOWED_TABLES = ['users', 'turmas', 'catequistas', 'students', 'attendance_sessions', 'events', 'gallery', 'library', 'formations', 'parish_config'];
@@ -88,6 +90,7 @@ app.get('/api/:resource', async (req, res) => {
   try {
     const { resource } = req.params;
     
+    // Configurações Especiais para parish_config (tabela única)
     if (resource === 'parish_config') {
       try {
           const [rows] = await pool.query('SELECT * FROM parish_config LIMIT 1');
@@ -95,6 +98,7 @@ app.get('/api/:resource', async (req, res) => {
           return res.json(parseRow(rows[0]));
       } catch (tableErr) {
           if (tableErr.code === 'ER_NO_SUCH_TABLE') {
+              console.warn("Table parish_config missing. Returning empty object.");
               return res.json({});
           }
           throw tableErr;

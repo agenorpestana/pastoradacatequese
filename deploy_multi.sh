@@ -148,6 +148,7 @@ if [ ! -z "$DB_PASSWORD" ]; then
     mysql -u root -e "CREATE DATABASE IF NOT EXISTS ${DB_NAME};"
     
     # Cria usuário FORÇANDO mysql_native_password para compatibilidade com Node.js
+    # Usando aspas simples dentro do comando SQL para evitar erro de sintaxe
     mysql -u root -e "CREATE USER IF NOT EXISTS '${DB_USER}'@'localhost' IDENTIFIED WITH mysql_native_password BY '${DB_PASSWORD}';"
     # Se já existir, altera a senha e o plugin
     mysql -u root -e "ALTER USER '${DB_USER}'@'localhost' IDENTIFIED WITH mysql_native_password BY '${DB_PASSWORD}';"
@@ -198,11 +199,12 @@ if [ "$IS_CATEQUESE" -eq 1 ]; then
     if [ ! -z "$DB_PASSWORD" ]; then
         echo "DB_HOST=localhost" > .env
         echo "DB_USER=${DB_USER}" >> .env
-        echo "DB_PASSWORD=${DB_PASSWORD}" >> .env
+        # Importante: Aspas para proteger caracteres especiais
+        echo "DB_PASSWORD=\"${DB_PASSWORD}\"" >> .env
         echo "DB_NAME=${DB_NAME}" >> .env
         echo "PORT=${APP_PORT}" >> .env
         if [ ! -z "$GEMINI_KEY" ]; then 
-            echo "API_KEY=$GEMINI_KEY" >> .env
+            echo "API_KEY=\"$GEMINI_KEY\"" >> .env
         else
             # Preservar chave antiga se não informada na atualização
             OLD_KEY=$(grep API_KEY .env.old 2>/dev/null | cut -d= -f2)
@@ -227,8 +229,10 @@ if [ "$IS_CATEQUESE" -eq 1 ]; then
     npm install || { echo -e "${RED}Falha ao instalar dependências do Frontend${NC}"; exit 1; }
 
     # Criar .env do Frontend
-    echo "VITE_API_URL=https://$DOMAIN/api" > .env
-    if [ ! -z "$GEMINI_KEY" ]; then echo "VITE_GOOGLE_API_KEY=$GEMINI_KEY" >> .env; fi
+    # Garante https:// e remove barra no final se houver para evitar duplicidade //
+    CLEAN_DOMAIN=$(echo $DOMAIN | sed 's:/*$::')
+    echo "VITE_API_URL=https://${CLEAN_DOMAIN}/api" > .env
+    if [ ! -z "$GEMINI_KEY" ]; then echo "VITE_GOOGLE_API_KEY=\"$GEMINI_KEY\"" >> .env; fi
 
     echo "Compilando Frontend (Build)..."
     npm run build || { echo -e "${RED}Falha no Build do Frontend${NC}"; exit 1; }
@@ -246,7 +250,7 @@ else
 PORT=${APP_PORT}
 DB_HOST=localhost
 DB_USER=${DB_USER}
-DB_PASSWORD=${DB_PASSWORD}
+DB_PASSWORD="${DB_PASSWORD}"
 DB_NAME=${DB_NAME}
 NODE_ENV=production
 EOL
@@ -291,6 +295,9 @@ server {
     server_name $DOMAIN;
     root $WEB_ROOT;
     index index.html;
+
+    # Aumentar tamanho máximo de upload para Galeria/Biblioteca
+    client_max_body_size 50M;
 
     location /api {
         proxy_pass http://localhost:$APP_PORT;
