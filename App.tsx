@@ -187,15 +187,17 @@ const App: React.FC = () => {
 
   // FILTRAGEM DA GALERIA POR PERMISSÃO DE TURMA
   const filteredGalleryByPermission = useMemo(() => {
-    if (!currentUser || currentUser.role === 'coordenador_paroquial') return gallery;
+    // Coordenadores veem tudo (incluindo fotos sem turma)
+    if (!currentUser || currentUser.role === 'coordenador_paroquial' || currentUser.role === 'coordenador_comunidade') return gallery;
 
+    // Catequistas e Auxiliares
     // Obtém os IDs das turmas permitidas para o usuário atual
     const allowedClassIds = filteredClasses.map(c => c.id);
 
     // Filtra a galeria:
-    // 1. Imagens sem turma vinculada (gerais) são visíveis a todos
-    // 2. Imagens com turma vinculada só são visíveis se a turma estiver na lista de permitidas
-    return gallery.filter(img => !img.turmaId || allowedClassIds.includes(img.turmaId));
+    // 1. Fotos vinculadas a turmas permitidas -> MOSTRAR
+    // 2. Fotos SEM turma vinculada (Gerais) -> OCULTAR (regra específica: "só vai aparecer para os demais perfis menos para os catequistas")
+    return gallery.filter(img => img.turmaId && allowedClassIds.includes(img.turmaId));
   }, [gallery, filteredClasses, currentUser]);
 
   const filteredStudentsByPermission = useMemo(() => {
@@ -386,6 +388,16 @@ const App: React.FC = () => {
     }
   };
 
+  const handleEditGallery = async (img: GalleryImage) => {
+    try {
+      await api.put('gallery', img.id, img);
+      setGallery(prev => prev.map(i => i.id === img.id ? img : i));
+    } catch (e) {
+      console.error(e);
+      alert('Erro ao editar imagem.');
+    }
+  };
+
   const handleDeleteGallery = async (id: string) => {
     if (confirm('Deseja realmente excluir esta lembrança da galeria?')) {
       try {
@@ -565,7 +577,8 @@ const App: React.FC = () => {
       {currentView === 'gallery' && p.gallery_view && (
         <GalleryView 
           images={filteredGalleryByPermission} 
-          onUpload={handleUploadGallery} 
+          onUpload={handleUploadGallery}
+          onEdit={handleEditGallery}
           onDelete={handleDeleteGallery}
           onDeleteMultiple={handleDeleteMultipleGallery}
           canUpload={p.gallery_upload}

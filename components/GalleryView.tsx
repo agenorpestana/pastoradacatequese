@@ -14,13 +14,15 @@ import {
   Loader2,
   CheckSquare,
   Square,
-  BookOpen
+  BookOpen,
+  Edit
 } from 'lucide-react';
 import { GalleryImage, Turma } from '../types';
 
 interface GalleryViewProps {
   images: GalleryImage[];
   onUpload: (image: GalleryImage) => void;
+  onEdit?: (image: GalleryImage) => void;
   onDelete: (id: string) => void;
   onDeleteMultiple?: (ids: string[]) => void;
   canUpload: boolean;
@@ -28,12 +30,15 @@ interface GalleryViewProps {
   availableClasses?: Turma[];
 }
 
-export const GalleryView: React.FC<GalleryViewProps> = ({ images, onUpload, onDelete, onDeleteMultiple, canUpload, canDelete, availableClasses = [] }) => {
+export const GalleryView: React.FC<GalleryViewProps> = ({ images, onUpload, onEdit, onDelete, onDeleteMultiple, canUpload, canDelete, availableClasses = [] }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [previewImage, setPreviewImage] = useState<GalleryImage | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  
+  // State for Editing
+  const [editingImage, setEditingImage] = useState<GalleryImage | null>(null);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [newImageTitle, setNewImageTitle] = useState('');
@@ -52,29 +57,62 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ images, onUpload, onDe
   };
 
   const handleUploadSubmit = () => {
-    if (!tempImageData || !newImageTitle) return;
+    if ((!tempImageData && !editingImage) || !newImageTitle) return;
     setIsProcessing(true);
 
     const now = new Date();
     // Format date as 'YYYY-MM-DD HH:MM:SS' compatible with MySQL DATETIME
     const formattedDate = now.toISOString().slice(0, 19).replace('T', ' ');
 
-    const newImg: GalleryImage = {
-      id: Math.random().toString(36).substr(2, 9),
-      url: tempImageData,
-      title: newImageTitle,
-      date: formattedDate,
-      turmaId: selectedTurmaId || undefined
-    };
+    if (editingImage && onEdit) {
+      // Logic for Editing
+      const updatedImg: GalleryImage = {
+        ...editingImage,
+        url: tempImageData || editingImage.url, // Keep old url if no new file selected
+        title: newImageTitle,
+        turmaId: selectedTurmaId || undefined,
+        // Optional: Update date on edit? usually better to keep original date or add updated_at.
+        // Keeping original date for now as it represents the event date often.
+      };
 
-    setTimeout(() => {
-      onUpload(newImg);
-      setTempImageData(null);
-      setNewImageTitle('');
-      setSelectedTurmaId('');
-      setIsUploading(false);
-      setIsProcessing(false);
-    }, 800);
+      setTimeout(() => {
+        onEdit(updatedImg);
+        resetForm();
+      }, 800);
+
+    } else {
+      // Logic for Creating
+      if (!tempImageData) return; // Should not happen due to validation
+      const newImg: GalleryImage = {
+        id: Math.random().toString(36).substr(2, 9),
+        url: tempImageData,
+        title: newImageTitle,
+        date: formattedDate,
+        turmaId: selectedTurmaId || undefined
+      };
+
+      setTimeout(() => {
+        onUpload(newImg);
+        resetForm();
+      }, 800);
+    }
+  };
+
+  const resetForm = () => {
+    setTempImageData(null);
+    setNewImageTitle('');
+    setSelectedTurmaId('');
+    setIsUploading(false);
+    setEditingImage(null);
+    setIsProcessing(false);
+  };
+
+  const openEditModal = (img: GalleryImage) => {
+    setEditingImage(img);
+    setNewImageTitle(img.title);
+    setSelectedTurmaId(img.turmaId || '');
+    setTempImageData(null); // Reset temp data, we show current image URL in UI
+    setIsUploading(true); // Re-use the upload modal
   };
 
   const toggleSelect = (e: React.MouseEvent | React.ChangeEvent, id: string) => {
@@ -148,7 +186,13 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ images, onUpload, onDe
             )}
             {canUpload && (
               <button 
-                onClick={() => setIsUploading(true)}
+                onClick={() => {
+                  setEditingImage(null);
+                  setNewImageTitle('');
+                  setTempImageData(null);
+                  setSelectedTurmaId('');
+                  setIsUploading(true);
+                }}
                 className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-8 py-3 bg-amber-400 text-white font-black rounded-2xl hover:bg-amber-500 transition-all shadow-xl shadow-amber-200 uppercase tracking-widest text-xs"
               >
                 <Plus className="w-4 h-4" /> Nova Foto
@@ -201,6 +245,20 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ images, onUpload, onDe
                     >
                       <Maximize2 size={22} />
                     </div>
+
+                    {canUpload && onEdit && (
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          openEditModal(img);
+                        }}
+                        className="p-3.5 bg-white text-amber-500 rounded-2xl hover:scale-110 hover:bg-amber-50 transition-all shadow-xl border border-amber-100 group/edit"
+                        title="Editar Detalhes"
+                      >
+                        <Edit size={22} />
+                      </button>
+                    )}
                     
                     {canDelete && (
                       <button 
@@ -241,7 +299,13 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ images, onUpload, onDe
              <h3 className="text-slate-400 font-black uppercase tracking-widest text-sm">A galeria aguarda por momentos de fé</h3>
              {canUpload && (
                <button 
-                 onClick={() => setIsUploading(true)}
+                 onClick={() => {
+                   setEditingImage(null);
+                   setNewImageTitle('');
+                   setTempImageData(null);
+                   setSelectedTurmaId('');
+                   setIsUploading(true);
+                 }}
                  className="mt-6 text-sky-600 font-black uppercase tracking-widest text-xs hover:underline flex items-center gap-2 mx-auto"
                >
                  <Plus size={14} /> Carregar primeira lembrança
@@ -251,7 +315,7 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ images, onUpload, onDe
         )}
       </div>
 
-      {/* MODAL UPLOAD MARIANO */}
+      {/* MODAL UPLOAD / EDIT MARIANO */}
       {isUploading && canUpload && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
           <div className="bg-white w-full max-w-xl rounded-[3rem] shadow-[0_32px_64px_-15px_rgba(0,0,0,0.3)] overflow-hidden animate-in zoom-in-95 duration-300 border border-sky-100 flex flex-col max-h-[90vh]">
@@ -262,8 +326,10 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ images, onUpload, onDe
                   <Camera className="text-white w-6 h-6" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-black text-white">Eternizar Momento</h2>
-                  <p className="text-sky-100 text-xs font-bold uppercase tracking-widest opacity-80">Selecione uma imagem da pastoral</p>
+                  <h2 className="text-xl font-black text-white">{editingImage ? 'Editar Lembrança' : 'Eternizar Momento'}</h2>
+                  <p className="text-sky-100 text-xs font-bold uppercase tracking-widest opacity-80">
+                    {editingImage ? 'Atualize os detalhes da foto' : 'Selecione uma imagem da pastoral'}
+                  </p>
                 </div>
               </div>
               <button onClick={() => setIsUploading(false)} className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all relative z-10">
@@ -273,10 +339,12 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ images, onUpload, onDe
 
             <div className="p-8 space-y-6 overflow-y-auto">
               <div className="space-y-4">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Selecione o Arquivo</label>
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">
+                  {editingImage ? 'Substituir Imagem (Opcional)' : 'Selecione o Arquivo'}
+                </label>
                 <div 
                   onClick={() => fileInputRef.current?.click()}
-                  className={`w-full h-64 rounded-[2.5rem] border-2 border-dashed flex flex-col items-center justify-center gap-4 cursor-pointer transition-all overflow-hidden relative ${tempImageData ? 'border-sky-500 bg-sky-50/30' : 'border-sky-100 hover:border-sky-400 hover:bg-sky-50/50'}`}
+                  className={`w-full h-64 rounded-[2.5rem] border-2 border-dashed flex flex-col items-center justify-center gap-4 cursor-pointer transition-all overflow-hidden relative ${tempImageData || editingImage ? 'border-sky-500 bg-sky-50/30' : 'border-sky-100 hover:border-sky-400 hover:bg-sky-50/50'}`}
                 >
                   <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
                   {tempImageData ? (
@@ -284,6 +352,13 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ images, onUpload, onDe
                       <img src={tempImageData} className="w-full h-full object-cover" alt="Preview" />
                       <div className="absolute inset-0 bg-sky-900/20 backdrop-blur-[1px] flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
                         <span className="bg-white text-sky-600 px-6 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl">Trocar Imagem</span>
+                      </div>
+                    </>
+                  ) : editingImage ? (
+                    <>
+                      <img src={editingImage.url} className="w-full h-full object-cover" alt="Current" />
+                      <div className="absolute inset-0 bg-sky-900/20 backdrop-blur-[1px] flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                        <span className="bg-white text-sky-600 px-6 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl">Substituir Imagem</span>
                       </div>
                     </>
                   ) : (
@@ -331,12 +406,12 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ images, onUpload, onDe
                   Cancelar
                 </button>
                 <button 
-                  disabled={!tempImageData || !newImageTitle || isProcessing}
+                  disabled={(!tempImageData && !editingImage) || !newImageTitle || isProcessing}
                   onClick={handleUploadSubmit}
                   className="flex-[2] py-4 bg-sky-600 text-white font-black uppercase tracking-widest text-[10px] rounded-2xl hover:bg-sky-700 transition-all shadow-xl shadow-sky-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
                 >
                   {isProcessing ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5 text-amber-300" />}
-                  Publicar na Galeria
+                  {editingImage ? 'Salvar Alterações' : 'Publicar na Galeria'}
                 </button>
               </div>
             </div>

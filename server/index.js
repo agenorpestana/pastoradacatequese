@@ -274,6 +274,10 @@ app.put('/api/:resource/:id', async (req, res) => {
           query = 'UPDATE formations SET tema=?, inicio=?, fim=?, presentes=?, full_data=? WHERE id=?';
           params = [data.tema, data.inicio, data.fim, json(data.presentes), json(data), id];
           break;
+        case 'gallery':
+          query = 'UPDATE gallery SET title=?, url=?, date=?, turma_id=? WHERE id=?';
+          params = [data.title, data.url, data.date, data.turmaId || null, id];
+          break;
     }
 
     if (query) {
