@@ -2,9 +2,8 @@
 import { GoogleGenAI } from "@google/genai";
 import { Student } from "../types";
 
-// CORREÇÃO: No Vite usa-se import.meta.env, não process.env
+// Vite env access
 const apiKey = (import.meta as any).env?.VITE_GOOGLE_API_KEY || '';
-const ai = new GoogleGenAI({ apiKey: apiKey });
 
 const cleanAIResponse = (text: string): string => {
   let cleaned = text.replace(/^(Aqui está|Com base|Gerei uma|Segue uma|Esta é uma).*?:/i, '');
@@ -21,10 +20,13 @@ export const generateSpiritualGoal = async (student: Student): Promise<string> =
   }
 
   try {
+    // Inicialização movida para dentro da função para evitar crash no carregamento da página
+    const ai = new GoogleGenAI({ apiKey: apiKey });
+
     const age = student.dataNascimento ? calculateAge(student.dataNascimento) : "Idade não informada";
     
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash', // Modelo atualizado e mais rápido
+      model: 'gemini-2.0-flash',
       contents: `Com base nas informações do catequizando: Nome: ${student.nomeCompleto}, Idade: ${age}, Turma: ${student.turma || 'Não definida'}, Sacramentos: ${student.batizado ? 'Batizado' : 'Não batizado'}. 
       Gere um pequeno parágrafo motivacional e um objetivo espiritual personalizado para este ano de catequese em português brasileiro. 
       Seja acolhedor e pastoral. 
