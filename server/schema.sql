@@ -1,6 +1,6 @@
 
-CREATE DATABASE IF NOT EXISTS catequese_db;
-USE catequese_db;
+-- Database creation is handled by the deployment script. 
+-- Do not include CREATE DATABASE or USE statements here to avoid overriding user configuration.
 
 CREATE TABLE IF NOT EXISTS parish_config (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -59,7 +59,6 @@ CREATE TABLE IF NOT EXISTS students (
     fez_primeira_eucaristia BOOLEAN DEFAULT FALSE,
     full_data JSON,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    -- Removed Foreign Key constraint to allow students without class initially or if class is deleted
 );
 
 CREATE TABLE IF NOT EXISTS attendance_sessions (
@@ -77,6 +76,15 @@ CREATE TABLE IF NOT EXISTS events (
     data_inicio DATETIME,
     data_fim DATETIME,
     tipo VARCHAR(50),
+    full_data JSON
+);
+
+CREATE TABLE IF NOT EXISTS formations (
+    id VARCHAR(50) PRIMARY KEY,
+    tema VARCHAR(255),
+    inicio DATETIME,
+    fim DATETIME,
+    presentes JSON,
     full_data JSON
 );
 

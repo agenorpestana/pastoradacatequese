@@ -9,7 +9,7 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 
-const pool = mysql.createPool({
+const dbConfig = {
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'catequese_user',
   password: process.env.DB_PASSWORD,
@@ -17,7 +17,11 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
-});
+};
+
+console.log(`Attempting DB connection to: ${dbConfig.host} / DB: ${dbConfig.database} / User: ${dbConfig.user}`);
+
+const pool = mysql.createPool(dbConfig);
 
 // Fixed: Added 'formations' to allowed tables to support App.tsx usage
 const ALLOWED_TABLES = ['users', 'turmas', 'catequistas', 'students', 'attendance_sessions', 'events', 'gallery', 'library', 'formations'];
@@ -29,8 +33,12 @@ const parseRow = (row) => {
   
   // Merge full_data if exists
   if (newRow.full_data) {
-    const fullData = typeof newRow.full_data === 'string' ? JSON.parse(newRow.full_data) : newRow.full_data;
-    Object.assign(newRow, fullData);
+    try {
+      const fullData = typeof newRow.full_data === 'string' ? JSON.parse(newRow.full_data) : newRow.full_data;
+      Object.assign(newRow, fullData);
+    } catch (e) {
+      console.warn("Failed to parse full_data", e);
+    }
     delete newRow.full_data;
   }
 
@@ -64,8 +72,8 @@ app.get('/api/:resource', async (req, res) => {
     const [rows] = await pool.query(`SELECT * FROM ${resource}`);
     res.json(rows.map(parseRow));
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
+    console.error(`Error fetching ${req.params.resource}:`, err);
+    res.status(500).json({ error: err.message, details: "Database fetch error" });
   }
 });
 
@@ -107,7 +115,6 @@ app.post('/api/:resource', async (req, res) => {
         break;
       case 'students':
         query = 'INSERT INTO students (id, matricula, nome_completo, turma_id, status, data_nascimento, sexo, telefone, batizado, fez_primeira_eucaristia, full_data) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
-        // We assume 'turma' in frontend maps to 'turma_id' logic, but for simplicity we store the string name in full_data and ignore relation strictness here
         params = [data.id, data.matricula, data.nomeCompleto, null, data.status, data.dataNascimento || null, data.sexo, data.telefone, data.batizado, data.fezPrimeiraEucaristia, json(data)];
         break;
       case 'catequistas':
@@ -122,7 +129,6 @@ app.post('/api/:resource', async (req, res) => {
         query = 'INSERT INTO events (id, titulo, data_inicio, data_fim, tipo, full_data) VALUES (?, ?, ?, ?, ?, ?)';
         params = [data.id, data.titulo, data.dataInicio, data.dataFim, data.tipo, json(data)];
         break;
-      // Fixed: Added case for formations
       case 'formations':
         query = 'INSERT INTO formations (id, tema, inicio, fim, presentes, full_data) VALUES (?, ?, ?, ?, ?, ?)';
         params = [data.id, data.tema, data.inicio, data.fim, json(data.presentes), json(data)];
@@ -133,7 +139,7 @@ app.post('/api/:resource', async (req, res) => {
         break;
       case 'library':
         query = 'INSERT INTO library (id, name, category, url, type, upload_date) VALUES (?, ?, ?, ?, ?, ?)';
-        params = [data.id, data.name, data.category, data.url, data.type, data.uploadDate];
+        params = [data.id, data.name, data.category, data.url, data.type, data.upload_date];
         break;
     }
 
@@ -144,7 +150,7 @@ app.post('/api/:resource', async (req, res) => {
       res.status(400).send('Table not mapped');
     }
   } catch (err) {
-    console.error(err);
+    console.error(`Error creating in ${req.params.resource}:`, err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -186,12 +192,10 @@ app.put('/api/:resource/:id', async (req, res) => {
           query = 'UPDATE events SET titulo=?, data_inicio=?, data_fim=?, tipo=?, full_data=? WHERE id=?';
           params = [data.titulo, data.dataInicio, data.dataFim, data.tipo, json(data), id];
           break;
-        // Fixed: Added case for formations
         case 'formations':
           query = 'UPDATE formations SET tema=?, inicio=?, fim=?, presentes=?, full_data=? WHERE id=?';
           params = [data.tema, data.inicio, data.fim, json(data.presentes), json(data), id];
           break;
-        // Gallery and Library typically don't have updates in this app logic, just delete/add
     }
 
     if (query) {
@@ -201,7 +205,7 @@ app.put('/api/:resource/:id', async (req, res) => {
         res.status(400).send('Update not mapped for this resource');
     }
   } catch (err) {
-    console.error(err);
+    console.error(`Error updating ${req.params.resource}:`, err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -215,7 +219,7 @@ app.delete('/api/:resource/:id', async (req, res) => {
         await pool.query(`DELETE FROM ${resource} WHERE id = ?`, [id]);
         res.json({ success: true });
     } catch (err) {
-        console.error(err);
+        console.error(`Error deleting from ${req.params.resource}:`, err);
         res.status(500).json({ error: err.message });
     }
 });
