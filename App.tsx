@@ -382,9 +382,13 @@ const App: React.FC = () => {
     try {
       await api.post('gallery', img);
       setGallery(prev => [img, ...prev]);
-    } catch (e) { 
+    } catch (e: any) { 
       console.error(e);
-      alert('Erro ao enviar imagem. Verifique o console para mais detalhes.'); 
+      if (e.message?.includes('413') || e.message?.includes('Too Large')) {
+        alert('O arquivo é muito grande para o servidor. Tente reduzir o tamanho (máx 150MB).');
+      } else {
+        alert('Erro ao enviar imagem. Verifique o console para mais detalhes.');
+      }
     }
   };
 
@@ -392,9 +396,13 @@ const App: React.FC = () => {
     try {
       await api.put('gallery', img.id, img);
       setGallery(prev => prev.map(i => i.id === img.id ? img : i));
-    } catch (e) {
+    } catch (e: any) {
       console.error(e);
-      alert('Erro ao editar imagem.');
+      if (e.message?.includes('413') || e.message?.includes('Too Large')) {
+        alert('O arquivo é muito grande para o servidor. Tente reduzir o tamanho (máx 150MB).');
+      } else {
+        alert('Erro ao editar imagem.');
+      }
     }
   };
 
@@ -420,7 +428,14 @@ const App: React.FC = () => {
     try {
       await api.post('library', file);
       setLibrary(prev => [file, ...prev]);
-    } catch (e) { alert('Erro ao enviar arquivo'); }
+    } catch (e: any) { 
+      console.error('Library Upload Error:', e);
+      if (e.message?.includes('413') || e.message?.includes('Too Large')) {
+        alert('O arquivo é muito grande para o servidor. Tente reduzir o tamanho (máx 150MB).');
+      } else {
+        alert('Erro ao enviar arquivo. Verifique sua conexão e tente novamente.'); 
+      }
+    }
   };
 
   const handleDeleteLibrary = async (id: string) => {

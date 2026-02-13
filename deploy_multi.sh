@@ -287,8 +287,25 @@ NGINX_CONF="/etc/nginx/sites-available/$DOMAIN"
 WEB_ROOT="$APP_DIR/dist"
 if [ ! -d "$WEB_ROOT" ] && [ -d "$APP_DIR/build" ]; then WEB_ROOT="$APP_DIR/build"; fi
 
-if [ ! -f "$NGINX_CONF" ]; then
-    echo -e "${GREEN}Configurando Nginx para porta $APP_PORT...${NC}"
+if [ -f "$NGINX_CONF" ]; then
+    # ATUALIZAÇÃO DE CONFIGURAÇÃO EXISTENTE
+    echo -e "${GREEN}Verificando configuração Nginx existente...${NC}"
+    
+    # Verifica se client_max_body_size já existe
+    if grep -q "client_max_body_size" "$NGINX_CONF"; then
+        echo -e "${YELLOW}Atualizando limite de upload para 200M...${NC}"
+        sed -i "s/client_max_body_size .*/client_max_body_size 200M;/g" "$NGINX_CONF"
+    else
+        echo -e "${YELLOW}Injetando limite de upload de 200M...${NC}"
+        # Inserir logo após server_name
+        sed -i "/server_name $DOMAIN;/a \    client_max_body_size 200M;" "$NGINX_CONF"
+    fi
+    
+    nginx -t
+    systemctl restart nginx
+else
+    # NOVA CONFIGURAÇÃO
+    echo -e "${GREEN}Criando nova configuração Nginx para porta $APP_PORT...${NC}"
     cat > $NGINX_CONF <<EOL
 server {
     listen 80;
@@ -324,9 +341,6 @@ EOL
     systemctl restart nginx
     echo -e "${YELLOW}Configurando SSL (Let's Encrypt)...${NC}"
     certbot --nginx -d $DOMAIN --non-interactive --agree-tos -m admin@$DOMAIN --redirect
-else
-    echo -e "${GREEN}Configuração Nginx já existente. Reiniciando serviço...${NC}"
-    systemctl restart nginx
 fi
 
 echo -e "${GREEN}=== Processo Concluído! ===${NC}"
