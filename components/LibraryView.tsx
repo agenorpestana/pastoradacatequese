@@ -54,6 +54,13 @@ export const LibraryView: React.FC<LibraryViewProps> = ({ files, onUpload, onDel
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Validate file size (150MB limit to be safe within 200MB server limit with base64 overhead)
+      if (file.size > 150 * 1024 * 1024) {
+        alert("O arquivo é muito grande. O tamanho máximo permitido é 150MB.");
+        if (fileInputRef.current) fileInputRef.current.value = '';
+        return;
+      }
+
       const reader = new FileReader();
       reader.onloadend = () => {
         setNewFile({

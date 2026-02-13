@@ -297,7 +297,7 @@ server {
     index index.html;
 
     # Aumentar tamanho máximo de upload para Galeria/Biblioteca
-    client_max_body_size 50M;
+    client_max_body_size 200M;
 
     location /api {
         proxy_pass http://localhost:$APP_PORT;

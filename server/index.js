@@ -10,7 +10,9 @@ const bodyParser = require('body-parser');
 
 const app = express();
 app.use(cors());
-app.use(bodyParser.json({ limit: '50mb' }));
+// Increased limit to 200mb to handle large PDF/Image uploads (Base64 adds ~33% overhead)
+app.use(bodyParser.json({ limit: '200mb' }));
+app.use(bodyParser.urlencoded({ limit: '200mb', extended: true }));
 
 // Validate critical environment variables
 if (!process.env.DB_USER) {
