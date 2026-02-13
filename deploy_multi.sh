@@ -19,9 +19,9 @@ fi
 # 1. Seleção do Sistema
 # ==========================================
 echo -e "${YELLOW}Qual sistema você deseja instalar ou atualizar?${NC}"
-echo "1) Opa Suite Dashboard (Porta 3000)"
-echo "2) Unity Score SaaS (Porta 3001)"
-echo "3) Pastoral da Catequese (Porta 3002)"
+echo "1) Opa Suite Dashboard (Porta Padrão: 3000)"
+echo "2) Unity Score SaaS (Porta Padrão: 3001)"
+echo "3) Pastoral da Catequese (Porta Padrão: 3002)"
 read SYSTEM_CHOICE
 
 case $SYSTEM_CHOICE in
@@ -55,11 +55,11 @@ case $SYSTEM_CHOICE in
     ;;
 esac
 
-echo -e "${GREEN}>> Selecionado: $SYSTEM_NAME (Porta Interna: $APP_PORT)${NC}"
+echo -e "${GREEN}>> Selecionado: $SYSTEM_NAME${NC}"
 echo ""
 
 # ==========================================
-# 2. Coleta de Dados do Domínio
+# 2. Coleta de Dados do Domínio e Porta
 # ==========================================
 echo -e "${YELLOW}Digite o domínio ou subdomínio para este sistema (ex: app.seudominio.com):${NC}"
 read DOMAIN
@@ -68,6 +68,25 @@ if [ -z "$DOMAIN" ]; then
   echo -e "${RED}Domínio é obrigatório.${NC}"
   exit 1
 fi
+
+# Personalização da Porta (Para rodar múltiplos sistemas ou domínios diferentes)
+echo -e "${YELLOW}Porta da Aplicação (Padrão: $APP_PORT) [Enter para manter]:${NC}"
+read CUSTOM_PORT
+
+if [ ! -z "$CUSTOM_PORT" ]; then
+    if [[ "$CUSTOM_PORT" =~ ^[0-9]+$ ]]; then
+        APP_PORT=$CUSTOM_PORT
+        echo -e "${GREEN}>> Porta definida para: $APP_PORT${NC}"
+    else
+        echo -e "${RED}>> Entrada inválida. Mantendo porta padrão: $APP_PORT${NC}"
+    fi
+fi
+
+# Tornar o nome do PM2 único baseando-se no domínio (substitui pontos por hífens)
+# Ex: catequese-api-app-seudominio-com
+SAFE_DOMAIN_SUFFIX=$(echo $DOMAIN | tr '.' '-')
+PM2_NAME="${PM2_NAME}-${SAFE_DOMAIN_SUFFIX}"
+echo -e "${GREEN}>> ID do Processo PM2: $PM2_NAME${NC}"
 
 APP_DIR="/var/www/$DOMAIN"
 IS_UPDATE=0
@@ -272,7 +291,7 @@ fi
 # ==========================================
 # 8. Gerenciamento de Processos (PM2)
 # ==========================================
-echo -e "${GREEN}Reiniciando Backend ($PM2_NAME)...${NC}"
+echo -e "${GREEN}Reiniciando Backend ($PM2_NAME) na porta $APP_PORT...${NC}"
 pm2 delete $PM2_NAME 2>/dev/null
 
 # Inicia o processo no diretório correto
@@ -297,9 +316,13 @@ if [ -f "$NGINX_CONF" ]; then
         sed -i "s/client_max_body_size .*/client_max_body_size 200M;/g" "$NGINX_CONF"
     else
         echo -e "${YELLOW}Injetando limite de upload de 200M...${NC}"
-        # Inserir logo após server_name
-        sed -i "/server_name $DOMAIN;/a \    client_max_body_size 200M;" "$NGINX_CONF"
+        # Inserir logo após a abertura do bloco server
+        sed -i "/server {/a \    client_max_body_size 200M;" "$NGINX_CONF"
     fi
+    
+    # Atualiza a porta do proxy_pass se tiver mudado
+    echo -e "${YELLOW}Atualizando porta do proxy para $APP_PORT...${NC}"
+    sed -i "s/proxy_pass http:\/\/localhost:[0-9]*;/proxy_pass http:\/\/localhost:$APP_PORT;/g" "$NGINX_CONF"
     
     nginx -t
     systemctl restart nginx
@@ -346,3 +369,5 @@ fi
 echo -e "${GREEN}=== Processo Concluído! ===${NC}"
 echo -e "Sistema: $SYSTEM_NAME"
 echo -e "URL: https://$DOMAIN"
+echo -e "Porta Interna: $APP_PORT"
+echo -e "Processo PM2: $PM2_NAME"

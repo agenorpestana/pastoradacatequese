@@ -27,7 +27,13 @@ export const api = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
+      
       if (!response.ok) {
+        // Tratar erro de arquivo muito grande especificamente
+        if (response.status === 413) {
+          throw new Error('Arquivo muito grande (Erro 413). O limite do servidor é 200MB.');
+        }
+
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || errorData.error || `Failed to save ${resource}`);
       }
@@ -45,7 +51,12 @@ export const api = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
+      
       if (!response.ok) {
+        if (response.status === 413) {
+          throw new Error('Arquivo muito grande (Erro 413). O limite do servidor é 200MB.');
+        }
+
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || errorData.error || `Failed to update ${resource}`);
       }
