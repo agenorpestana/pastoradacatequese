@@ -5,6 +5,7 @@
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
+BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 echo -e "${GREEN}=== Gerenciador de Instalação Multi-SaaS ===${NC}"
@@ -16,19 +17,27 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # ==========================================
-# 1. Seleção do Sistema
+# 0. Menu Principal: Ação
 # ==========================================
-echo -e "${YELLOW}Qual sistema você deseja instalar ou atualizar?${NC}"
-echo "1) Opa Suite Dashboard (Porta Padrão: 3000)"
-echo "2) Unity Score SaaS (Porta Padrão: 3001)"
-echo "3) Pastoral da Catequese (Porta Padrão: 3002)"
+echo -e "${BLUE}O que você deseja fazer?${NC}"
+echo "1) Instalar ou Atualizar um Sistema"
+echo "2) Desinstalar um Sistema existente"
+read ACTION_CHOICE
+
+# ==========================================
+# 1. Seleção do Sistema (Comum para ambas as ações)
+# ==========================================
+echo -e "${YELLOW}Selecione o Sistema:${NC}"
+echo "1) Opa Suite Dashboard"
+echo "2) Unity Score SaaS"
+echo "3) Pastoral da Catequese"
 read SYSTEM_CHOICE
 
 case $SYSTEM_CHOICE in
   1)
     SYSTEM_NAME="Opa Suite Dashboard"
     APP_PORT=3000
-    PM2_NAME="opa-dash-api"
+    PM2_PREFIX="opa-dash-api"
     DEFAULT_DB_NAME="opadashboard"
     DEFAULT_DB_USER="opadash"
     IS_CATEQUESE=0
@@ -36,7 +45,7 @@ case $SYSTEM_CHOICE in
   2)
     SYSTEM_NAME="Unity Score SaaS"
     APP_PORT=3001
-    PM2_NAME="unity-score-api"
+    PM2_PREFIX="unity-score-api"
     DEFAULT_DB_NAME="unity_saas"
     DEFAULT_DB_USER="unity_user"
     IS_CATEQUESE=0
@@ -44,7 +53,7 @@ case $SYSTEM_CHOICE in
   3)
     SYSTEM_NAME="Pastoral da Catequese"
     APP_PORT=3002
-    PM2_NAME="catequese-api"
+    PM2_PREFIX="catequese-api"
     DEFAULT_DB_NAME="catequese_db"
     DEFAULT_DB_USER="catequese_user"
     IS_CATEQUESE=1
@@ -55,12 +64,94 @@ case $SYSTEM_CHOICE in
     ;;
 esac
 
+# ==========================================
+# LÓGICA DE DESINSTALAÇÃO
+# ==========================================
+if [ "$ACTION_CHOICE" -eq 2 ]; then
+    echo -e "${RED}=== MODO DE DESINSTALAÇÃO ===${NC}"
+    echo -e "${YELLOW}Digite o domínio do sistema que deseja remover (ex: app.seudominio.com):${NC}"
+    read DOMAIN
+
+    if [ -z "$DOMAIN" ]; then
+      echo -e "${RED}Domínio é obrigatório para localizar a instalação.${NC}"
+      exit 1
+    fi
+
+    APP_DIR="/var/www/$DOMAIN"
+    
+    # Recalcula o nome do PM2 baseado na lógica de instalação
+    SAFE_DOMAIN_SUFFIX=$(echo $DOMAIN | tr '.' '-')
+    PM2_NAME="${PM2_PREFIX}-${SAFE_DOMAIN_SUFFIX}"
+
+    echo -e "${RED}ATENÇÃO: Você está prestes a remover:${NC}"
+    echo -e "Sistema: $SYSTEM_NAME"
+    echo -e "Domínio: $DOMAIN"
+    echo -e "Diretório: $APP_DIR"
+    echo -e "Processo PM2: $PM2_NAME"
+    echo ""
+    echo -e "${YELLOW}Tem certeza que deseja prosseguir? (s/n)${NC}"
+    read CONFIRM
+
+    if [ "$CONFIRM" != "s" ] && [ "$CONFIRM" != "S" ]; then
+        echo "Operação cancelada."
+        exit 0
+    fi
+
+    echo -e "${YELLOW}1. Parando e removendo processo PM2...${NC}"
+    pm2 delete "$PM2_NAME" 2>/dev/null || echo "Processo PM2 não encontrado ou já removido."
+    pm2 save
+
+    echo -e "${YELLOW}2. Removendo configurações do Nginx...${NC}"
+    rm -f "/etc/nginx/sites-available/$DOMAIN"
+    rm -f "/etc/nginx/sites-enabled/$DOMAIN"
+    systemctl reload nginx
+
+    echo -e "${YELLOW}3. Removendo Certificado SSL (se existir)...${NC}"
+    certbot delete --cert-name "$DOMAIN" --non-interactive 2>/dev/null || echo "Certificado não encontrado."
+
+    echo -e "${YELLOW}4. Removendo arquivos da aplicação...${NC}"
+    if [ -d "$APP_DIR" ]; then
+        rm -rf "$APP_DIR"
+        echo "Diretório $APP_DIR removido."
+    else
+        echo "Diretório não encontrado."
+    fi
+
+    echo -e "${YELLOW}5. Banco de Dados${NC}"
+    echo -e "${RED}Deseja EXCLUIR também o Banco de Dados ($DEFAULT_DB_NAME)? CUIDADO: Isso apaga todos os dados! (s/n)${NC}"
+    read DB_CONFIRM
+
+    if [ "$DB_CONFIRM" == "s" ] || [ "$DB_CONFIRM" == "S" ]; then
+        echo -e "Digite a senha do usuário root do MySQL para confirmar a exclusão:"
+        read -s DB_ROOT_PASS
+        echo ""
+        # Tenta apagar o banco. Nota: Se houver múltiplos sistemas usando o mesmo banco (o que não é recomendado no multi-tenant real, mas possível), isso apaga tudo.
+        # Como o script sugere nomes de banco padrão, assume-se que o usuário sabe o que está fazendo.
+        # Para ser mais seguro em multi-tenant real, o nome do banco deveria incluir o domínio, mas seguiremos o padrão atual do script.
+        echo "Apagando banco de dados ${DEFAULT_DB_NAME}..."
+        mysql -u root -p"$DB_ROOT_PASS" -e "DROP DATABASE IF EXISTS ${DEFAULT_DB_NAME};" 2>/dev/null
+        
+        if [ $? -eq 0 ]; then
+            echo -e "${GREEN}Banco de dados removido.${NC}"
+        else
+            echo -e "${RED}Erro ao remover banco (senha incorreta?).${NC}"
+        fi
+    else
+        echo "Banco de dados mantido."
+    fi
+
+    echo -e "${GREEN}=== Desinstalação Concluída! ===${NC}"
+    exit 0
+fi
+
+# ==========================================
+# LÓGICA DE INSTALAÇÃO / ATUALIZAÇÃO (Código Original Modificado)
+# ==========================================
+
 echo -e "${GREEN}>> Selecionado: $SYSTEM_NAME${NC}"
 echo ""
 
-# ==========================================
 # 2. Coleta de Dados do Domínio e Porta
-# ==========================================
 echo -e "${YELLOW}Digite o domínio ou subdomínio para este sistema (ex: app.seudominio.com):${NC}"
 read DOMAIN
 
@@ -82,10 +173,9 @@ if [ ! -z "$CUSTOM_PORT" ]; then
     fi
 fi
 
-# Tornar o nome do PM2 único baseando-se no domínio (substitui pontos por hífens)
-# Ex: catequese-api-app-seudominio-com
+# Tornar o nome do PM2 único baseando-se no domínio
 SAFE_DOMAIN_SUFFIX=$(echo $DOMAIN | tr '.' '-')
-PM2_NAME="${PM2_NAME}-${SAFE_DOMAIN_SUFFIX}"
+PM2_NAME="${PM2_PREFIX}-${SAFE_DOMAIN_SUFFIX}"
 echo -e "${GREEN}>> ID do Processo PM2: $PM2_NAME${NC}"
 
 APP_DIR="/var/www/$DOMAIN"
@@ -101,10 +191,7 @@ else
     echo -e "${GREEN}Modo de NOVA INSTALAÇÃO ativado.${NC}"
 fi
 
-# ==========================================
 # 3. Dados de Conexão
-# ==========================================
-
 CHECK_ENV_FILE="$APP_DIR/.env"
 if [ "$IS_CATEQUESE" -eq 1 ]; then CHECK_ENV_FILE="$APP_DIR/server/.env"; fi
 
@@ -140,9 +227,7 @@ fi
 DB_NAME=${DB_NAME:-$DEFAULT_DB_NAME}
 DB_USER=${DB_USER:-$DEFAULT_DB_USER}
 
-# ==========================================
 # 4. Pacotes do Sistema
-# ==========================================
 echo -e "${GREEN}Verificando pacotes do sistema...${NC}"
 apt update
 apt install -y nginx certbot python3-certbot-nginx curl git mysql-server build-essential
@@ -158,9 +243,7 @@ if ! command -v pm2 &> /dev/null; then
     npm install -g pm2
 fi
 
-# ==========================================
 # 5. Configuração do MySQL
-# ==========================================
 if [ ! -z "$DB_PASSWORD" ]; then
     echo -e "${GREEN}Configurando MySQL para $SYSTEM_NAME...${NC}"
     # Cria o banco se não existir
@@ -177,9 +260,7 @@ if [ ! -z "$DB_PASSWORD" ]; then
     mysql -u root -e "FLUSH PRIVILEGES;"
 fi
 
-# ==========================================
 # 6. Gerenciamento do Código Fonte
-# ==========================================
 mkdir -p $APP_DIR
 
 if [ $IS_UPDATE -eq 1 ]; then
@@ -201,9 +282,7 @@ else
     cd $APP_DIR
 fi
 
-# ==========================================
 # 7. Configuração Específica e Build
-# ==========================================
 
 if [ "$IS_CATEQUESE" -eq 1 ]; then
     # --- LÓGICA ESPECÍFICA PARA PASTORAL DA CATEQUESE ---
@@ -288,9 +367,7 @@ if [ ! -d "$APP_DIR/dist" ] && [ ! -d "$APP_DIR/build" ]; then
     exit 1
 fi
 
-# ==========================================
 # 8. Gerenciamento de Processos (PM2)
-# ==========================================
 echo -e "${GREEN}Reiniciando Backend ($PM2_NAME) na porta $APP_PORT...${NC}"
 pm2 delete $PM2_NAME 2>/dev/null
 
@@ -299,9 +376,7 @@ cd $PM2_START_DIR
 PORT=$APP_PORT pm2 start "$PM2_SCRIPT" --name "$PM2_NAME" --update-env
 pm2 save
 
-# ==========================================
 # 9. Nginx e SSL
-# ==========================================
 NGINX_CONF="/etc/nginx/sites-available/$DOMAIN"
 WEB_ROOT="$APP_DIR/dist"
 if [ ! -d "$WEB_ROOT" ] && [ -d "$APP_DIR/build" ]; then WEB_ROOT="$APP_DIR/build"; fi
