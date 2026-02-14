@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Search, Filter, MoreHorizontal, Eye, Trash2, Calendar, Phone, MapPin, Edit, UserCheck, UserX, GraduationCap, Fingerprint, UserPlus, BookOpen, FileText } from 'lucide-react';
+import { Search, Filter, MoreHorizontal, Eye, Trash2, Calendar, Phone, MapPin, Edit, UserCheck, UserX, GraduationCap, Fingerprint, UserPlus, BookOpen, FileText, Users } from 'lucide-react';
 import { Student, TurmaLevel, Turma } from '../types';
 
 interface StudentTableProps {
@@ -34,7 +34,6 @@ export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses
     return matchesSearch && matchesTurma && matchesStatus;
   });
 
-  // Função para buscar o nível da etapa baseado no nome da turma
   const getStudentLevel = (turmaNome: string) => {
     if (!turmaNome) return '---';
     const foundClass = allClasses.find(c => c.nome === turmaNome);
@@ -42,22 +41,31 @@ export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header com Busca e Botão Novo */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <h2 className="text-3xl font-serif font-bold text-slate-800 tracking-tight">Lista de Catequizandos</h2>
+    <div className="space-y-8 animate-in fade-in duration-500 pb-10">
+      {/* HEADER CARD - Standardized Style */}
+      <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col md:flex-row justify-between items-center gap-6">
+        <div className="flex items-center gap-4">
+          <div className="bg-blue-600 p-4 rounded-3xl shadow-xl shadow-blue-100 text-white">
+            <Users className="w-8 h-8" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-serif font-black text-slate-800 tracking-tight">Lista de Catequizandos</h2>
+            <p className="text-slate-500 text-sm font-medium">Gestão completa de matrículas e dados pessoais.</p>
+          </div>
+        </div>
+
         {onAddNew && (
           <button 
             onClick={onAddNew}
-            className="bg-blue-600 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all transform hover:-translate-y-0.5"
+            className="flex items-center gap-2 px-8 py-3 bg-blue-600 text-white font-black rounded-2xl hover:bg-blue-700 transition-all shadow-xl shadow-blue-200 uppercase tracking-widest text-xs w-full md:w-auto justify-center"
           >
-            <UserPlus className="w-5 h-5" /> Novo Cadastro
+            <UserPlus className="w-4 h-4" /> Novo Cadastro
           </button>
         )}
       </div>
 
-      {/* Filters Header */}
-      <div className="bg-white p-4 md:p-6 rounded-[2rem] md:rounded-3xl border border-slate-100 shadow-sm flex flex-col xl:flex-row gap-4">
+      {/* FILTER CARD */}
+      <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex flex-col xl:flex-row gap-4">
         <div className="flex-1 relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
           <input 
@@ -65,7 +73,7 @@ export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses
             placeholder="Buscar por nome ou matrícula..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 rounded-xl md:rounded-2xl border border-slate-200 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm"
+            className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm font-medium"
           />
         </div>
         
@@ -74,7 +82,7 @@ export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses
             <select 
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value as any)}
-              className="w-full bg-slate-50 border border-slate-200 text-slate-700 py-3 px-4 rounded-xl md:rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 font-bold text-[10px] md:text-xs uppercase tracking-wider"
+              className="w-full bg-slate-50 border border-slate-100 text-slate-700 py-3 px-6 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 font-bold text-[10px] md:text-xs uppercase tracking-wider"
             >
               <option value="all">Todos os Status</option>
               <option value="Ativo">Ativos</option>
@@ -87,7 +95,7 @@ export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses
             <select 
               value={selectedTurma}
               onChange={(e) => setSelectedTurma(e.target.value as any)}
-              className="w-full bg-slate-50 border border-slate-200 text-slate-700 py-3 px-4 rounded-xl md:rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 font-bold text-[10px] md:text-xs uppercase tracking-wider"
+              className="w-full bg-slate-50 border border-slate-100 text-slate-700 py-3 px-6 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 font-bold text-[10px] md:text-xs uppercase tracking-wider"
             >
               <option value="all">Todas as Turmas</option>
               {Object.values(TurmaLevel).map(level => (
@@ -98,17 +106,17 @@ export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses
         </div>
       </div>
 
-      {/* Table/List Container */}
-      <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
+      {/* TABLE CONTAINER */}
+      <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
         <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
           <table className="w-full text-left border-collapse min-w-[800px]">
             <thead>
               <tr className="bg-slate-50/50 border-b border-slate-100">
-                <th className="px-6 md:px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Matrícula / Catequizando</th>
-                <th className="px-6 md:px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Status</th>
-                <th className="px-6 md:px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Turma</th>
-                <th className="px-6 md:px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Nível / Etapa</th>
-                <th className="px-6 md:px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-right">Ações</th>
+                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Matrícula / Catequizando</th>
+                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Status</th>
+                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Turma</th>
+                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Nível / Etapa</th>
+                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-right">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -119,9 +127,9 @@ export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses
                     className="hover:bg-slate-50/80 transition-all group cursor-pointer"
                     onClick={() => onView(student)}
                   >
-                    <td className="px-6 md:px-8 py-5">
+                    <td className="px-8 py-5">
                       <div className="flex items-center gap-4">
-                        <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl flex flex-col items-center justify-center shadow-sm transition-transform group-hover:scale-105 border-2 border-white overflow-hidden shrink-0 ${
+                        <div className={`w-12 h-12 rounded-2xl flex flex-col items-center justify-center shadow-sm transition-transform group-hover:scale-105 border-2 border-white overflow-hidden shrink-0 ${
                           student.foto ? '' :
                           student.status === 'Concluido' ? 'bg-indigo-100 text-indigo-700' :
                           student.status === 'Inativo' ? 'bg-slate-100 text-slate-500' :
@@ -131,8 +139,8 @@ export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses
                             <img src={student.foto} className="w-full h-full object-cover" alt="" />
                           ) : (
                             <>
-                              <span className="text-[7px] md:text-[8px] font-black leading-none mb-1">#{student.matricula || '---'}</span>
-                              <span className="font-bold uppercase text-base md:text-lg leading-none">{(student.nomeCompleto || '?').charAt(0)}</span>
+                              <span className="text-[7px] font-black leading-none mb-1">#{student.matricula || '---'}</span>
+                              <span className="font-bold uppercase text-lg leading-none">{(student.nomeCompleto || '?').charAt(0)}</span>
                             </>
                           )}
                         </div>
@@ -145,7 +153,7 @@ export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 md:px-8 py-5">
+                    <td className="px-8 py-5">
                       {student.status === 'Concluido' ? (
                         <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[9px] font-black bg-indigo-50 text-indigo-600 border border-indigo-100 uppercase tracking-widest whitespace-nowrap">
                           <GraduationCap className="w-3 h-3" /> Crismado
@@ -160,18 +168,18 @@ export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses
                         </span>
                       )}
                     </td>
-                    <td className="px-6 md:px-8 py-5">
-                      <span className="inline-flex items-center px-3 md:px-4 py-1.5 rounded-xl text-[9px] font-black bg-slate-100 text-slate-600 border border-slate-200 uppercase tracking-widest whitespace-nowrap">
+                    <td className="px-8 py-5">
+                      <span className="inline-flex items-center px-4 py-1.5 rounded-xl text-[9px] font-black bg-slate-100 text-slate-600 border border-slate-200 uppercase tracking-widest whitespace-nowrap">
                         {student.turma || 'Sem Turma'}
                       </span>
                     </td>
-                    <td className="px-6 md:px-8 py-5">
-                      <span className="inline-flex items-center px-3 md:px-4 py-1.5 rounded-xl text-[9px] font-black bg-indigo-50 text-indigo-700 border border-indigo-100 uppercase tracking-widest whitespace-nowrap">
+                    <td className="px-8 py-5">
+                      <span className="inline-flex items-center px-4 py-1.5 rounded-xl text-[9px] font-black bg-indigo-50 text-indigo-700 border border-indigo-100 uppercase tracking-widest whitespace-nowrap">
                         <BookOpen className="w-3 h-3 mr-1" />
                         {getStudentLevel(student.turma)}
                       </span>
                     </td>
-                    <td className="px-6 md:px-8 py-5 text-right" onClick={(e) => e.stopPropagation()}>
+                    <td className="px-8 py-5 text-right" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center justify-end gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-all transform sm:translate-x-2 sm:group-hover:translate-x-0">
                         <button 
                           onClick={() => onView(student)}

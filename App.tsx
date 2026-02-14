@@ -48,7 +48,8 @@ import {
   ShieldCheck,
   Star,
   Sparkles,
-  Loader2
+  Loader2,
+  LayoutDashboard
 } from 'lucide-react';
 import { api } from './services/api';
 
@@ -704,25 +705,31 @@ const DashboardContent = ({ events, students, classes, catequistas, suggestedDat
 
     return (
       <div className="space-y-10 pb-10">
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h2 className="text-3xl font-serif font-bold text-slate-800 tracking-tight">Painel Pastoral</h2>
-            <p className="text-slate-500 mt-1 flex items-center gap-2">
-              Bem-vindo(a), <span className="text-sky-600 font-black">{user?.nome}</span>.
-            </p>
+        <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex items-center gap-4">
+            <div className="bg-blue-600 p-4 rounded-3xl shadow-xl shadow-blue-100">
+              <LayoutDashboard className="text-white w-8 h-8" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-serif font-black text-slate-800 tracking-tight">Painel Pastoral</h2>
+              <p className="text-slate-500 text-sm mt-1 flex items-center gap-2">
+                Bem-vindo(a), <span className="text-blue-600 font-black">{user?.nome}</span>.
+              </p>
+            </div>
           </div>
-        </header>
+        </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
            <div className="bg-white p-7 rounded-[2rem] border border-sky-50 shadow-sm flex flex-col justify-between group transition-all hover:shadow-lg">
-             <div><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Catequizandos</p><h3 className="text-3xl font-bold text-slate-800">{viewableStudents.length}</h3></div>
+             <div><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Catequizandos</p><h3 className="text-3xl font-black text-slate-800 font-serif">{viewableStudents.length}</h3></div>
              <div className="flex gap-4 pt-4 border-t border-slate-50"><div><p className="text-[9px] font-black text-green-600 uppercase">Ativos: {activeStudentsCount}</p></div></div>
            </div>
            <div className="bg-white p-7 rounded-[2rem] border border-sky-50 shadow-sm flex flex-col justify-between group transition-all hover:shadow-lg">
-             <div><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Turmas</p><h3 className="text-3xl font-bold text-slate-800">{totalClassesCount}</h3></div>
+             <div><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Turmas</p><h3 className="text-3xl font-black text-slate-800 font-serif">{totalClassesCount}</h3></div>
            </div>
-           <div className="bg-sky-600 p-7 rounded-[2.5rem] text-white shadow-xl shadow-sky-100 flex flex-col justify-between">
-             <div><p className="text-[10px] font-black text-sky-200 uppercase tracking-widest mb-1">Crismados</p><h3 className="text-4xl font-black">{crismadosCount}</h3></div>
+           <div className="bg-blue-600 p-7 rounded-[2.5rem] text-white shadow-xl shadow-blue-100 flex flex-col justify-between relative overflow-hidden">
+             <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent"></div>
+             <div><p className="text-[10px] font-black text-blue-200 uppercase tracking-widest mb-1">Crismados</p><h3 className="text-4xl font-black font-serif">{crismadosCount}</h3></div>
            </div>
         </div>
 

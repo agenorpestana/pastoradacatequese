@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Search, Edit, Trash2, Calendar, Phone, Mail, UserCheck, History, MapPin, UserPlus, MessageCircle } from 'lucide-react';
+import { Search, Edit, Trash2, Calendar, Phone, Mail, UserCheck, History, MapPin, UserPlus, MessageCircle, UsersRound } from 'lucide-react';
 import { Catequista } from '../types';
 
 interface CatequistaTableProps {
@@ -21,37 +21,43 @@ export const CatequistaTable: React.FC<CatequistaTableProps> = ({ catequistas, o
   );
 
   return (
-    <div className="space-y-6">
-      {/* Header com Título e Botão Novo */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h2 className="text-3xl font-serif font-bold text-slate-800 tracking-tight">Corpo de Catequistas</h2>
-          <p className="text-slate-500 text-sm font-medium">Gestão de voluntários e educadores da fé.</p>
+    <div className="space-y-8 animate-in fade-in duration-500 pb-10">
+      {/* HEADER CARD - Standardized Style */}
+      <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col md:flex-row justify-between items-center gap-6">
+        <div className="flex items-center gap-4">
+          <div className="bg-sky-600 p-4 rounded-3xl shadow-xl shadow-sky-100 text-white">
+            <UsersRound className="w-8 h-8" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-serif font-black text-slate-800 tracking-tight">Corpo de Catequistas</h2>
+            <p className="text-slate-500 text-sm font-medium">Gestão de voluntários e educadores da fé.</p>
+          </div>
         </div>
-        {onAddNew && (
-          <button 
-            onClick={onAddNew}
-            className="bg-sky-600 text-white px-6 py-3 rounded-2xl font-black flex items-center gap-2 shadow-xl shadow-sky-100 hover:bg-sky-700 transition-all transform hover:-translate-y-0.5 uppercase tracking-widest text-xs"
-          >
-            <UserPlus className="w-5 h-5" /> Novo Catequista
-          </button>
-        )}
+
+        <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+          <div className="relative flex-1 sm:w-64">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+            <input 
+              type="text" 
+              placeholder="Buscar por nome..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 bg-sky-50/50 border border-sky-100 rounded-2xl outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-400 transition-all text-sm font-medium"
+            />
+          </div>
+
+          {onAddNew && (
+            <button 
+              onClick={onAddNew}
+              className="flex items-center gap-2 px-8 py-3 bg-sky-600 text-white font-black rounded-2xl hover:bg-sky-700 transition-all shadow-xl shadow-sky-200 uppercase tracking-widest text-xs w-full sm:w-auto justify-center"
+            >
+              <UserPlus className="w-4 h-4" /> Novo
+            </button>
+          )}
+        </div>
       </div>
 
-      <div className="bg-white p-4 rounded-[2rem] border border-sky-50 shadow-sm">
-        <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-sky-300 w-5 h-5" />
-          <input 
-            type="text" 
-            placeholder="Buscar por nome, documento ou comunidade..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-12 pr-4 py-3.5 bg-sky-50/30 rounded-2xl border border-sky-50 outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-400 transition-all text-sm font-medium"
-          />
-        </div>
-      </div>
-
-      <div className="bg-white rounded-[2.5rem] border border-sky-50 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
