@@ -28,6 +28,7 @@ import { EventFormModal } from './components/EventFormModal';
 import { CalendarView } from './components/CalendarView';
 import { GalleryView } from './components/GalleryView';
 import { LibraryView } from './components/LibraryView';
+import { PwaInstallPrompt } from './components/PwaInstallPrompt';
 import { AppView, Student, Turma, AttendanceSession, Catequista, ParishEvent, FormationEvent, User, GalleryImage, StudentDocument, LibraryFile, ParishConfig, TurmaLevel, UserPermissions } from './types';
 import { 
   ClipboardList, 
@@ -541,7 +542,12 @@ const App: React.FC = () => {
     );
   }
 
-  if (!isAuthenticated) return <Login onLogin={handleLogin} />;
+  if (!isAuthenticated) return (
+    <>
+      <Login onLogin={handleLogin} />
+      <PwaInstallPrompt />
+    </>
+  );
 
   const p: UserPermissions = {
     ...defaultPermissions,
@@ -549,135 +555,138 @@ const App: React.FC = () => {
   };
 
   return (
-    <Layout 
-      currentView={currentView} 
-      setView={handleSetView} 
-      currentUser={currentUser!} 
-      onLogout={handleLogout} 
-      parishConfig={parishConfig} 
-    >
-      
-      {currentView === 'dashboard' && p.dashboard && <div className="animate-in fade-in"><DashboardContent events={events} students={students} classes={filteredClasses} catequistas={catequistas} suggestedDate={suggestedDate} onDateChange={handleDateChange} onAddEvent={(d: string) => { setSuggestedDate(d || suggestedDate); setIsAddingEvent(true); }} user={currentUser} onTakeEventAttendance={setTakingEventAttendance} /></div>}
-      
-      {currentView === 'register' && p.students_create && <RegistrationForm config={parishConfig} onSave={handleSaveStudent} onCancel={() => handleSetView('list')} initialData={editingStudent} allClasses={classes} />}
-      
-      {currentView === 'list' && p.students_view && (
-        <StudentTable 
-          students={filteredStudentsByPermission} 
-          allClasses={classes}
-          onDelete={handleDeleteStudent} 
-          onView={(s) => setSelectedStudent(s)} 
-          onEdit={(s) => { 
-            if (s.status === 'Concluido' && !p.students_confirmed_manage) return alert('Sem permissão para editar crismados.');
-            setEditingStudent(s); setView('register'); 
-          }} 
-          onManageDocuments={(s) => setManagingDocuments(s)}
-          onAddNew={p.students_create ? () => handleSetView('register') : undefined}
-        />
-      )}
+    <>
+      <Layout 
+        currentView={currentView} 
+        setView={handleSetView} 
+        currentUser={currentUser!} 
+        onLogout={handleLogout} 
+        parishConfig={parishConfig} 
+      >
+        
+        {currentView === 'dashboard' && p.dashboard && <div className="animate-in fade-in"><DashboardContent events={events} students={students} classes={filteredClasses} catequistas={catequistas} suggestedDate={suggestedDate} onDateChange={handleDateChange} onAddEvent={(d: string) => { setSuggestedDate(d || suggestedDate); setIsAddingEvent(true); }} user={currentUser} onTakeEventAttendance={setTakingEventAttendance} /></div>}
+        
+        {currentView === 'register' && p.students_create && <RegistrationForm config={parishConfig} onSave={handleSaveStudent} onCancel={() => handleSetView('list')} initialData={editingStudent} allClasses={classes} />}
+        
+        {currentView === 'list' && p.students_view && (
+          <StudentTable 
+            students={filteredStudentsByPermission} 
+            allClasses={classes}
+            onDelete={handleDeleteStudent} 
+            onView={(s) => setSelectedStudent(s)} 
+            onEdit={(s) => { 
+              if (s.status === 'Concluido' && !p.students_confirmed_manage) return alert('Sem permissão para editar crismados.');
+              setEditingStudent(s); setView('register'); 
+            }} 
+            onManageDocuments={(s) => setManagingDocuments(s)}
+            onAddNew={p.students_create ? () => handleSetView('register') : undefined}
+          />
+        )}
 
-      {currentView === 'classes_list' && p.classes && (
-        <ClassTable 
-          classes={filteredClasses} 
-          onDelete={handleDeleteClass} 
-          onEdit={t => { setEditingClass(t); setView('classes_create'); }} 
-          onViewMembers={setViewingClassMembers} 
-          onTakeAttendance={setTakingAttendance} 
-          onViewHistory={setViewingClassHistory} 
-          onAddNew={currentUser?.role === 'coordenador_paroquial' || currentUser?.role === 'coordenador_comunidade' ? () => handleSetView('classes_create') : undefined}
-        />
-      )}
-      {currentView === 'classes_create' && p.classes && <ClassForm onSave={handleSaveClass} onCancel={() => setView('classes_list')} initialData={editingClass || undefined} allStudents={students} catequistas={catequistas} />}
-      
-      {currentView === 'gallery' && p.gallery_view && (
-        <GalleryView 
-          images={filteredGalleryByPermission} 
-          onUpload={handleUploadGallery}
-          onEdit={handleEditGallery}
-          onDelete={handleDeleteGallery}
-          onDeleteMultiple={handleDeleteMultipleGallery}
-          canUpload={p.gallery_upload}
-          canDelete={p.gallery_delete}
-          availableClasses={currentUser?.role === 'coordenador_paroquial' ? classes : filteredClasses}
-        />
-      )}
+        {currentView === 'classes_list' && p.classes && (
+          <ClassTable 
+            classes={filteredClasses} 
+            onDelete={handleDeleteClass} 
+            onEdit={t => { setEditingClass(t); setView('classes_create'); }} 
+            onViewMembers={setViewingClassMembers} 
+            onTakeAttendance={setTakingAttendance} 
+            onViewHistory={setViewingClassHistory} 
+            onAddNew={currentUser?.role === 'coordenador_paroquial' || currentUser?.role === 'coordenador_comunidade' ? () => handleSetView('classes_create') : undefined}
+          />
+        )}
+        {currentView === 'classes_create' && p.classes && <ClassForm onSave={handleSaveClass} onCancel={() => setView('classes_list')} initialData={editingClass || undefined} allStudents={students} catequistas={catequistas} />}
+        
+        {currentView === 'gallery' && p.gallery_view && (
+          <GalleryView 
+            images={filteredGalleryByPermission} 
+            onUpload={handleUploadGallery}
+            onEdit={handleEditGallery}
+            onDelete={handleDeleteGallery}
+            onDeleteMultiple={handleDeleteMultipleGallery}
+            canUpload={p.gallery_upload}
+            canDelete={p.gallery_delete}
+            availableClasses={currentUser?.role === 'coordenador_paroquial' ? classes : filteredClasses}
+          />
+        )}
 
-      {currentView === 'library' && p.library_view && (
-        <LibraryView 
-          files={library} 
-          onUpload={handleUploadLibrary} 
-          onDelete={handleDeleteLibrary}
-          canUpload={p.library_upload}
-          canDelete={p.library_delete}
-        />
-      )}
+        {currentView === 'library' && p.library_view && (
+          <LibraryView 
+            files={library} 
+            onUpload={handleUploadLibrary} 
+            onDelete={handleDeleteLibrary}
+            canUpload={p.library_upload}
+            canDelete={p.library_delete}
+          />
+        )}
 
-      {currentView === 'catequista_list' && p.catequistas && (
-        <CatequistaTable 
-          catequistas={catequistas} 
-          onDelete={handleDeleteCatequista} 
-          onEdit={c => { setEditingCatequista(c); setView('catequista_create'); }} 
-          onViewHistory={setViewingCatequistaHistory} 
-          onAddNew={() => handleSetView('catequista_create')}
-        />
-      )}
-      {currentView === 'catequista_create' && p.catequistas && <CatequistaForm onSave={handleSaveCatequista} onCancel={() => setView('catequista_list')} initialData={editingCatequista || undefined} />}
-      
-      {currentView === 'formation_list' && p.formations && (
-        <FormationTable 
-          formations={formations} 
-          onDelete={async (id) => { if(confirm('Excluir formação?')) { await api.delete('formations', id); setFormations(prev => prev.filter(f => f.id !== id)); }}} 
-          onEdit={f => { setEditingFormation(f); setView('formation_create'); }} 
-          onAttendance={f => setTakingFormationAttendance(f)} 
-        />
-      )}
-      {currentView === 'formation_create' && p.formations && (
-        <FormationForm 
-          onSave={handleSaveFormation} 
-          onCancel={() => setView('formation_list')} 
-          initialData={editingFormation || undefined} 
-        />
-      )}
+        {currentView === 'catequista_list' && p.catequistas && (
+          <CatequistaTable 
+            catequistas={catequistas} 
+            onDelete={handleDeleteCatequista} 
+            onEdit={c => { setEditingCatequista(c); setView('catequista_create'); }} 
+            onViewHistory={setViewingCatequistaHistory} 
+            onAddNew={() => handleSetView('catequista_create')}
+          />
+        )}
+        {currentView === 'catequista_create' && p.catequistas && <CatequistaForm onSave={handleSaveCatequista} onCancel={() => setView('catequista_list')} initialData={editingCatequista || undefined} />}
+        
+        {currentView === 'formation_list' && p.formations && (
+          <FormationTable 
+            formations={formations} 
+            onDelete={async (id) => { if(confirm('Excluir formação?')) { await api.delete('formations', id); setFormations(prev => prev.filter(f => f.id !== id)); }}} 
+            onEdit={f => { setEditingFormation(f); setView('formation_create'); }} 
+            onAttendance={f => setTakingFormationAttendance(f)} 
+          />
+        )}
+        {currentView === 'formation_create' && p.formations && (
+          <FormationForm 
+            onSave={handleSaveFormation} 
+            onCancel={() => setView('formation_list')} 
+            initialData={editingFormation || undefined} 
+          />
+        )}
 
-      {currentView === 'attendance_quick' && p.attendance && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredClasses.map(t => <button key={t.id} onClick={() => setTakingAttendance(t)} className="bg-white p-8 rounded-[2rem] border border-sky-50 hover:shadow-xl transition-all text-left"><div className="bg-sky-100 w-12 h-12 rounded-2xl flex items-center justify-center text-sky-600 mb-4"><CheckCircle2 /></div><h4 className="font-black text-slate-800">{t.nome}</h4><p className="text-xs text-slate-400 uppercase">{t.diaSemana} • {t.horario}</p></button>)}
-        </div>
-      )}
+        {currentView === 'attendance_quick' && p.attendance && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredClasses.map(t => <button key={t.id} onClick={() => setTakingAttendance(t)} className="bg-white p-8 rounded-[2rem] border border-sky-50 hover:shadow-xl transition-all text-left"><div className="bg-sky-100 w-12 h-12 rounded-2xl flex items-center justify-center text-sky-600 mb-4"><CheckCircle2 /></div><h4 className="font-black text-slate-800">{t.nome}</h4><p className="text-xs text-slate-400 uppercase">{t.diaSemana} • {t.horario}</p></button>)}
+          </div>
+        )}
 
-      {currentView === 'reports' && p.reports && <Reports students={filteredStudentsByPermission} classes={filteredClasses} attendanceSessions={attendanceSessions} />}
-      {currentView === 'attendance_report' && p.attendance_report && <AttendanceReport classes={filteredClasses} attendanceSessions={attendanceSessions} catequistas={catequistas} config={parishConfig} />}
-      {currentView === 'certificates' && p.certificates && <CertificateGenerator config={parishConfig} students={filteredStudentsByPermission} />}
-      {currentView === 'profile' && <ProfileForm currentUser={currentUser!} onSave={handleSaveProfile} onCancel={() => setView('dashboard')} />}
-      {currentView === 'users_list' && p.users_management && <UserList users={users} currentUser={currentUser!} onEdit={u => { setEditingUser(u); setView('users_create'); }} onDelete={async (id) => { if(confirm('Excluir usuário?')) { await api.delete('users', id); setUsers(prev => prev.filter(u => u.id !== id)); }}} onCreateNew={() => handleSetView('users_create')} />}
-      {currentView === 'users_create' && p.users_management && <UserForm onSave={handleSaveUser} onCancel={() => setView('users_list')} initialData={editingUser || undefined} availableClasses={classes} catequistas={catequistas} />}
-      
-      {currentView === 'config' && currentUser?.role === 'coordenador_paroquial' && <ConfigForm config={parishConfig} onSave={handleSaveConfig} />}
+        {currentView === 'reports' && p.reports && <Reports students={filteredStudentsByPermission} classes={filteredClasses} attendanceSessions={attendanceSessions} />}
+        {currentView === 'attendance_report' && p.attendance_report && <AttendanceReport classes={filteredClasses} attendanceSessions={attendanceSessions} catequistas={catequistas} config={parishConfig} />}
+        {currentView === 'certificates' && p.certificates && <CertificateGenerator config={parishConfig} students={filteredStudentsByPermission} />}
+        {currentView === 'profile' && <ProfileForm currentUser={currentUser!} onSave={handleSaveProfile} onCancel={() => setView('dashboard')} />}
+        {currentView === 'users_list' && p.users_management && <UserList users={users} currentUser={currentUser!} onEdit={u => { setEditingUser(u); setView('users_create'); }} onDelete={async (id) => { if(confirm('Excluir usuário?')) { await api.delete('users', id); setUsers(prev => prev.filter(u => u.id !== id)); }}} onCreateNew={() => handleSetView('users_create')} />}
+        {currentView === 'users_create' && p.users_management && <UserForm onSave={handleSaveUser} onCancel={() => setView('users_list')} initialData={editingUser || undefined} availableClasses={classes} catequistas={catequistas} />}
+        
+        {currentView === 'config' && currentUser?.role === 'coordenador_paroquial' && <ConfigForm config={parishConfig} onSave={handleSaveConfig} />}
 
-      {selectedStudent && <StudentDetailsModal config={parishConfig} student={selectedStudent} attendanceSessions={attendanceSessions} classes={classes} onClose={() => setSelectedStudent(null)} />}
-      {managingDocuments && (
-        <StudentDocumentsModal 
-          student={managingDocuments} 
-          onClose={() => setManagingDocuments(null)} 
-          onUpdateDocuments={(docs) => handleUpdateStudentDocuments(managingDocuments.id, docs)} 
-        />
-      )}
-      {viewingClassMembers && <ClassMembersModal turma={viewingClassMembers} members={students.filter(s => s.turma === viewingClassMembers.nome)} onClose={() => setViewingClassMembers(null)} onViewStudent={(s) => setSelectedStudent(s)} />}
-      {takingAttendance && <ClassAttendanceModal turma={takingAttendance} members={students.filter(s => s.turma === takingAttendance.nome)} onClose={() => setTakingAttendance(null)} onSave={handleSaveAttendance} existingSessions={attendanceSessions} />}
-      {viewingClassHistory && <ClassHistoryModal turma={viewingClassHistory} sessions={attendanceSessions} members={students.filter(s => s.turma === viewingClassHistory.nome)} onClose={() => setViewingClassHistory(null)} config={parishConfig} />}
-      {viewingCatequistaHistory && <CatequistaHistoryModal catequista={viewingCatequistaHistory} formations={formations} parishEvents={events} onClose={() => setViewingCatequistaHistory(null)} />}
-      {takingFormationAttendance && (
-        <FormationAttendanceModal 
-          formation={takingFormationAttendance} 
-          catequistas={catequistas} 
-          onClose={() => setTakingFormationAttendance(null)} 
-          onSave={handleFormationAttendance} 
-        />
-      )}
-      
-      {isAddingEvent && <EventFormModal initialDate={suggestedDate} onSave={handleSaveEvent} onClose={() => setIsAddingEvent(false)} />}
-      {takingEventAttendance && <ParishEventAttendanceModal event={takingEventAttendance} catequistas={catequistas} onClose={() => setTakingEventAttendance(null)} onSave={handleSaveEventAttendance} />}
-    </Layout>
+        {selectedStudent && <StudentDetailsModal config={parishConfig} student={selectedStudent} attendanceSessions={attendanceSessions} classes={classes} onClose={() => setSelectedStudent(null)} />}
+        {managingDocuments && (
+          <StudentDocumentsModal 
+            student={managingDocuments} 
+            onClose={() => setManagingDocuments(null)} 
+            onUpdateDocuments={(docs) => handleUpdateStudentDocuments(managingDocuments.id, docs)} 
+          />
+        )}
+        {viewingClassMembers && <ClassMembersModal turma={viewingClassMembers} members={students.filter(s => s.turma === viewingClassMembers.nome)} onClose={() => setViewingClassMembers(null)} onViewStudent={(s) => setSelectedStudent(s)} />}
+        {takingAttendance && <ClassAttendanceModal turma={takingAttendance} members={students.filter(s => s.turma === takingAttendance.nome)} onClose={() => setTakingAttendance(null)} onSave={handleSaveAttendance} existingSessions={attendanceSessions} />}
+        {viewingClassHistory && <ClassHistoryModal turma={viewingClassHistory} sessions={attendanceSessions} members={students.filter(s => s.turma === viewingClassHistory.nome)} onClose={() => setViewingClassHistory(null)} config={parishConfig} />}
+        {viewingCatequistaHistory && <CatequistaHistoryModal catequista={viewingCatequistaHistory} formations={formations} parishEvents={events} onClose={() => setViewingCatequistaHistory(null)} />}
+        {takingFormationAttendance && (
+          <FormationAttendanceModal 
+            formation={takingFormationAttendance} 
+            catequistas={catequistas} 
+            onClose={() => setTakingFormationAttendance(null)} 
+            onSave={handleFormationAttendance} 
+          />
+        )}
+        
+        {isAddingEvent && <EventFormModal initialDate={suggestedDate} onSave={handleSaveEvent} onClose={() => setIsAddingEvent(false)} />}
+        {takingEventAttendance && <ParishEventAttendanceModal event={takingEventAttendance} catequistas={catequistas} onClose={() => setTakingEventAttendance(null)} onSave={handleSaveEventAttendance} />}
+      </Layout>
+      <PwaInstallPrompt />
+    </>
   );
 };
 
