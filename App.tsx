@@ -28,13 +28,14 @@ import { LibraryView } from './components/LibraryView';
 import { ConfigForm } from './components/ConfigForm';
 import { StudentDocumentsModal } from './components/StudentDocumentsModal';
 import { CalendarView } from './components/CalendarView';
+import { PwaInstallPrompt } from './components/PwaInstallPrompt';
 import { api } from './services/api';
 import { 
   AppView, User, Student, Turma, Catequista, FormationEvent, 
   ParishEvent, GalleryImage, LibraryFile, AttendanceSession, 
   ParishConfig, StudentDocument
 } from './types';
-import { LayoutDashboard, CheckCircle2 } from 'lucide-react';
+import { LayoutDashboard, CheckCircle2, Loader2 } from 'lucide-react';
 
 // DashboardContent Component
 const DashboardContent = ({ events, students, classes, catequistas, suggestedDate, onDateChange, onAddEvent, user, onTakeEventAttendance }: any) => {
@@ -103,6 +104,7 @@ const DashboardContent = ({ events, students, classes, catequistas, suggestedDat
 // App Component
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [view, setView] = useState<AppView>('dashboard');
   
   // Data States
@@ -150,6 +152,27 @@ const App: React.FC = () => {
 
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
 
+  // Check Session on Mount
+  useEffect(() => {
+    const checkSession = async () => {
+      const storedSession = sessionStorage.getItem('catequese_auth_session');
+      if (storedSession) {
+        try {
+          // Buscamos os usuários para validar a sessão e recuperar permissões
+          const allUsers = await api.get('users');
+          const found = allUsers.find((u: User) => u.email === storedSession || u.nome === storedSession);
+          if (found) {
+            setUser(found);
+          }
+        } catch (e) {
+          console.error("Falha ao restaurar sessão:", e);
+        }
+      }
+      setIsLoadingAuth(false);
+    };
+    checkSession();
+  }, []);
+
   // Initial Data Fetch
   const fetchData = useCallback(async () => {
     if (!user) return;
@@ -191,6 +214,7 @@ const App: React.FC = () => {
        const found = allUsers.find((user: User) => (user.email === u || user.nome === u) && user.senha === p);
        if (found) {
          setUser(found);
+         sessionStorage.setItem('catequese_auth_session', u); // Salvar sessão
          return true;
        }
        return false;
@@ -203,6 +227,7 @@ const App: React.FC = () => {
   const handleLogout = () => {
     setUser(null);
     setView('dashboard');
+    sessionStorage.removeItem('catequese_auth_session'); // Limpar sessão
   };
 
   // --- CRUD Handlers ---
@@ -452,8 +477,24 @@ const App: React.FC = () => {
     } catch (e) { alert(e); }
   };
 
+  if (isLoadingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin text-blue-600"><Loader2 className="w-10 h-10" /></div>
+          <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Carregando Sistema...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!user) {
-    return <Login onLogin={async (u, p) => await onLoginSubmit(u, p)} />;
+    return (
+      <>
+        <Login onLogin={async (u, p) => await onLoginSubmit(u, p)} />
+        <PwaInstallPrompt />
+      </>
+    );
   }
 
   const renderContent = () => {
@@ -594,92 +635,95 @@ const App: React.FC = () => {
   };
 
   return (
-    <Layout currentView={view} setView={setView} currentUser={user} onLogout={handleLogout} parishConfig={parishConfig}>
-      {renderContent()}
+    <>
+      <Layout currentView={view} setView={setView} currentUser={user} onLogout={handleLogout} parishConfig={parishConfig}>
+        {renderContent()}
 
-      {/* Modals */}
-      {viewingStudent && (
-        <StudentDetailsModal 
-          student={viewingStudent} 
-          attendanceSessions={attendanceSessions} 
-          classes={classes} 
-          onClose={() => setViewingStudent(null)} 
-          config={parishConfig}
-        />
-      )}
+        {/* Modals */}
+        {viewingStudent && (
+          <StudentDetailsModal 
+            student={viewingStudent} 
+            attendanceSessions={attendanceSessions} 
+            classes={classes} 
+            onClose={() => setViewingStudent(null)} 
+            config={parishConfig}
+          />
+        )}
 
-      {managingDocumentsStudent && (
-        <StudentDocumentsModal 
-          student={managingDocumentsStudent}
-          onClose={() => setManagingDocumentsStudent(null)}
-          onUpdateDocuments={handleUpdateDocuments}
-        />
-      )}
+        {managingDocumentsStudent && (
+          <StudentDocumentsModal 
+            student={managingDocumentsStudent}
+            onClose={() => setManagingDocumentsStudent(null)}
+            onUpdateDocuments={handleUpdateDocuments}
+          />
+        )}
 
-      {viewingClassMembers && (
-        <ClassMembersModal 
-          turma={viewingClassMembers}
-          members={students.filter(s => s.turma === viewingClassMembers.nome)}
-          onClose={() => setViewingClassMembers(null)}
-          onViewStudent={(s) => { setViewingClassMembers(null); setViewingStudent(s); }}
-        />
-      )}
+        {viewingClassMembers && (
+          <ClassMembersModal 
+            turma={viewingClassMembers}
+            members={students.filter(s => s.turma === viewingClassMembers.nome)}
+            onClose={() => setViewingClassMembers(null)}
+            onViewStudent={(s) => { setViewingClassMembers(null); setViewingStudent(s); }}
+          />
+        )}
 
-      {takingAttendanceClass && (
-        <ClassAttendanceModal 
-          turma={takingAttendanceClass}
-          members={students.filter(s => s.turma === takingAttendanceClass.nome)}
-          onClose={() => setTakingAttendanceClass(null)}
-          onSave={handleSaveAttendance}
-          existingSessions={attendanceSessions}
-        />
-      )}
+        {takingAttendanceClass && (
+          <ClassAttendanceModal 
+            turma={takingAttendanceClass}
+            members={students.filter(s => s.turma === takingAttendanceClass.nome)}
+            onClose={() => setTakingAttendanceClass(null)}
+            onSave={handleSaveAttendance}
+            existingSessions={attendanceSessions}
+          />
+        )}
 
-      {viewingClassHistory && (
-        <ClassHistoryModal 
-           turma={viewingClassHistory}
-           sessions={attendanceSessions}
-           members={students.filter(s => s.turma === viewingClassHistory.nome)}
-           onClose={() => setViewingClassHistory(null)}
-           config={parishConfig}
-        />
-      )}
+        {viewingClassHistory && (
+          <ClassHistoryModal 
+            turma={viewingClassHistory}
+            sessions={attendanceSessions}
+            members={students.filter(s => s.turma === viewingClassHistory.nome)}
+            onClose={() => setViewingClassHistory(null)}
+            config={parishConfig}
+          />
+        )}
 
-      {takingFormationAttendance && (
-        <FormationAttendanceModal 
-          formation={takingFormationAttendance}
-          catequistas={catequistas}
-          onClose={() => setTakingFormationAttendance(null)}
-          onSave={handleSaveFormationAttendance}
-        />
-      )}
+        {takingFormationAttendance && (
+          <FormationAttendanceModal 
+            formation={takingFormationAttendance}
+            catequistas={catequistas}
+            onClose={() => setTakingFormationAttendance(null)}
+            onSave={handleSaveFormationAttendance}
+          />
+        )}
 
-      {viewingCatequistaHistory && (
-        <CatequistaHistoryModal 
-          catequista={viewingCatequistaHistory}
-          formations={formations}
-          parishEvents={events}
-          onClose={() => setViewingCatequistaHistory(null)}
-        />
-      )}
+        {viewingCatequistaHistory && (
+          <CatequistaHistoryModal 
+            catequista={viewingCatequistaHistory}
+            formations={formations}
+            parishEvents={events}
+            onClose={() => setViewingCatequistaHistory(null)}
+          />
+        )}
 
-      {addingEventDate && (
-        <EventFormModal 
-          onSave={handleSaveEvent}
-          onClose={() => setAddingEventDate(null)}
-          initialDate={addingEventDate}
-        />
-      )}
+        {addingEventDate && (
+          <EventFormModal 
+            onSave={handleSaveEvent}
+            onClose={() => setAddingEventDate(null)}
+            initialDate={addingEventDate}
+          />
+        )}
 
-      {takingEventAttendance && (
-        <ParishEventAttendanceModal 
-          event={takingEventAttendance}
-          catequistas={catequistas}
-          onClose={() => setTakingEventAttendance(null)}
-          onSave={handleSaveEventAttendance}
-        />
-      )}
-    </Layout>
+        {takingEventAttendance && (
+          <ParishEventAttendanceModal 
+            event={takingEventAttendance}
+            catequistas={catequistas}
+            onClose={() => setTakingEventAttendance(null)}
+            onSave={handleSaveEventAttendance}
+          />
+        )}
+      </Layout>
+      <PwaInstallPrompt />
+    </>
   );
 };
 
