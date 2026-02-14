@@ -45,7 +45,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
               <div className="bg-white border border-slate-100 p-6 rounded-[2.5rem] shadow-2xl shadow-slate-200/50 mb-6 group transition-transform hover:scale-110">
                 <Church className="text-blue-600 w-12 h-12" />
               </div>
-              <h1 className="text-2xl font-serif font-black text-slate-800 tracking-tight">Pastoral da Catequese</h1>
+              <h1 className="text-3xl font-serif font-black text-slate-800 tracking-tight">Pastoral da Catequese</h1>
               <p className="text-[10px] text-blue-600 font-black uppercase tracking-[0.2em] mt-2 flex items-center gap-2">
                 <Sparkles className="w-3 h-3" /> Paróquia N. Sra. de Fátima - Itamaraju-Ba
               </p>
@@ -117,7 +117,9 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
             </div>
           </div>
         </div>
-        <p className="text-center mt-6 text-slate-400 text-[10px] font-medium uppercase tracking-widest">© 2024 Paróquia N. Sra. de Fátima - Itamaraju-Ba</p>
+        <p className="text-center mt-6 text-slate-400 text-[10px] font-medium uppercase tracking-widest">
+          © 2026 Paróquia N. Sra. de Fátima - Itamaraju-Ba <span className="mx-2 opacity-50">|</span> Dev: <span className="font-bold text-slate-500">AgeTecnologia</span>
+        </p>
       </div>
       <style>{`
         .input-field {
