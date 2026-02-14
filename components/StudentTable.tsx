@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Search, Filter, MoreHorizontal, Eye, Trash2, Calendar, Phone, MapPin, Edit, UserCheck, UserX, GraduationCap, Fingerprint, UserPlus, BookOpen, FileText, Users } from 'lucide-react';
+import { Search, Filter, MoreHorizontal, Eye, Trash2, Calendar, Phone, MapPin, Edit, UserCheck, UserX, GraduationCap, Fingerprint, UserPlus, BookOpen, FileText, Users, Sparkles } from 'lucide-react';
 import { Student, TurmaLevel, Turma } from '../types';
 
 interface StudentTableProps {
@@ -45,12 +45,15 @@ export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses
       {/* HEADER CARD - Standardized Style */}
       <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col md:flex-row justify-between items-center gap-6">
         <div className="flex items-center gap-4">
-          <div className="bg-blue-600 p-4 rounded-3xl shadow-xl shadow-blue-100 text-white">
-            <Users className="w-8 h-8" />
+          <div className="bg-blue-600 p-4 rounded-3xl shadow-xl shadow-blue-100 relative group overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <Users className="w-8 h-8 text-white relative z-10" />
           </div>
           <div>
-            <h2 className="text-2xl font-serif font-black text-slate-800 tracking-tight">Lista de Catequizandos</h2>
-            <p className="text-slate-500 text-sm font-medium">Gestão completa de matrículas e dados pessoais.</p>
+            <h2 className="text-2xl font-black text-slate-800 tracking-tight">Lista de Catequizandos</h2>
+            <p className="text-slate-500 text-sm flex items-center gap-1.5">
+              <Sparkles size={12} className="text-blue-500" /> Gestão completa de matrículas e dados pessoais.
+            </p>
           </div>
         </div>
 

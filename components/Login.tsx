@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Church, Mail, Lock, LogIn, Loader2, Sparkles, ShieldCheck, User, Eye, EyeOff } from 'lucide-react';
 
 interface LoginProps {
-  onLogin: (usernameOrEmail: string, pass: string) => boolean;
+  onLogin: (usernameOrEmail: string, pass: string) => Promise<boolean> | boolean;
 }
 
 export const Login: React.FC<LoginProps> = ({ onLogin }) => {
@@ -13,19 +13,22 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
-    // Simulando um delay de rede para elegância
-    setTimeout(() => {
-      const success = onLogin(username, password);
+    try {
+      // Await result in case onLogin is async
+      const success = await onLogin(username, password);
       if (!success) {
         setError('Acesso negado. Verifique suas credenciais.');
         setIsLoading(false);
       }
-    }, 1200);
+    } catch (err) {
+      setError('Erro ao tentar fazer login.');
+      setIsLoading(false);
+    }
   };
 
   const handleForgotPass = (e: React.MouseEvent) => {

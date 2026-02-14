@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Search, Edit, Trash2, Calendar, Phone, Mail, UserCheck, History, MapPin, UserPlus, MessageCircle, UsersRound } from 'lucide-react';
+import { Search, Edit, Trash2, Calendar, Phone, Mail, UserCheck, History, MapPin, UserPlus, MessageCircle, UsersRound, Sparkles } from 'lucide-react';
 import { Catequista } from '../types';
 
 interface CatequistaTableProps {
@@ -25,12 +25,15 @@ export const CatequistaTable: React.FC<CatequistaTableProps> = ({ catequistas, o
       {/* HEADER CARD - Standardized Style */}
       <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col md:flex-row justify-between items-center gap-6">
         <div className="flex items-center gap-4">
-          <div className="bg-sky-600 p-4 rounded-3xl shadow-xl shadow-sky-100 text-white">
-            <UsersRound className="w-8 h-8" />
+          <div className="bg-sky-600 p-4 rounded-3xl shadow-xl shadow-sky-100 relative group overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <UsersRound className="w-8 h-8 text-white relative z-10" />
           </div>
           <div>
-            <h2 className="text-2xl font-serif font-black text-slate-800 tracking-tight">Corpo de Catequistas</h2>
-            <p className="text-slate-500 text-sm font-medium">Gestão de voluntários e educadores da fé.</p>
+            <h2 className="text-2xl font-black text-slate-800 tracking-tight">Corpo de Catequistas</h2>
+            <p className="text-slate-500 text-sm flex items-center gap-1.5">
+              <Sparkles size={12} className="text-sky-500" /> Gestão de voluntários e educadores da fé.
+            </p>
           </div>
         </div>
 

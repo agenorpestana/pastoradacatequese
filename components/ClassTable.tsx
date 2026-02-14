@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BookOpen, User, Clock, Trash2, Edit, Users, ClipboardCheck, FileSpreadsheet, Plus } from 'lucide-react';
+import { BookOpen, User, Clock, Trash2, Edit, Users, ClipboardCheck, FileSpreadsheet, Plus, Sparkles } from 'lucide-react';
 import { Turma } from '../types';
 
 interface ClassTableProps {
@@ -27,12 +27,15 @@ export const ClassTable: React.FC<ClassTableProps> = ({
       {/* HEADER CARD - Standardized Style */}
       <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col md:flex-row justify-between items-center gap-6">
         <div className="flex items-center gap-4">
-          <div className="bg-indigo-600 p-4 rounded-3xl shadow-xl shadow-indigo-100 text-white">
-            <BookOpen className="w-8 h-8" />
+          <div className="bg-indigo-600 p-4 rounded-3xl shadow-xl shadow-indigo-100 relative group overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <BookOpen className="w-8 h-8 text-white relative z-10" />
           </div>
           <div>
-            <h2 className="text-2xl font-serif font-black text-slate-800 tracking-tight">Turmas Catequéticas</h2>
-            <p className="text-slate-500 text-sm font-medium">Organização por níveis e etapas de formação.</p>
+            <h2 className="text-2xl font-black text-slate-800 tracking-tight">Turmas Catequéticas</h2>
+            <p className="text-slate-500 text-sm flex items-center gap-1.5">
+              <Sparkles size={12} className="text-indigo-500" /> Organização por níveis e etapas de formação.
+            </p>
           </div>
         </div>
 
