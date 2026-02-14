@@ -118,23 +118,34 @@ if [ "$ACTION_CHOICE" -eq 2 ]; then
     fi
 
     echo -e "${YELLOW}5. Banco de Dados${NC}"
-    echo -e "${RED}Deseja EXCLUIR também o Banco de Dados ($DEFAULT_DB_NAME)? CUIDADO: Isso apaga todos os dados! (s/n)${NC}"
+    echo -e "${RED}Deseja EXCLUIR algum Banco de Dados? (s/n)${NC}"
     read DB_CONFIRM
 
     if [ "$DB_CONFIRM" == "s" ] || [ "$DB_CONFIRM" == "S" ]; then
-        echo -e "Digite a senha do usuário root do MySQL para confirmar a exclusão:"
-        read -s DB_ROOT_PASS
-        echo ""
-        # Tenta apagar o banco. Nota: Se houver múltiplos sistemas usando o mesmo banco (o que não é recomendado no multi-tenant real, mas possível), isso apaga tudo.
-        # Como o script sugere nomes de banco padrão, assume-se que o usuário sabe o que está fazendo.
-        # Para ser mais seguro em multi-tenant real, o nome do banco deveria incluir o domínio, mas seguiremos o padrão atual do script.
-        echo "Apagando banco de dados ${DEFAULT_DB_NAME}..."
-        mysql -u root -p"$DB_ROOT_PASS" -e "DROP DATABASE IF EXISTS ${DEFAULT_DB_NAME};" 2>/dev/null
-        
-        if [ $? -eq 0 ]; then
-            echo -e "${GREEN}Banco de dados removido.${NC}"
+        echo -e "${YELLOW}Digite o NOME EXATO do banco de dados que deseja excluir (Padrão sugerido: ${DEFAULT_DB_NAME}):${NC}"
+        read DB_TO_DELETE
+
+        if [ -z "$DB_TO_DELETE" ]; then
+            echo -e "${RED}Nome do banco não informado. Operação de banco cancelada.${NC}"
         else
-            echo -e "${RED}Erro ao remover banco (senha incorreta?).${NC}"
+            echo -e "${RED}CONFIRMAÇÃO FINAL: Todos os dados de '$DB_TO_DELETE' serão perdidos. Digite 'DELETAR' para confirmar:${NC}"
+            read FINAL_CONFIRM
+            
+            if [ "$FINAL_CONFIRM" == "DELETAR" ]; then
+                echo -e "Digite a senha do usuário root do MySQL:"
+                read -s DB_ROOT_PASS
+                echo ""
+                
+                mysql -u root -p"$DB_ROOT_PASS" -e "DROP DATABASE IF EXISTS \`${DB_TO_DELETE}\`;" 2>/dev/null
+                
+                if [ $? -eq 0 ]; then
+                    echo -e "${GREEN}Banco de dados '$DB_TO_DELETE' removido com sucesso.${NC}"
+                else
+                    echo -e "${RED}Erro ao remover banco (senha incorreta ou nome inválido).${NC}"
+                fi
+            else
+                echo "Exclusão do banco cancelada."
+            fi
         fi
     else
         echo "Banco de dados mantido."
