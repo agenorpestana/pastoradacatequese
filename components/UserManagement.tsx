@@ -236,7 +236,8 @@ export const UserForm: React.FC<UserFormProps> = ({ onSave, onCancel, initialDat
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-8 md:p-12 space-y-12">
+        {/* Added autoComplete="off" to form and specific attributes to inputs to prevent browser autofill */}
+        <form onSubmit={handleSubmit} className="p-8 md:p-12 space-y-12" autoComplete="off">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
             {/* DADOS BÁSICOS */}
             <div className="md:col-span-5 space-y-6">
@@ -245,9 +246,41 @@ export const UserForm: React.FC<UserFormProps> = ({ onSave, onCancel, initialDat
                 <h4 className="font-black text-slate-800 uppercase tracking-wide text-xs">Identificação do Usuário</h4>
               </div>
               <div className="space-y-4">
-                <div><label className="label-style">Nome Completo</label><input required value={formData.nome} onChange={e => setFormData({...formData, nome: e.target.value})} className="input-style" placeholder="Ex: Maria José de Souza" /></div>
-                <div><label className="label-style">E-mail de Login</label><input required type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="input-style" placeholder="usuario@catequese.com" /></div>
-                <div><label className="label-style">Senha de Acesso</label><input required type="password" value={formData.senha} onChange={e => setFormData({...formData, senha: e.target.value})} className="input-style font-mono" placeholder="••••••••" /></div>
+                <div>
+                  <label className="label-style">Nome Completo</label>
+                  <input 
+                    required 
+                    value={formData.nome} 
+                    onChange={e => setFormData({...formData, nome: e.target.value})} 
+                    className="input-style" 
+                    placeholder="Ex: Maria José de Souza" 
+                    autoComplete="off"
+                  />
+                </div>
+                <div>
+                  <label className="label-style">E-mail de Login</label>
+                  <input 
+                    required 
+                    type="email" 
+                    value={formData.email} 
+                    onChange={e => setFormData({...formData, email: e.target.value})} 
+                    className="input-style" 
+                    placeholder="usuario@catequese.com"
+                    autoComplete="off"
+                  />
+                </div>
+                <div>
+                  <label className="label-style">Senha de Acesso</label>
+                  <input 
+                    required 
+                    type="password" 
+                    value={formData.senha} 
+                    onChange={e => setFormData({...formData, senha: e.target.value})} 
+                    className="input-style font-mono" 
+                    placeholder="••••••••"
+                    autoComplete="new-password"
+                  />
+                </div>
                 <div>
                   <label className="label-style">Nível de Hierarquia</label>
                   <select value={formData.role} onChange={e => setFormData({...formData, role: e.target.value as any})} className="input-style font-bold">
