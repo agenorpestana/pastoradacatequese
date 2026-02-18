@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Save, Printer, User, Home, Users, Church, MapPin, Calendar, ArrowRight, ArrowLeft, ClipboardList, Wine, UserPlus, CheckCircle2, Mail, Phone, ShieldCheck, Heart, FileText, BookOpen, Fingerprint, UserCheck, Camera, Upload, RotateCcw, Image as ImageIcon, BookOpenText, Star, MessageSquare, Waves, Award, X } from 'lucide-react';
 import { Student, PersonFull, PersonBasic, Turma, ParishConfig } from '../types';
+import { maskPhone, maskCpfCnpj } from '../utils/masks';
 
 interface RegistrationFormProps {
   onSave: (student: Student) => void;
@@ -246,6 +247,14 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
     const data = formData[personKey] || {};
     
     const updatePerson = (field: keyof PersonFull, value: any) => {
+      // Aplicar máscaras
+      if (field === 'telefone' || field === 'whatsapp') {
+        value = maskPhone(value);
+      }
+      if (field === 'rgCpf') {
+        value = maskCpfCnpj(value);
+      }
+
       const isAddressField = ['endereco', 'numero', 'bairro', 'cidade', 'ufEndereco', 'cep'].includes(field as string);
       
       setFormData(prev => {
@@ -286,8 +295,8 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
           </div>
 
           <div className="md:col-span-3">
-            <label className="label-style">RG-CPF</label>
-            <input type="text" value={data.rgCpf || ''} onChange={e => updatePerson('rgCpf', e.target.value)} className="input-style" />
+            <label className="label-style">CPF</label>
+            <input type="text" value={data.rgCpf || ''} onChange={e => updatePerson('rgCpf', e.target.value)} className="input-style" placeholder="000.000.000-00" />
           </div>
 
           <div className="md:col-span-3">
@@ -316,7 +325,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
           </div>
           <div className="md:col-span-4">
             <label className="label-style">WhatsApp</label>
-            <input type="tel" value={data.whatsapp || ''} onChange={e => updatePerson('whatsapp', e.target.value)} className="input-style" placeholder="(00) 90000-0000" />
+            <input type="tel" value={data.whatsapp || ''} onChange={e => updatePerson('whatsapp', e.target.value)} className="input-style" placeholder="(00) 00000-0000" />
           </div>
           <div className="md:col-span-4">
             <label className="label-style">E-mail</label>
@@ -383,7 +392,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
               <h3 className="bg-slate-100 px-2 py-0.5 text-[8px] font-black uppercase border-l-4 border-slate-900 mb-1.5 tracking-widest">1. Dados Pessoais</h3>
               <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[9px] pr-24">
                 <p className="col-span-2"><strong>Nome:</strong> {formData.nomeCompleto}</p>
-                <p><strong>RG/CPF:</strong> {formData.rgCpf || '___________'}</p>
+                <p><strong>CPF:</strong> {formData.rgCpf || '___________'}</p>
                 <p><strong>Nascimento:</strong> {formData.dataNascimento ? new Date(formData.dataNascimento + 'T00:00:00').toLocaleDateString('pt-BR') : '___/___/___'}</p>
                 <p><strong>Naturalidade:</strong> {formData.naturalidade} - {formData.ufNaturalidade}</p>
                 <p><strong>Telefone/Zap:</strong> {formData.telefone} {formData.whatsapp && `/ ${formData.whatsapp}`}</p>
@@ -543,8 +552,8 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                   </div>
 
                   <div className="md:col-span-3">
-                    <label className="label-style">RG / CPF</label>
-                    <input type="text" value={formData.rgCpf} onChange={e => setFormData({...formData, rgCpf: e.target.value})} className="input-style" placeholder="000.000.000-00" />
+                    <label className="label-style">CPF</label>
+                    <input type="text" value={formData.rgCpf} onChange={e => setFormData({...formData, rgCpf: maskCpfCnpj(e.target.value)})} className="input-style" placeholder="000.000.000-00" />
                   </div>
 
                   <div className="md:col-span-3">
@@ -593,11 +602,11 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                   
                   <div className="md:col-span-3">
                     <label className="label-style">Telefone</label>
-                    <input type="tel" value={formData.telefone} onChange={e => setFormData({...formData, telefone: e.target.value})} className="input-style" placeholder="(00) 00000-0000" />
+                    <input type="tel" value={formData.telefone} onChange={e => setFormData({...formData, telefone: maskPhone(e.target.value)})} className="input-style" placeholder="(00) 00000-0000" />
                   </div>
                   <div className="md:col-span-3">
                     <label className="label-style">WhatsApp</label>
-                    <input type="tel" value={formData.whatsapp} onChange={e => setFormData({...formData, whatsapp: e.target.value})} className="input-style" placeholder="(00) 90000-0000" />
+                    <input type="tel" value={formData.whatsapp} onChange={e => setFormData({...formData, whatsapp: maskPhone(e.target.value)})} className="input-style" placeholder="(00) 00000-0000" />
                   </div>
                   <div className="md:col-span-6">
                     <label className="label-style">E-mail</label>

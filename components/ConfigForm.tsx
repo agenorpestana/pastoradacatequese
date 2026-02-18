@@ -2,6 +2,7 @@
 import React, { useState, useRef } from 'react';
 import { Settings, Save, Church, MapPin, Phone, Globe, Instagram, Facebook, Mail, Camera, Image as ImageIcon, ShieldCheck } from 'lucide-react';
 import { ParishConfig } from '../types';
+import { maskPhone } from '../utils/masks';
 
 interface ConfigFormProps {
   config: ParishConfig;
@@ -122,8 +123,14 @@ export const ConfigForm: React.FC<ConfigFormProps> = ({ config, onSave }) => {
               </div>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <div><label className="label-style">Telefone Fixo</label><input value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="input-style" /></div>
-                  <div><label className="label-style">WhatsApp</label><input value={formData.whatsapp} onChange={e => setFormData({...formData, whatsapp: e.target.value})} className="input-style" /></div>
+                  <div>
+                    <label className="label-style">Telefone Fixo</label>
+                    <input value={formData.phone} onChange={e => setFormData({...formData, phone: maskPhone(e.target.value)})} className="input-style" />
+                  </div>
+                  <div>
+                    <label className="label-style">WhatsApp</label>
+                    <input value={formData.whatsapp} onChange={e => setFormData({...formData, whatsapp: maskPhone(e.target.value)})} className="input-style" />
+                  </div>
                 </div>
                 <div><label className="label-style">E-mail da Paróquia/Pastoral</label><input type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="input-style" /></div>
               </div>

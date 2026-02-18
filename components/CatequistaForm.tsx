@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Save, UserCheck, ArrowLeft, Calendar, Phone, Mail, MapPin, ShieldCheck, MessageCircle, Sparkles, X } from 'lucide-react';
 import { Catequista } from '../types';
+import { maskPhone, maskCpfCnpj } from '../utils/masks';
 
 interface CatequistaFormProps {
   onSave: (catequista: Catequista) => void;
@@ -84,8 +85,8 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
               <input required type="date" value={formData.dataNascimento || ''} onChange={e => setFormData({...formData, dataNascimento: e.target.value})} className="input-style" />
             </div>
             <div className="md:col-span-3">
-              <label className="label-style">RG / CPF</label>
-              <input type="text" value={formData.rgCpf || ''} onChange={e => setFormData({...formData, rgCpf: e.target.value})} className="input-style" placeholder="000.000.000-00" />
+              <label className="label-style">CPF</label>
+              <input type="text" value={formData.rgCpf || ''} onChange={e => setFormData({...formData, rgCpf: maskCpfCnpj(e.target.value)})} className="input-style" placeholder="000.000.000-00" />
             </div>
             <div className="md:col-span-3">
               <label className="label-style">Estado Civil</label>
@@ -128,14 +129,14 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
               <label className="label-style">Telefone Fixo</label>
               <div className="relative">
                 <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-sky-300 w-4 h-4" />
-                <input type="tel" value={formData.telefone || ''} onChange={e => setFormData({...formData, telefone: e.target.value})} className="input-style pl-11" placeholder="(00) 0000-0000" />
+                <input type="tel" value={formData.telefone || ''} onChange={e => setFormData({...formData, telefone: maskPhone(e.target.value)})} className="input-style pl-11" placeholder="(00) 0000-0000" />
               </div>
             </div>
             <div>
               <label className="label-style">WhatsApp</label>
               <div className="relative">
                 <MessageCircle className="absolute left-4 top-1/2 -translate-y-1/2 text-green-400 w-5 h-5" />
-                <input type="tel" value={formData.whatsapp || ''} onChange={e => setFormData({...formData, whatsapp: e.target.value})} className="input-style pl-11 border-green-50 focus:border-green-400" placeholder="(00) 90000-0000" />
+                <input type="tel" value={formData.whatsapp || ''} onChange={e => setFormData({...formData, whatsapp: maskPhone(e.target.value)})} className="input-style pl-11 border-green-50 focus:border-green-400" placeholder="(00) 90000-0000" />
               </div>
             </div>
             <div>
