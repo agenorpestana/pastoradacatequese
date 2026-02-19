@@ -35,17 +35,40 @@ import {
   ParishEvent, GalleryImage, LibraryFile, AttendanceSession, 
   ParishConfig, StudentDocument
 } from './types';
-import { LayoutDashboard, CheckCircle2, Loader2 } from 'lucide-react';
+import { 
+  LayoutDashboard, CheckCircle2, Loader2, ClipboardList, BookOpen, 
+  UsersRound, Droplets, Wine, Flame, Sparkles 
+} from 'lucide-react';
 
 // DashboardContent Component
 const DashboardContent = ({ events, students, classes, catequistas, suggestedDate, onDateChange, onAddEvent, user, onTakeEventAttendance }: any) => {
     const selectedDayEvents = events.filter((e: any) => e.dataInicio === suggestedDate);
     const dateObj = new Date(suggestedDate + 'T00:00:00');
     const dayName = dateObj.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' });
-    const viewableStudents = students;
-    const totalClassesCount = classes.length;
-    const activeStudentsCount = students.filter((s:any) => s.status === 'Ativo').length;
-    const crismadosCount = students.filter((s:any) => s.status === 'Concluido').length;
+    
+    // Statistics Calculations
+    const totalStudents = students.length;
+    const activeStudents = students.filter((s:any) => s.status === 'Ativo');
+    const inactiveStudentsCount = students.filter((s:any) => s.status === 'Inativo').length;
+    const concludedStudentsCount = students.filter((s:any) => s.status === 'Concluido').length;
+
+    const totalClasses = classes.length;
+    
+    const totalCatequistas = catequistas.length;
+    const activeCatequistasCount = catequistas.filter((c:any) => c.status === 'Ativo').length;
+    const inactiveCatequistasCount = totalCatequistas - activeCatequistasCount;
+
+    const activeBatizadosCount = activeStudents.filter((s:any) => s.batizado).length;
+    const activeSemBatismoCount = activeStudents.length - activeBatizadosCount;
+
+    const activeEucaristiaCount = activeStudents.filter((s:any) => s.fezPrimeiraEucaristia).length;
+    const activeSemEucaristiaCount = activeStudents.length - activeEucaristiaCount;
+
+    // Logic for Crisma preparation stats
+    const crismaLevels = ['Crisma 1ª Etapa', 'Crisma 2ª Etapa', 'Catecumenato', 'Catequese de Adultos'];
+    const crismaClasses = classes.filter((c:any) => crismaLevels.some((l: string) => (c.nivel || '').includes(l) || c.nivel === l));
+    const crismaClassNames = crismaClasses.map((c:any) => c.nome);
+    const studentsInCrismaPrep = activeStudents.filter((s:any) => crismaClassNames.includes(s.turma)).length;
 
     return (
       <div className="space-y-10 pb-10">
@@ -64,18 +87,117 @@ const DashboardContent = ({ events, students, classes, catequistas, suggestedDat
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-           <div className="bg-white p-7 rounded-[2rem] border border-sky-50 shadow-sm flex flex-col justify-between group transition-all hover:shadow-lg">
-             <div><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Catequizandos</p><h3 className="text-3xl font-black text-slate-800">{viewableStudents.length}</h3></div>
-             <div className="flex gap-4 pt-4 border-t border-slate-50"><div><p className="text-[9px] font-black text-green-600 uppercase">Ativos: {activeStudentsCount}</p></div></div>
+        {/* 6 Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+           
+           {/* 1. TOTAL CATEQUIZANDOS */}
+           <div className="bg-white p-7 rounded-[2rem] border border-sky-50 shadow-sm flex flex-col justify-between group transition-all hover:shadow-lg h-48">
+             <div className="flex justify-between items-start">
+               <div>
+                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Catequizandos</p>
+                 <h3 className="text-4xl font-black text-slate-800">{totalStudents}</h3>
+               </div>
+               <div className="bg-blue-50 p-3 rounded-2xl text-blue-600">
+                  <ClipboardList className="w-6 h-6" />
+               </div>
+             </div>
+             <div className="flex gap-4 pt-4 border-t border-slate-50 text-[9px] font-black uppercase tracking-wide">
+               <span className="text-green-600">Ativos: {activeStudents.length}</span>
+               <span className="text-red-400">Inativos: {inactiveStudentsCount}</span>
+               <span className="text-indigo-400">Crismados: {concludedStudentsCount}</span>
+             </div>
            </div>
-           <div className="bg-white p-7 rounded-[2rem] border border-sky-50 shadow-sm flex flex-col justify-between group transition-all hover:shadow-lg">
-             <div><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Turmas</p><h3 className="text-3xl font-black text-slate-800">{totalClassesCount}</h3></div>
+
+           {/* 2. TOTAL DE TURMAS */}
+           <div className="bg-white p-7 rounded-[2rem] border border-sky-50 shadow-sm flex flex-col justify-between group transition-all hover:shadow-lg h-48">
+             <div className="flex justify-between items-start">
+               <div>
+                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total de Turmas</p>
+                 <h3 className="text-4xl font-black text-slate-800">{totalClasses}</h3>
+               </div>
+               <div className="bg-indigo-50 p-3 rounded-2xl text-indigo-600">
+                  <BookOpen className="w-6 h-6" />
+               </div>
+             </div>
+             <div className="pt-4 border-t border-slate-50">
+               <p className="text-[9px] font-black text-amber-500 uppercase tracking-wide flex items-center gap-1">
+                  <Sparkles className="w-3 h-3" /> Grupos de Oração
+               </p>
+             </div>
            </div>
-           <div className="bg-blue-600 p-7 rounded-[2.5rem] text-white shadow-xl shadow-blue-100 flex flex-col justify-between relative overflow-hidden">
+
+           {/* 3. CATEQUISTAS */}
+           <div className="bg-white p-7 rounded-[2rem] border border-sky-50 shadow-sm flex flex-col justify-between group transition-all hover:shadow-lg h-48">
+             <div className="flex justify-between items-start">
+               <div>
+                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Catequistas</p>
+                 <h3 className="text-4xl font-black text-slate-800">{totalCatequistas}</h3>
+               </div>
+               <div className="bg-amber-50 p-3 rounded-2xl text-amber-600">
+                  <UsersRound className="w-6 h-6" />
+               </div>
+             </div>
+             <div className="flex gap-4 pt-4 border-t border-slate-50 text-[9px] font-black uppercase tracking-wide">
+               <span className="text-green-600">Ativos: {activeCatequistasCount}</span>
+               <span className="text-slate-400">Inativos: {inactiveCatequistasCount}</span>
+             </div>
+           </div>
+
+           {/* 4. SACR. DO BATISMO */}
+           <div className="bg-white p-7 rounded-[2rem] border border-sky-50 shadow-sm flex flex-col justify-between group transition-all hover:shadow-lg h-48">
+             <div className="flex justify-between items-start">
+               <div>
+                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Sacr. do Batismo (Ativos)</p>
+                 <h3 className="text-4xl font-black text-slate-800">{activeBatizadosCount}</h3>
+               </div>
+               <div className="bg-cyan-50 p-3 rounded-2xl text-cyan-600">
+                  <Droplets className="w-6 h-6" />
+               </div>
+             </div>
+             <div className="flex gap-4 pt-4 border-t border-slate-50 text-[9px] font-black uppercase tracking-wide">
+               <span className="text-cyan-600">Batizados: {activeBatizadosCount}</span>
+               <span className="text-slate-400">Sem Batizar: {activeSemBatismoCount}</span>
+             </div>
+           </div>
+
+           {/* 5. SACR. DA EUCARISTIA */}
+           <div className="bg-white p-7 rounded-[2rem] border border-sky-50 shadow-sm flex flex-col justify-between group transition-all hover:shadow-lg h-48">
+             <div className="flex justify-between items-start">
+               <div>
+                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Sacr. da Eucaristia (Ativos)</p>
+                 <h3 className="text-4xl font-black text-slate-800">{activeEucaristiaCount}</h3>
+               </div>
+               <div className="bg-amber-50 p-3 rounded-2xl text-amber-600">
+                  <Wine className="w-6 h-6" />
+               </div>
+             </div>
+             <div className="flex gap-4 pt-4 border-t border-slate-50 text-[9px] font-black uppercase tracking-wide">
+               <span className="text-amber-600">Com Eucaristia: {activeEucaristiaCount}</span>
+               <span className="text-slate-400">Sem Eucaristia: {activeSemEucaristiaCount}</span>
+             </div>
+           </div>
+
+           {/* 6. SACR. DA CRISMA */}
+           <div className="bg-sky-600 p-7 rounded-[2rem] shadow-xl shadow-sky-100 flex flex-col justify-between h-48 relative overflow-hidden group hover:shadow-2xl transition-all text-white">
              <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent"></div>
-             <div><p className="text-[10px] font-black text-blue-200 uppercase tracking-widest mb-1">Crismados</p><h3 className="text-4xl font-black">{crismadosCount}</h3></div>
+             <div className="absolute top-0 right-0 p-8 opacity-10 transform translate-x-4 -translate-y-4">
+                <Flame className="w-32 h-32 text-white" />
+             </div>
+             <div className="flex justify-between items-start z-10">
+               <div>
+                 <p className="text-[10px] font-black text-sky-200 uppercase tracking-widest mb-1">Sacr. da Crisma</p>
+                 <h3 className="text-4xl font-black">{concludedStudentsCount}</h3>
+               </div>
+               <div className="bg-white/20 p-3 rounded-2xl backdrop-blur-md">
+                  <Flame className="w-6 h-6 text-white" />
+               </div>
+             </div>
+             <div className="flex gap-4 pt-4 border-t border-white/20 z-10 text-[9px] font-black uppercase tracking-wide opacity-90">
+               <span>Total de Turmas: {crismaClasses.length}</span>
+               <span>Em Preparação: {studentsInCrismaPrep}</span>
+             </div>
            </div>
+
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
