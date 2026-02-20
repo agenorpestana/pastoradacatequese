@@ -1,18 +1,20 @@
 
 import React, { useState, useMemo } from 'react';
-import { BarChart3, Calendar, Printer, School, UserCheck, TrendingUp, Search } from 'lucide-react';
-import { Turma, AttendanceSession, Catequista, ParishConfig } from '../types';
+import { BarChart3, Calendar, Printer, School, UserCheck, TrendingUp, Search, ArrowLeft, FileSpreadsheet } from 'lucide-react';
+import { Turma, AttendanceSession, Catequista, ParishConfig, Student } from '../types';
 
 interface AttendanceReportProps {
   classes: Turma[];
   attendanceSessions: AttendanceSession[];
   catequistas: Catequista[];
   config: ParishConfig;
+  students: Student[];
 }
 
-export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, attendanceSessions, catequistas, config }) => {
+export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, attendanceSessions, catequistas, config, students }) => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedClassForDiary, setSelectedClassForDiary] = useState<string | null>(null);
 
   // Cálculos Estatísticos
   const stats = useMemo(() => {
@@ -76,10 +78,179 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
     c.catequista.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const renderDiary = () => {
+    if (!selectedClassForDiary) return null;
+
+    const turma = classes.find(c => c.id === selectedClassForDiary);
+    if (!turma) return null;
+
+    const classStudents = students
+      .filter(s => s.turma === turma.nome && s.status === 'Ativo')
+      .sort((a, b) => a.nomeCompleto.localeCompare(b.nomeCompleto));
+
+    const classSessions = attendanceSessions
+      .filter(s => s.turmaId === turma.id && new Date(s.date).getFullYear() === selectedYear)
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    // Group sessions by month
+    const sessionsByMonth = classSessions.reduce((acc, session) => {
+      // session.date is YYYY-MM-DD
+      const parts = session.date.split('-');
+      // Fallback if date is not YYYY-MM-DD (e.g. ISO with time)
+      let month = 0;
+      if (parts.length >= 3) {
+         month = parseInt(parts[1]) - 1;
+      } else {
+         month = new Date(session.date).getMonth();
+      }
+      
+      if (!acc[month]) acc[month] = [];
+      acc[month].push(session);
+      return acc;
+    }, {} as Record<number, AttendanceSession[]>);
+
+    const months = Object.keys(sessionsByMonth).map(Number).sort((a, b) => a - b);
+
+    const monthNames = [
+      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    ];
+
+    return (
+      <div className="bg-white min-h-screen">
+        {/* Controls */}
+        <div className="no-print p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+          <button 
+            onClick={() => setSelectedClassForDiary(null)}
+            className="flex items-center gap-2 text-slate-600 hover:text-slate-900 font-bold"
+          >
+            <ArrowLeft className="w-4 h-4" /> Voltar
+          </button>
+          <div className="flex gap-2">
+             <button 
+              onClick={() => window.print()}
+              className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white font-bold rounded-lg hover:bg-slate-800"
+            >
+              <Printer className="w-4 h-4" /> Imprimir Diário
+            </button>
+          </div>
+        </div>
+
+        {/* Print Content */}
+        <div className="p-8 print:p-0 print:landscape">
+          <style>{`
+            @media print {
+              @page { size: landscape; margin: 10mm; }
+              body { -webkit-print-color-adjust: exact; }
+              .no-print { display: none !important; }
+            }
+          `}</style>
+
+          {/* Header */}
+          <div className="border border-black mb-4">
+            <div className="bg-slate-100 border-b border-black p-2 text-center font-black uppercase text-sm">
+               DIÁRIO CONSOLIDADO DE FREQUÊNCIA
+            </div>
+            <div className="flex text-xs font-bold uppercase">
+              <div className="flex-1 p-2 border-r border-black">
+                ANO: {selectedYear}
+              </div>
+              <div className="flex-[2] p-2 border-r border-black">
+                TURMA: {turma.nome}
+              </div>
+              <div className="flex-1 p-2">
+                RESUMO: {classStudents.length} CATEQUIZANDOS
+              </div>
+            </div>
+          </div>
+
+          {/* Matrix Table */}
+          <table className="w-full border-collapse border border-black text-[10px]">
+            <thead>
+              {/* Month Row */}
+              <tr>
+                <th className="border border-black p-1 w-8 text-center bg-slate-50" rowSpan={2}>Nº</th>
+                <th className="border border-black p-1 text-left bg-slate-50 min-w-[200px]" rowSpan={2}>CATEQUIZANDO</th>
+                {months.map(month => (
+                  <th 
+                    key={month} 
+                    colSpan={sessionsByMonth[month].length} 
+                    className="border border-black p-1 text-center bg-slate-100 uppercase"
+                  >
+                    {monthNames[month]}
+                  </th>
+                ))}
+              </tr>
+              {/* Day Row */}
+              <tr>
+                {months.map(month => (
+                  sessionsByMonth[month].map(session => {
+                    let day = '00';
+                    const parts = session.date.split('-');
+                    if (parts.length >= 3) {
+                        day = parts[2].substring(0, 2);
+                    } else {
+                        day = new Date(session.date).getDate().toString().padStart(2, '0');
+                    }
+                    
+                    return (
+                      <th key={session.id} className="border border-black p-1 text-center w-8">
+                        {day}
+                      </th>
+                    );
+                  })
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {classStudents.map((student, index) => (
+                <tr key={student.id}>
+                  <td className="border border-black p-1 text-center font-bold">{index + 1}</td>
+                  <td className="border border-black p-1 font-medium truncate max-w-[200px]">{student.nomeCompleto}</td>
+                  {months.map(month => (
+                    sessionsByMonth[month].map(session => {
+                      const entry = session.entries.find(e => e.studentId === student.id);
+                      const isPresent = entry?.status === 'present';
+                      const isAbsent = entry?.status === 'absent';
+                      
+                      return (
+                        <td key={`${student.id}-${session.id}`} className="border border-black p-1 text-center font-bold">
+                          {isPresent && <span className="text-green-600">V</span>}
+                          {isAbsent && <span className="text-red-600">X</span>}
+                          {!entry && <span className="text-slate-300">-</span>}
+                        </td>
+                      );
+                    })
+                  ))}
+                </tr>
+              ))}
+              {classStudents.length === 0 && (
+                <tr>
+                  <td colSpan={2 + classSessions.length} className="border border-black p-4 text-center italic text-slate-500">
+                    Nenhum aluno ativo nesta turma.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+          
+          <div className="mt-4 text-[10px] text-slate-500 flex justify-between">
+             <span>Gerado em {new Date().toLocaleDateString('pt-BR')}</span>
+             <span>Legenda: V = Presente, X = Ausente</span>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  if (selectedClassForDiary) {
+    return renderDiary();
+  }
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       
-      {/* SEÇÃO APENAS PARA IMPRESSÃO */}
+      {/* SEÇÃO APENAS PARA IMPRESSÃO (RELATÓRIO GERAL) */}
       <div className="print-only fixed inset-0 z-[200] bg-white p-8">
         <div className="text-center border-b-2 border-slate-900 pb-6 mb-6">
           <h1 className="text-2xl font-black uppercase tracking-widest">{config.parishName}</h1>
@@ -179,7 +350,7 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
              onClick={() => window.print()}
              className="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-all shadow-lg shadow-slate-200"
            >
-             <Printer className="w-4 h-4" /> <span className="text-xs uppercase tracking-widest">Imprimir</span>
+             <Printer className="w-4 h-4" /> <span className="text-xs uppercase tracking-widest">Imprimir Geral</span>
            </button>
         </div>
       </div>
@@ -235,9 +406,17 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
                      <h4 className="font-bold text-slate-800 text-sm">{c.nome}</h4>
                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{c.catequista}</p>
                    </div>
-                   <span className={`text-lg font-black ${c.attendanceRate >= 75 ? 'text-emerald-600' : c.attendanceRate >= 50 ? 'text-amber-500' : 'text-red-500'}`}>
-                     {c.attendanceRate.toFixed(0)}%
-                   </span>
+                   <div className="flex flex-col items-end gap-1">
+                      <span className={`text-lg font-black ${c.attendanceRate >= 75 ? 'text-emerald-600' : c.attendanceRate >= 50 ? 'text-amber-500' : 'text-red-500'}`}>
+                        {c.attendanceRate.toFixed(0)}%
+                      </span>
+                      <button 
+                        onClick={() => setSelectedClassForDiary(c.id)}
+                        className="text-[10px] flex items-center gap-1 bg-slate-900 text-white px-2 py-1 rounded-lg hover:bg-slate-700 transition-colors"
+                      >
+                        <FileSpreadsheet className="w-3 h-3" /> Diário
+                      </button>
+                   </div>
                  </div>
                  <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
                    <div 

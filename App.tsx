@@ -772,7 +772,7 @@ const App: React.FC = () => {
       case 'reports':
         return <Reports students={students} classes={classes} attendanceSessions={attendanceSessions} />;
       case 'attendance_report':
-        return <AttendanceReport classes={classes} attendanceSessions={attendanceSessions} catequistas={catequistas} config={parishConfig} />;
+        return <AttendanceReport classes={classes} attendanceSessions={attendanceSessions} catequistas={catequistas} config={parishConfig} students={students} />;
       case 'certificates':
         return <CertificateGenerator students={students} config={parishConfig} />;
       case 'profile':
