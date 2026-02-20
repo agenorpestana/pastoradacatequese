@@ -394,6 +394,8 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                 <p className="col-span-2"><strong>Nome:</strong> {formData.nomeCompleto}</p>
                 <p><strong>CPF:</strong> {formData.rgCpf || '___________'}</p>
                 <p><strong>Nascimento:</strong> {formData.dataNascimento ? new Date(formData.dataNascimento + 'T00:00:00').toLocaleDateString('pt-BR') : '___/___/___'}</p>
+                <p><strong>Estado Civil:</strong> {formData.estadoCivil || 'Solteiro(a)'}</p>
+                <p><strong>Status:</strong> {formData.status || 'Ativo'}</p>
                 <p><strong>Naturalidade:</strong> {formData.naturalidade} - {formData.ufNaturalidade}</p>
                 <p><strong>Telefone/Zap:</strong> {formData.telefone} {formData.whatsapp && `/ ${formData.whatsapp}`}</p>
                 <p><strong>E-mail:</strong> {formData.email}</p>
@@ -450,12 +452,12 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                <p className="text-[8px] leading-relaxed text-justify italic text-slate-700">
                  "Catequese é processo permanente de educação na fé". Ao inscrever seu(sua) filho(a) na catequese, você está se comprometendo a fazer parte deste processo, ou seja, ter um compromisso de participar com seu(sua) filho(a) das atividades da Paróquia (Missa das crianças e reuniões). É responsabilidade sua a educação religiosa de seu (sua) filho(a) pois, não se deve esquecer que 'os pais são os primeiros catequistas dos filhos'. Sem o seu compromisso e apoio, o trabalho catequético será em vão.
                </p>
-               <div className="mt-4 text-right">
+               <div className="mt-8 text-right">
                  <p className="text-[8px] font-bold">{config.city}-{config.state}, _____ /_____/_________</p>
                </div>
             </section>
 
-            <div className="mt-8 grid grid-cols-2 gap-12">
+            <div className="mt-12 grid grid-cols-2 gap-12">
               <div className="text-center">
                 <div className="border-t border-slate-900 pt-1 text-[8px] font-bold uppercase">Assinatura do Responsável</div>
               </div>
