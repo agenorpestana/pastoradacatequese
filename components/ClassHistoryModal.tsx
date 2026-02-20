@@ -53,29 +53,34 @@ export const ClassHistoryModal: React.FC<ClassHistoryModalProps> = ({ turma, ses
             return acc;
           }, {} as Record<number, AttendanceSession[]>);
 
+          // Sort sessions within each month by date ascending
+          Object.keys(sessionsByMonth).forEach(key => {
+            const monthKey = Number(key);
+            sessionsByMonth[monthKey].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+          });
+
           const months = Object.keys(sessionsByMonth).map(Number).sort((a, b) => a - b);
 
           const monthNames = [
-            'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-            'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+            'JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO',
+            'JULHO', 'AGOSTO', 'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO'
           ];
 
           return (
             <>
               {/* Header */}
-              <div className="border border-black mb-4">
-                <div className="bg-slate-100 border-b border-black p-2 text-center font-black uppercase text-sm">
-                   DIÁRIO CONSOLIDADO DE FREQUÊNCIA
-                </div>
-                <div className="flex text-xs font-bold uppercase">
-                  <div className="flex-1 p-2 border-r border-black">
-                    ANO: {turma.ano}
+              <div className="mb-6 border-b-4 border-slate-900 pb-2">
+                <div className="flex justify-between items-end mb-2">
+                  <div>
+                    <h1 className="text-3xl font-black uppercase tracking-tighter text-slate-900">LISTA DE CHAMADA</h1>
+                    <p className="text-sm font-bold text-slate-600 uppercase mt-1">Turma: {turma.nome}</p>
+                    <p className="text-xs text-slate-500 uppercase mt-0.5">
+                      Catequista: {turma.catequista} | Horário: {turma.horario}
+                    </p>
                   </div>
-                  <div className="flex-[2] p-2 border-r border-black">
-                    TEMA: {turma.nome}
-                  </div>
-                  <div className="flex-1 p-2">
-                    RESUMO: {sortedMembers.length} CATEQUIZANDOS
+                  <div className="text-right">
+                    <p className="text-xl font-black uppercase tracking-tight">ANO: {turma.ano}</p>
+                    <p className="text-[10px] text-slate-400 mt-1 uppercase">Gerado em: {new Date().toLocaleDateString('pt-BR')}</p>
                   </div>
                 </div>
               </div>
@@ -85,13 +90,13 @@ export const ClassHistoryModal: React.FC<ClassHistoryModalProps> = ({ turma, ses
                 <thead>
                   {/* Month Row */}
                   <tr>
-                    <th className="border border-black p-1 w-8 text-center bg-slate-50" rowSpan={2}>Nº</th>
-                    <th className="border border-black p-1 text-left bg-slate-50 min-w-[200px]" rowSpan={2}>CATEQUIZANDO</th>
+                    <th className="border border-black p-2 w-10 text-center bg-slate-50 font-black" rowSpan={2}>Nº</th>
+                    <th className="border border-black p-2 text-left bg-slate-50 min-w-[250px] font-black" rowSpan={2}>CATEQUIZANDO</th>
                     {months.map(month => (
                       <th 
                         key={month} 
                         colSpan={sessionsByMonth[month].length} 
-                        className="border border-black p-1 text-center bg-slate-100 uppercase"
+                        className="border border-black p-1 text-center bg-slate-100 font-black uppercase"
                       >
                         {monthNames[month]}
                       </th>
@@ -109,7 +114,7 @@ export const ClassHistoryModal: React.FC<ClassHistoryModalProps> = ({ turma, ses
                             day = new Date(session.date).getDate().toString().padStart(2, '0');
                         }
                         return (
-                          <th key={session.id} className="border border-black p-1 text-center w-8">
+                          <th key={session.id} className="border border-black p-1 text-center w-8 font-bold bg-white">
                             {day}
                           </th>
                         );
@@ -121,7 +126,7 @@ export const ClassHistoryModal: React.FC<ClassHistoryModalProps> = ({ turma, ses
                   {sortedMembers.map((student, index) => (
                     <tr key={student.id}>
                       <td className="border border-black p-1 text-center font-bold">{index + 1}</td>
-                      <td className="border border-black p-1 font-medium truncate max-w-[200px]">{student.nomeCompleto}</td>
+                      <td className="border border-black p-1 font-medium truncate max-w-[250px] uppercase">{student.nomeCompleto}</td>
                       {months.map(month => (
                         sessionsByMonth[month].map(session => {
                           const entry = session.entries.find(e => e.studentId === student.id);
@@ -149,8 +154,7 @@ export const ClassHistoryModal: React.FC<ClassHistoryModalProps> = ({ turma, ses
                 </tbody>
               </table>
 
-              <div className="mt-4 text-[10px] text-slate-500 flex justify-between">
-                 <span>Gerado em {new Date().toLocaleDateString('pt-BR')}</span>
+              <div className="mt-4 text-[10px] text-slate-500 flex justify-end">
                  <span>Legenda: V = Presente, X = Ausente</span>
               </div>
             </>
