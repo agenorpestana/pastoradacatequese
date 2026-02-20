@@ -61,7 +61,7 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
+    <div className="modal-root fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
       
       {/* FICHA DE IMPRESSÃO OFICIAL (VISÍVEL APENAS NO PRINT) */}
       <div className="print-only bg-white min-h-screen text-slate-900 absolute inset-0 z-[100] hidden">
@@ -70,7 +70,23 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
             @media print {
               @page { margin: 0; }
               body { margin: 0; }
-              .print-only { display: block !important; padding: 15mm; height: 100vh; }
+              .modal-root { 
+                position: absolute !important; 
+                top: 0 !important; 
+                left: 0 !important; 
+                width: 100% !important; 
+                height: auto !important; 
+                background: white !important; 
+                padding: 0 !important;
+                z-index: 9999 !important;
+                display: block !important;
+              }
+              .print-only { 
+                display: block !important; 
+                padding: 15mm; 
+                height: 100vh; 
+                position: relative !important;
+              }
               .no-print { display: none !important; }
             }
           `}
