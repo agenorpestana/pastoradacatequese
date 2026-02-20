@@ -27,72 +27,135 @@ export const ClassHistoryModal: React.FC<ClassHistoryModalProps> = ({ turma, ses
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
       
       {/* PRINT ONLY SECTION - CONSOLIDADO DO DIÁRIO */}
-      <div className="print-only p-10 w-full bg-white text-slate-900 font-sans absolute inset-0 z-[100]">
-        <div className="border-b-4 border-slate-900 pb-4 mb-8 flex justify-between items-end">
-          <div className="flex items-center gap-4">
-             {config.logo ? <img src={config.logo} className="w-16 h-16 object-contain" /> : <Church className="w-12 h-12" />}
-             <div>
-                <h1 className="text-2xl font-black uppercase tracking-tighter">Diário Consolidado de Frequência</h1>
-                <p className="text-sm font-bold text-slate-600">{config.parishName}</p>
-                <p className="text-xs text-slate-500">Turma: {turma.nome} | Catequista: {turma.catequista}</p>
-             </div>
-          </div>
-          <div className="text-right">
-            <p className="text-xs font-bold uppercase">Ano Letivo: {turma.ano}</p>
-            <p className="text-[10px] text-slate-400 mt-1">Extraído em: {new Date().toLocaleDateString('pt-BR')}</p>
-          </div>
-        </div>
+      <div className="print-only p-8 w-full bg-white text-slate-900 font-sans absolute inset-0 z-[100]">
+        <style>{`
+            @media print {
+              @page { size: landscape; margin: 10mm; }
+              body { -webkit-print-color-adjust: exact; }
+              .no-print { display: none !important; }
+            }
+        `}</style>
 
-        {sortedSessions.length > 0 ? (
-          <div className="space-y-12">
-            {sortedSessions.map((session, idx) => (
-              <div key={session.id} className={`${idx > 0 && idx % 2 === 0 ? 'page-break mt-10' : ''}`}>
-                <div className="bg-slate-50 p-2 border-l-4 border-slate-900 mb-2 flex justify-between items-center">
-                  <h3 className="text-sm font-black uppercase">
-                    Data: {new Date(session.date + 'T00:00:00').toLocaleDateString('pt-BR')} | Tema: {session.tema || "---"}
-                  </h3>
-                  <span className="text-[10px] font-bold">Resumo: {session.entries.filter(e => e.status === 'present').length} Presentes</span>
+        {(() => {
+          // Logic for Consolidated Diary
+          const sessionsByMonth = sortedSessions.reduce((acc, session) => {
+            // session.date is YYYY-MM-DD
+            const parts = session.date.split('-');
+            let month = 0;
+            if (parts.length >= 3) {
+               month = parseInt(parts[1]) - 1;
+            } else {
+               month = new Date(session.date).getMonth();
+            }
+            
+            if (!acc[month]) acc[month] = [];
+            acc[month].push(session);
+            return acc;
+          }, {} as Record<number, AttendanceSession[]>);
+
+          const months = Object.keys(sessionsByMonth).map(Number).sort((a, b) => a - b);
+
+          const monthNames = [
+            'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+            'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+          ];
+
+          return (
+            <>
+              {/* Header */}
+              <div className="border border-black mb-4">
+                <div className="bg-slate-100 border-b border-black p-2 text-center font-black uppercase text-sm">
+                   DIÁRIO CONSOLIDADO DE FREQUÊNCIA
                 </div>
-                <table className="w-full border-collapse border border-slate-300">
-                  <thead>
-                    <tr className="bg-slate-100">
-                      <th className="border border-slate-300 px-3 py-1 text-left text-[10px] font-black uppercase w-12">Nº</th>
-                      <th className="border border-slate-300 px-3 py-1 text-left text-[10px] font-black uppercase">Catequizando</th>
-                      <th className="border border-slate-300 px-3 py-1 text-center text-[10px] font-black uppercase w-32">Presença</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {sortedMembers.map((m, index) => {
-                      const entry = session.entries.find(e => e.studentId === m.id);
-                      return (
-                        <tr key={m.id}>
-                          <td className="border border-slate-300 px-3 py-1 text-xs font-bold text-center">{index + 1}</td>
-                          <td className="border border-slate-300 px-3 py-1 text-xs font-medium">{m.nomeCompleto}</td>
-                          <td className="border border-slate-300 px-3 py-1 text-xs font-black text-center uppercase">
-                            {entry?.status === 'present' ? 'P' : 'F'}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                <div className="flex text-xs font-bold uppercase">
+                  <div className="flex-1 p-2 border-r border-black">
+                    ANO: {turma.ano}
+                  </div>
+                  <div className="flex-[2] p-2 border-r border-black">
+                    TEMA: {turma.nome}
+                  </div>
+                  <div className="flex-1 p-2">
+                    RESUMO: {sortedMembers.length} CATEQUIZANDOS
+                  </div>
+                </div>
               </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-center py-20 italic">Nenhum registro de chamada encontrado para esta turma.</p>
-        )}
 
-        <div className="mt-16 pt-8 border-t-2 border-slate-200 grid grid-cols-2 gap-20">
-          <div className="text-center">
-            <div className="h-px bg-slate-900 w-full mb-2"></div>
-            <p className="text-[10px] font-bold uppercase">Assinatura do Catequista</p>
-          </div>
-          <div className="text-center">
-            <div className="h-px bg-slate-900 w-full mb-2"></div>
-            <p className="text-[10px] font-bold uppercase">Visto da Coordenação</p>
-          </div>
-        </div>
+              {/* Matrix Table */}
+              <table className="w-full border-collapse border border-black text-[10px]">
+                <thead>
+                  {/* Month Row */}
+                  <tr>
+                    <th className="border border-black p-1 w-8 text-center bg-slate-50" rowSpan={2}>Nº</th>
+                    <th className="border border-black p-1 text-left bg-slate-50 min-w-[200px]" rowSpan={2}>CATEQUIZANDO</th>
+                    {months.map(month => (
+                      <th 
+                        key={month} 
+                        colSpan={sessionsByMonth[month].length} 
+                        className="border border-black p-1 text-center bg-slate-100 uppercase"
+                      >
+                        {monthNames[month]}
+                      </th>
+                    ))}
+                  </tr>
+                  {/* Day Row */}
+                  <tr>
+                    {months.map(month => (
+                      sessionsByMonth[month].map(session => {
+                        let day = '00';
+                        const parts = session.date.split('-');
+                        if (parts.length >= 3) {
+                            day = parts[2].substring(0, 2);
+                        } else {
+                            day = new Date(session.date).getDate().toString().padStart(2, '0');
+                        }
+                        return (
+                          <th key={session.id} className="border border-black p-1 text-center w-8">
+                            {day}
+                          </th>
+                        );
+                      })
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {sortedMembers.map((student, index) => (
+                    <tr key={student.id}>
+                      <td className="border border-black p-1 text-center font-bold">{index + 1}</td>
+                      <td className="border border-black p-1 font-medium truncate max-w-[200px]">{student.nomeCompleto}</td>
+                      {months.map(month => (
+                        sessionsByMonth[month].map(session => {
+                          const entry = session.entries.find(e => e.studentId === student.id);
+                          const isPresent = entry?.status === 'present';
+                          const isAbsent = entry?.status === 'absent';
+                          
+                          return (
+                            <td key={`${student.id}-${session.id}`} className="border border-black p-1 text-center font-bold">
+                              {isPresent && <span className="text-green-600">V</span>}
+                              {isAbsent && <span className="text-red-600">X</span>}
+                              {!entry && <span className="text-slate-300">-</span>}
+                            </td>
+                          );
+                        })
+                      ))}
+                    </tr>
+                  ))}
+                  {sortedMembers.length === 0 && (
+                    <tr>
+                      <td colSpan={2 + sortedSessions.length} className="border border-black p-4 text-center italic text-slate-500">
+                        Nenhum aluno ativo nesta turma.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+
+              <div className="mt-4 text-[10px] text-slate-500 flex justify-between">
+                 <span>Gerado em {new Date().toLocaleDateString('pt-BR')}</span>
+                 <span>Legenda: V = Presente, X = Ausente</span>
+              </div>
+            </>
+          );
+        })()}
       </div>
 
       {/* UI MODAL SECTION */}
