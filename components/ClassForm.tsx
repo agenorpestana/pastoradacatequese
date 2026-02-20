@@ -106,7 +106,7 @@ export const ClassForm: React.FC<ClassFormProps> = ({ onSave, onCancel, initialD
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="md:col-span-2">
+            <div className="md:col-span-1">
               <label className="label-style">Nome da Turma</label>
               <input 
                 required 
@@ -115,6 +115,17 @@ export const ClassForm: React.FC<ClassFormProps> = ({ onSave, onCancel, initialD
                 onChange={e => setFormData({...formData, nome: e.target.value})} 
                 className="input-style" 
                 placeholder="Ex: Turma São Francisco 2024" 
+              />
+            </div>
+
+            <div className="md:col-span-1">
+              <label className="label-style">Comunidade</label>
+              <input 
+                type="text" 
+                value={formData.comunidade || ''} 
+                onChange={e => setFormData({...formData, comunidade: e.target.value})} 
+                className="input-style" 
+                placeholder="Ex: Matriz, Capela..." 
               />
             </div>
 

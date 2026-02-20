@@ -95,11 +95,31 @@ export const LibraryView: React.FC<LibraryViewProps> = ({ files, onUpload, onDel
     }, 800);
   };
 
+  const handleDownload = (file: LibraryFile) => {
+    const link = document.createElement('a');
+    link.href = file.url;
+    link.download = file.name;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const handleView = (file: LibraryFile) => {
-    const win = window.open();
-    if (win) {
-      win.document.write(`<iframe src="${file.url}" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>`);
-    }
+    // Convert Data URL to Blob to allow opening in new tab (Chrome blocks top-frame navigation to data: URLs)
+    fetch(file.url)
+      .then(res => res.blob())
+      .then(blob => {
+        const blobUrl = URL.createObjectURL(blob);
+        const win = window.open(blobUrl, '_blank');
+        if (!win) {
+          alert("Por favor, permita popups para visualizar o arquivo.");
+        }
+      })
+      .catch(e => {
+        console.error("Erro ao abrir arquivo:", e);
+        // Fallback: try to download if view fails
+        handleDownload(file);
+      });
   };
 
   const filteredFiles = files.filter(f => {
@@ -200,7 +220,7 @@ export const LibraryView: React.FC<LibraryViewProps> = ({ files, onUpload, onDel
 
               {/* Botão de Download Flutuante (Hover) */}
               <button 
-                onClick={() => handleView(file)}
+                onClick={() => handleDownload(file)}
                 className="absolute right-6 bottom-6 bg-slate-900 text-white p-3 rounded-2xl shadow-xl transform translate-y-20 group-hover:translate-y-0 transition-transform duration-300"
               >
                 <Download size={20} />

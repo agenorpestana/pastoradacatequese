@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { Save, UserCheck, ArrowLeft, Calendar, Phone, Mail, MapPin, ShieldCheck, MessageCircle, Sparkles, X } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Save, UserCheck, ArrowLeft, Calendar, Phone, Mail, MapPin, ShieldCheck, MessageCircle, Sparkles, X, Camera, Heart, FileText } from 'lucide-react';
 import { Catequista } from '../types';
 import { maskPhone, maskCpfCnpj } from '../utils/masks';
 
@@ -17,8 +17,28 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
     estadoCivil: 'Solteiro(a)',
     whatsapp: '',
     telefone: '',
-    email: ''
+    email: '',
+    matricula: Math.floor(100000 + Math.random() * 900000).toString() // Generate random 6-digit matricula
   });
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!formData.matricula) {
+      setFormData(prev => ({ ...prev, matricula: Math.floor(100000 + Math.random() * 900000).toString() }));
+    }
+  }, []);
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({ ...prev, foto: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,6 +81,34 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+            {/* FOTO E MATRÍCULA */}
+            <div className="md:col-span-12 flex flex-col md:flex-row gap-6 items-center mb-4">
+              <div 
+                onClick={() => fileInputRef.current?.click()}
+                className="w-32 h-32 rounded-full border-4 border-sky-100 bg-slate-50 flex items-center justify-center cursor-pointer hover:border-sky-300 transition-all relative overflow-hidden group shrink-0"
+              >
+                {formData.foto ? (
+                  <img src={formData.foto} alt="Foto" className="w-full h-full object-cover" />
+                ) : (
+                  <Camera className="w-10 h-10 text-slate-300 group-hover:text-sky-500 transition-colors" />
+                )}
+                <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <p className="text-white text-[10px] font-bold uppercase">Alterar</p>
+                </div>
+                <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handlePhotoChange} />
+              </div>
+              <div className="flex-1 w-full">
+                 <label className="label-style">Nº de Registro (Matrícula)</label>
+                 <input 
+                   type="text" 
+                   value={formData.matricula || ''} 
+                   readOnly 
+                   className="input-style bg-slate-100 text-slate-500 font-mono tracking-widest" 
+                 />
+                 <p className="text-[10px] text-slate-400 mt-1">Gerado automaticamente pelo sistema.</p>
+              </div>
+            </div>
+
             <div className="md:col-span-9">
               <label className="label-style">Nome Completo</label>
               <input required type="text" value={formData.nome || ''} onChange={e => setFormData({...formData, nome: e.target.value})} className="input-style" placeholder="Ex: Maria de Fátima Souza" />
@@ -98,6 +146,47 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
                 <option>U. Estável</option>
               </select>
             </div>
+
+            {/* DADOS DO CÔNJUGE (CONDICIONAL) */}
+            {formData.estadoCivil === 'Casado(a)' && (
+              <div className="md:col-span-12 bg-pink-50/50 border border-pink-100 rounded-2xl p-6 animate-in fade-in slide-in-from-top-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <Heart className="w-4 h-4 text-pink-500" />
+                  <h5 className="text-xs font-black text-pink-700 uppercase tracking-widest">Dados do Cônjuge</h5>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="md:col-span-1">
+                    <label className="label-style">Nome do Cônjuge</label>
+                    <input 
+                      type="text" 
+                      value={formData.conjuge || ''} 
+                      onChange={e => setFormData({...formData, conjuge: e.target.value})} 
+                      className="input-style bg-white" 
+                    />
+                  </div>
+                  <div className="md:col-span-1">
+                    <label className="label-style">CPF do Cônjuge</label>
+                    <input 
+                      type="text" 
+                      value={formData.conjugeRgCpf || ''} 
+                      onChange={e => setFormData({...formData, conjugeRgCpf: maskCpfCnpj(e.target.value)})} 
+                      className="input-style bg-white" 
+                      placeholder="000.000.000-00"
+                    />
+                  </div>
+                  <div className="md:col-span-1">
+                    <label className="label-style">Telefone do Cônjuge</label>
+                    <input 
+                      type="tel" 
+                      value={formData.conjugeTelefone || ''} 
+                      onChange={e => setFormData({...formData, conjugeTelefone: maskPhone(e.target.value)})} 
+                      className="input-style bg-white" 
+                      placeholder="(00) 00000-0000"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="md:col-span-10">
               <label className="label-style">Naturalidade</label>

@@ -74,6 +74,7 @@ export interface Turma {
   horario: string;
   ano: string;
   ativa: boolean;
+  comunidade?: string;
 }
 
 export interface AttendanceEntry {
@@ -152,11 +153,16 @@ export interface PersonFull extends PersonBasic {
 export interface Catequista {
   id: string;
   nome: string;
+  foto?: string;
+  matricula?: string;
   status: 'Ativo' | 'Inativo';
   sexo: 'M' | 'F';
   dataNascimento: string;
   rgCpf: string;
   estadoCivil: string;
+  conjuge?: string;
+  conjugeRgCpf?: string;
+  conjugeTelefone?: string;
   naturalidade: string;
   ufNaturalidade: string;
   comunidade: string;

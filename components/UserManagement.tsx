@@ -294,7 +294,7 @@ export const UserForm: React.FC<UserFormProps> = ({ onSave, onCancel, initialDat
                 {(formData.role === 'catequista' || formData.role === 'catequista_auxiliar') && (
                   <div className="animate-in fade-in slide-in-from-top-2 duration-300 bg-sky-50 border border-sky-100 p-4 rounded-2xl">
                     <label className="label-style text-sky-700 flex items-center gap-2">
-                      <Link className="w-3 h-3" /> Vincular a Cadastro de Catequista
+                      <Link className="w-3 h-3" /> VINCULAR AO CATEQUISTA
                     </label>
                     <select 
                       value={formData.linkedCatequistaId || ''} 
