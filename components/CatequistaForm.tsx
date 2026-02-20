@@ -21,6 +21,9 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
     matricula: Math.floor(100000 + Math.random() * 900000).toString() // Generate random 6-digit matricula
   });
 
+  const [isCameraActive, setIsCameraActive] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -28,6 +31,43 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
       setFormData(prev => ({ ...prev, matricula: Math.floor(100000 + Math.random() * 900000).toString() }));
     }
   }, []);
+
+  const startCamera = async () => {
+    try {
+      setIsCameraActive(true);
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+    } catch (err) {
+      console.error("Erro ao acessar a câmera:", err);
+      alert("Não foi possível acessar a câmera.");
+      setIsCameraActive(false);
+    }
+  };
+
+  const stopCamera = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
+      tracks.forEach(track => track.stop());
+      videoRef.current.srcObject = null;
+    }
+    setIsCameraActive(false);
+  };
+
+  const capturePhoto = () => {
+    if (videoRef.current && canvasRef.current) {
+      const context = canvasRef.current.getContext('2d');
+      if (context) {
+        canvasRef.current.width = videoRef.current.videoWidth;
+        canvasRef.current.height = videoRef.current.videoHeight;
+        context.drawImage(videoRef.current, 0, 0);
+        const imageData = canvasRef.current.toDataURL('image/jpeg');
+        setFormData({ ...formData, foto: imageData });
+        stopCamera();
+      }
+    }
+  };
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -83,20 +123,38 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
             {/* FOTO E MATRÍCULA */}
             <div className="md:col-span-12 flex flex-col md:flex-row gap-6 items-center mb-4">
-              <div 
-                onClick={() => fileInputRef.current?.click()}
-                className="w-32 h-32 rounded-full border-4 border-sky-100 bg-slate-50 flex items-center justify-center cursor-pointer hover:border-sky-300 transition-all relative overflow-hidden group shrink-0"
-              >
-                {formData.foto ? (
+              <div className="relative group w-32 h-32 rounded-full border-4 border-sky-100 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0">
+                {isCameraActive ? (
+                   <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover" />
+                ) : formData.foto ? (
                   <img src={formData.foto} alt="Foto" className="w-full h-full object-cover" />
                 ) : (
-                  <Camera className="w-10 h-10 text-slate-300 group-hover:text-sky-500 transition-colors" />
+                  <Camera className="w-10 h-10 text-slate-300" />
                 )}
-                <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <p className="text-white text-[10px] font-bold uppercase">Alterar</p>
+                
+                {/* Overlay Buttons */}
+                <div className={`absolute inset-0 bg-black/40 flex items-center justify-center gap-2 transition-opacity ${isCameraActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+                   {!isCameraActive ? (
+                     <>
+                       <button type="button" onClick={startCamera} className="p-2 bg-white rounded-full hover:bg-sky-50 transition-colors" title="Tirar Foto">
+                         <Camera size={16} className="text-sky-600" />
+                       </button>
+                       <button type="button" onClick={() => fileInputRef.current?.click()} className="p-2 bg-white rounded-full hover:bg-sky-50 transition-colors" title="Escolher da Galeria">
+                         <FileText size={16} className="text-sky-600" />
+                       </button>
+                     </>
+                   ) : (
+                     <button type="button" onClick={capturePhoto} className="px-3 py-1 bg-white rounded-full text-[10px] font-black uppercase text-sky-600">
+                       Capturar
+                     </button>
+                   )}
                 </div>
+                
+                {/* Hidden Canvas for Capture */}
+                <canvas ref={canvasRef} className="hidden" />
                 <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handlePhotoChange} />
               </div>
+
               <div className="flex-1 w-full">
                  <label className="label-style">Nº de Registro (Matrícula)</label>
                  <input 
