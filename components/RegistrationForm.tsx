@@ -425,10 +425,22 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                 <div className="flex flex-col gap-0.5">
                   <p><strong>Batizado(a):</strong> {formData.batizado ? 'Sim' : 'Não'} {formData.batizado && ` - Paróquia: ${formData.batismoParoquia} / ${formData.batismoUF}`}</p>
                   {formData.batizado && (
-                    <p className="pl-2"><strong>Comunidade:</strong> {formData.batismoComunidade || '---'} | <strong>Local/Cidade:</strong> {formData.batismoLocal || '---'} | <strong>Celebrante:</strong> {formData.batismoCelebrante || '---'}</p>
+                    <>
+                      <p className="pl-2"><strong>Comunidade:</strong> {formData.batismoComunidade || '---'} | <strong>Local/Cidade:</strong> {formData.batismoLocal || '---'} | <strong>Celebrante:</strong> {formData.batismoCelebrante || '---'}</p>
+                      <div className="grid grid-cols-2 gap-x-4 pl-2 mt-0.5">
+                         <div>
+                            <p className="font-bold underline uppercase text-[7px]">Madrinha de Batismo</p>
+                            <p><strong>Nome:</strong> {formData.madrinhaBatismo?.nome || '---'}</p>
+                         </div>
+                         <div>
+                            <p className="font-bold underline uppercase text-[7px]">Padrinho de Batismo</p>
+                            <p><strong>Nome:</strong> {formData.padrinhoBatismo?.nome || '---'}</p>
+                         </div>
+                      </div>
+                    </>
                   )}
                 </div>
-                <div className="flex flex-col gap-0.5">
+                <div className="flex flex-col gap-0.5 mt-1">
                   <p><strong>1ª Eucaristia:</strong> {formData.fezPrimeiraEucaristia ? 'Sim' : 'Não'} {formData.fezPrimeiraEucaristia && ` - Paróquia: ${formData.eucaristiaParoquia} / ${formData.eucaristiaUF}`}</p>
                   {formData.fezPrimeiraEucaristia && (
                     <p className="pl-2"><strong>Comunidade:</strong> {formData.eucaristiaComunidade || '---'} | <strong>Local/Cidade:</strong> {formData.eucaristiaLocal || '---'} | <strong>Catequistas:</strong> {formData.eucaristiaCatequistas || '---'}</p>
@@ -438,13 +450,39 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
             </section>
 
             <section>
-              <h3 className="bg-slate-100 px-2 py-0.5 text-[8px] font-black uppercase border-l-4 border-slate-900 mb-1.5 tracking-widest">4. Crisma</h3>
+              <h3 className="bg-slate-100 px-2 py-0.5 text-[8px] font-black uppercase border-l-4 border-slate-900 mb-1.5 tracking-widest">4. Crisma / Preparação</h3>
               <div className="grid grid-cols-2 gap-x-4 text-[9px]">
                 <p><strong>Turma:</strong> {formData.turma || '___'}</p>
                 <p><strong>Catequista:</strong> {displayCatequistas}</p>
-                <p className="col-span-2"><strong>Padrinho/Madrinha:</strong> {formData.padrinhoCrisma?.nome || '____________________'}</p>
+                <p><strong>Início Prep.:</strong> {formData.inicioPreparacao ? new Date(formData.inicioPreparacao).toLocaleDateString('pt-BR') : '___/___/___'}</p>
+                <p><strong>Fim Prep.:</strong> {formData.fimPreparacao ? new Date(formData.fimPreparacao).toLocaleDateString('pt-BR') : '___/___/___'}</p>
+                
+                <div className="col-span-2 mt-1 border-t border-slate-100 pt-1">
+                   <p className="font-bold underline uppercase text-[7px]">Padrinho/Madrinha de Crisma</p>
+                   <p><strong>Nome:</strong> {formData.padrinhoCrisma?.nome || '____________________'}</p>
+                   <p><strong>Telefone:</strong> {formData.padrinhoCrisma?.telefone || '____________________'}</p>
+                </div>
+
+                {(formData.dataCelebracao || formData.localCelebracao || formData.celebrante) && (
+                  <div className="col-span-2 mt-1 border-t border-slate-100 pt-1">
+                    <p className="font-bold underline uppercase text-[7px] mb-0.5">Dados da Celebração</p>
+                    <div className="grid grid-cols-2 gap-x-4">
+                      <p><strong>Data:</strong> {formData.dataCelebracao ? new Date(formData.dataCelebracao).toLocaleDateString('pt-BR') : '---'}</p>
+                      <p><strong>Local:</strong> {formData.localCelebracao || '---'}</p>
+                      <p className="col-span-2"><strong>Celebrante:</strong> {formData.celebrante || '---'}</p>
+                      <p><strong>Livro:</strong> {formData.livro || '--'} | <strong>Folha:</strong> {formData.folha || '--'} | <strong>Registro:</strong> {formData.numeroRegistro || '--'}</p>
+                    </div>
+                  </div>
+                )}
               </div>
             </section>
+
+            {formData.observacoes && (
+              <section>
+                <h3 className="bg-slate-100 px-2 py-0.5 text-[8px] font-black uppercase border-l-4 border-slate-900 mb-1.5 tracking-widest">5. Observações</h3>
+                <p className="text-[9px] text-justify leading-snug">{formData.observacoes}</p>
+              </section>
+            )}
 
             {/* TERMO DE COMPROMISSO (APENAS IMPRESSÃO) */}
             <section className="mt-4 pt-3 border-t border-slate-200">
@@ -457,7 +495,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                </div>
             </section>
 
-            <div className="mt-12 grid grid-cols-2 gap-12">
+            <div className="mt-16 grid grid-cols-2 gap-12">
               <div className="text-center">
                 <div className="border-t border-slate-900 pt-1 text-[8px] font-bold uppercase">Assinatura do Responsável</div>
               </div>

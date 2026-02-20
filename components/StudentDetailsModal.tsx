@@ -124,10 +124,22 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
                 <div className="flex flex-col gap-0.5">
                   <p><strong>Batizado(a):</strong> {student.batizado ? 'Sim' : 'Não'} {student.batizado && ` - Paróquia: ${student.batismoParoquia} / ${student.batismoUF}`}</p>
                   {student.batizado && (
-                    <p className="pl-2"><strong>Comunidade:</strong> {student.batismoComunidade || '---'} | <strong>Local/Cidade:</strong> {student.batismoLocal || '---'} | <strong>Celebrante:</strong> {student.batismoCelebrante || '---'}</p>
+                    <>
+                      <p className="pl-2"><strong>Comunidade:</strong> {student.batismoComunidade || '---'} | <strong>Local/Cidade:</strong> {student.batismoLocal || '---'} | <strong>Celebrante:</strong> {student.batismoCelebrante || '---'}</p>
+                      <div className="grid grid-cols-2 gap-x-4 pl-2 mt-0.5">
+                         <div>
+                            <p className="font-bold underline uppercase text-[7px]">Madrinha de Batismo</p>
+                            <p><strong>Nome:</strong> {student.madrinhaBatismo?.nome || '---'}</p>
+                         </div>
+                         <div>
+                            <p className="font-bold underline uppercase text-[7px]">Padrinho de Batismo</p>
+                            <p><strong>Nome:</strong> {student.padrinhoBatismo?.nome || '---'}</p>
+                         </div>
+                      </div>
+                    </>
                   )}
                 </div>
-                <div className="flex flex-col gap-0.5">
+                <div className="flex flex-col gap-0.5 mt-1">
                   <p><strong>1ª Eucaristia:</strong> {student.fezPrimeiraEucaristia ? 'Sim' : 'Não'} {student.fezPrimeiraEucaristia && ` - Paróquia: ${student.eucaristiaParoquia} / ${student.eucaristiaUF}`}</p>
                   {student.fezPrimeiraEucaristia && (
                     <p className="pl-2"><strong>Comunidade:</strong> {student.eucaristiaComunidade || '---'} | <strong>Local/Cidade:</strong> {student.eucaristiaLocal || '---'} | <strong>Catequistas:</strong> {student.eucaristiaCatequistas || '---'}</p>
@@ -137,13 +149,39 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
             </section>
 
             <section>
-              <h3 className="bg-slate-100 px-2 py-0.5 text-[8px] font-black uppercase border-l-4 border-slate-900 mb-1.5 tracking-widest">4. Crisma</h3>
+              <h3 className="bg-slate-100 px-2 py-0.5 text-[8px] font-black uppercase border-l-4 border-slate-900 mb-1.5 tracking-widest">4. Crisma / Preparação</h3>
               <div className="grid grid-cols-2 gap-x-4 text-[9px]">
                 <p><strong>Turma:</strong> {student.turma || '___'}</p>
                 <p><strong>Catequista:</strong> {displayCatequistas}</p>
-                <p className="col-span-2"><strong>Padrinho/Madrinha:</strong> {student.padrinhoCrisma?.nome || '____________________'}</p>
+                <p><strong>Início Prep.:</strong> {student.inicioPreparacao ? new Date(student.inicioPreparacao).toLocaleDateString('pt-BR') : '___/___/___'}</p>
+                <p><strong>Fim Prep.:</strong> {student.fimPreparacao ? new Date(student.fimPreparacao).toLocaleDateString('pt-BR') : '___/___/___'}</p>
+
+                <div className="col-span-2 mt-1 border-t border-slate-100 pt-1">
+                   <p className="font-bold underline uppercase text-[7px]">Padrinho/Madrinha de Crisma</p>
+                   <p><strong>Nome:</strong> {student.padrinhoCrisma?.nome || '____________________'}</p>
+                   <p><strong>Telefone:</strong> {student.padrinhoCrisma?.telefone || '____________________'}</p>
+                </div>
+
+                {(student.dataCelebracao || student.localCelebracao || student.celebrante) && (
+                  <div className="col-span-2 mt-1 border-t border-slate-100 pt-1">
+                    <p className="font-bold underline uppercase text-[7px] mb-0.5">Dados da Celebração</p>
+                    <div className="grid grid-cols-2 gap-x-4">
+                      <p><strong>Data:</strong> {student.dataCelebracao ? new Date(student.dataCelebracao).toLocaleDateString('pt-BR') : '---'}</p>
+                      <p><strong>Local:</strong> {student.localCelebracao || '---'}</p>
+                      <p className="col-span-2"><strong>Celebrante:</strong> {student.celebrante || '---'}</p>
+                      <p><strong>Livro:</strong> {student.livro || '--'} | <strong>Folha:</strong> {student.folha || '--'} | <strong>Registro:</strong> {student.numeroRegistro || '--'}</p>
+                    </div>
+                  </div>
+                )}
               </div>
             </section>
+
+            {student.observacoes && (
+              <section>
+                <h3 className="bg-slate-100 px-2 py-0.5 text-[8px] font-black uppercase border-l-4 border-slate-900 mb-1.5 tracking-widest">5. Observações</h3>
+                <p className="text-[9px] text-justify leading-snug">{student.observacoes}</p>
+              </section>
+            )}
 
             {/* TERMO DE COMPROMISSO (APENAS IMPRESSÃO) */}
             <section className="mt-4 pt-3 border-t border-slate-200">
@@ -156,7 +194,7 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
                </div>
             </section>
 
-            <div className="mt-12 grid grid-cols-2 gap-12">
+            <div className="mt-16 grid grid-cols-2 gap-12">
               <div className="text-center">
                 <div className="border-t border-slate-900 pt-1 text-[8px] font-bold uppercase">Assinatura do Responsável</div>
               </div>
