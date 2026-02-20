@@ -157,6 +157,22 @@ export const ClassHistoryModal: React.FC<ClassHistoryModalProps> = ({ turma, ses
               <div className="mt-4 text-[10px] text-slate-500 flex justify-end">
                  <span>Legenda: V = Presente, X = Ausente</span>
               </div>
+
+              <div className="border-t border-black pt-2 mt-4 text-center">
+                <p className="text-[8px] font-bold uppercase">
+                  {config.address} - {config.city}/{config.state}
+                </p>
+                <div className="flex justify-center gap-4 mt-1 text-[8px] font-bold uppercase">
+                  {config.phone && <span>Tel: {config.phone}</span>}
+                  {config.whatsapp && <span>Zap: {config.whatsapp}</span>}
+                  {config.email && <span>Email: {config.email}</span>}
+                </div>
+                <div className="flex justify-center gap-4 mt-0.5 text-[8px] font-bold uppercase text-slate-600">
+                  {config.instagram && <span>Insta: {config.instagram}</span>}
+                  {config.facebook && <span>Face: {config.facebook}</span>}
+                  {config.website && <span>Site: {config.website}</span>}
+                </div>
+              </div>
             </>
           );
         })()}

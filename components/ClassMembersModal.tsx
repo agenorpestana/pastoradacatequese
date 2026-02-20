@@ -1,16 +1,17 @@
 
 import React from 'react';
 import { X, Printer, Users, User, Phone, BookOpen, Calendar } from 'lucide-react';
-import { Turma, Student } from '../types';
+import { Turma, Student, ParishConfig } from '../types';
 
 interface ClassMembersModalProps {
   turma: Turma;
   members: Student[];
   onClose: () => void;
   onViewStudent: (student: Student) => void;
+  config: ParishConfig;
 }
 
-export const ClassMembersModal: React.FC<ClassMembersModalProps> = ({ turma, members, onClose, onViewStudent }) => {
+export const ClassMembersModal: React.FC<ClassMembersModalProps> = ({ turma, members, onClose, onViewStudent, config }) => {
   const handlePrint = () => {
     window.print();
   };
@@ -21,7 +22,15 @@ export const ClassMembersModal: React.FC<ClassMembersModalProps> = ({ turma, mem
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
       {/* PRINT ONLY SECTION */}
-      <div className="print-only p-10 w-full bg-white text-slate-900 font-sans">
+      <div className="print-only p-10 w-full bg-white text-slate-900 font-sans relative min-h-screen hidden">
+        <style>{`
+          @media print {
+            @page { margin: 0; }
+            body { margin: 0; }
+            .print-only { display: block !important; padding: 10mm; height: 100vh; }
+            .no-print { display: none !important; }
+          }
+        `}</style>
         <div className="border-b-4 border-slate-900 pb-4 mb-8 flex justify-between items-end">
           <div>
             <h1 className="text-2xl font-black uppercase tracking-tighter">Lista de Chamada</h1>
@@ -66,6 +75,22 @@ export const ClassMembersModal: React.FC<ClassMembersModalProps> = ({ turma, mem
         <div className="mt-12 grid grid-cols-2 gap-20">
           <div className="border-t border-slate-900 pt-2 text-center text-[10px] font-bold uppercase">Assinatura do Catequista</div>
           <div className="border-t border-slate-900 pt-2 text-center text-[10px] font-bold uppercase">Coordenação de Catequese</div>
+        </div>
+
+        <div className="border-t-2 border-slate-900 pt-2 mt-auto text-center absolute bottom-10 left-0 right-0 px-10">
+          <p className="text-[8px] font-bold uppercase">
+            {config.address} - {config.city}/{config.state}
+          </p>
+          <div className="flex justify-center gap-4 mt-1 text-[8px] font-bold uppercase">
+            {config.phone && <span>Tel: {config.phone}</span>}
+            {config.whatsapp && <span>Zap: {config.whatsapp}</span>}
+            {config.email && <span>Email: {config.email}</span>}
+          </div>
+          <div className="flex justify-center gap-4 mt-0.5 text-[8px] font-bold uppercase text-slate-600">
+            {config.instagram && <span>Insta: {config.instagram}</span>}
+            {config.facebook && <span>Face: {config.facebook}</span>}
+            {config.website && <span>Site: {config.website}</span>}
+          </div>
         </div>
       </div>
 

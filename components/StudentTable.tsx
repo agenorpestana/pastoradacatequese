@@ -18,6 +18,12 @@ export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses
   const [selectedTurma, setSelectedTurma] = useState<TurmaLevel | 'all'>('all');
   const [selectedStatus, setSelectedStatus] = useState<'all' | 'Ativo' | 'Inativo' | 'Concluido'>('all');
 
+  const getStudentLevel = (turmaNome: string) => {
+    if (!turmaNome) return '---';
+    const foundClass = allClasses.find(c => c.nome === turmaNome);
+    return foundClass ? foundClass.nivel : '---';
+  };
+
   const filteredStudents = (students || []).filter(student => {
     const nome = student.nomeCompleto || '';
     const matricula = student.matricula || '';
@@ -28,17 +34,11 @@ export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses
       nome.toLowerCase().includes((searchTerm || '').toLowerCase()) || 
       matricula.includes(searchTerm);
 
-    const matchesTurma = selectedTurma === 'all' || turma === selectedTurma;
+    const matchesTurma = selectedTurma === 'all' || getStudentLevel(turma) === selectedTurma;
     const matchesStatus = selectedStatus === 'all' || status === selectedStatus;
     
     return matchesSearch && matchesTurma && matchesStatus;
   });
-
-  const getStudentLevel = (turmaNome: string) => {
-    if (!turmaNome) return '---';
-    const foundClass = allClasses.find(c => c.nome === turmaNome);
-    return foundClass ? foundClass.nivel : '---';
-  };
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-10">

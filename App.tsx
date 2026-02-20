@@ -859,6 +859,7 @@ const App: React.FC = () => {
             members={students.filter(s => s.turma === viewingClassMembers.nome)}
             onClose={() => setViewingClassMembers(null)}
             onViewStudent={(s) => { setViewingClassMembers(null); setViewingStudent(s); }}
+            config={parishConfig}
           />
         )}
 

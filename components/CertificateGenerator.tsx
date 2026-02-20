@@ -142,6 +142,22 @@ export const CertificateGenerator: React.FC<CertificateGeneratorProps> = ({ stud
                   <p className="text-[11px] text-slate-400 font-bold uppercase tracking-[0.4em]">
                     {config.city}-{config.state}, {new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' })}
                   </p>
+                  
+                  <div className="mt-6 pt-4 border-t border-slate-100 w-full max-w-2xl mx-auto">
+                    <p className="text-[8px] font-bold uppercase text-slate-400">
+                      {config.address} - {config.city}/{config.state}
+                    </p>
+                    <div className="flex justify-center gap-4 mt-1 text-[8px] font-bold uppercase text-slate-400">
+                      {config.phone && <span>Tel: {config.phone}</span>}
+                      {config.whatsapp && <span>Zap: {config.whatsapp}</span>}
+                      {config.email && <span>Email: {config.email}</span>}
+                    </div>
+                    <div className="flex justify-center gap-4 mt-0.5 text-[8px] font-bold uppercase text-slate-300">
+                      {config.instagram && <span>Insta: {config.instagram}</span>}
+                      {config.facebook && <span>Face: {config.facebook}</span>}
+                      {config.website && <span>Site: {config.website}</span>}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
