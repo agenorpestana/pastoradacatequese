@@ -37,15 +37,27 @@ import {
 } from './types';
 import { 
   LayoutDashboard, CheckCircle2, Loader2, ClipboardList, BookOpen, 
-  UsersRound, Droplets, Wine, Flame, Sparkles 
+  UsersRound, Droplets, Wine, Flame, Sparkles, CalendarDays, Clock 
 } from 'lucide-react';
 
 // DashboardContent Component
 const DashboardContent = ({ events, students, classes, catequistas, suggestedDate, onDateChange, onAddEvent, user, onTakeEventAttendance }: any) => {
+    // Eventos do dia selecionado
     const selectedDayEvents = events.filter((e: any) => e.dataInicio === suggestedDate);
     const dateObj = new Date(suggestedDate + 'T00:00:00');
     const dayName = dateObj.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' });
     
+    // Eventos Futuros (A partir de hoje)
+    const today = new Date().toISOString().split('T')[0];
+    const futureEvents = events
+        .filter((e: any) => e.dataInicio >= today)
+        .sort((a: any, b: any) => {
+            const dateA = new Date(a.dataInicio + 'T' + (a.horarioInicio || '00:00'));
+            const dateB = new Date(b.dataInicio + 'T' + (b.horarioInicio || '00:00'));
+            return dateA.getTime() - dateB.getTime();
+        })
+        .slice(0, 10); // Limitar aos próximos 10 eventos
+
     // Statistics Calculations
     const totalStudents = students.length;
     const activeStudents = students.filter((s:any) => s.status === 'Ativo');
@@ -201,21 +213,82 @@ const DashboardContent = ({ events, students, classes, catequistas, suggestedDat
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
-           <div className="xl:col-span-3 h-[500px]">
-              <CalendarView events={events} selectedDate={suggestedDate} onDateChange={onDateChange} onAddEvent={onAddEvent} />
+           {/* Coluna Esquerda: Calendário + Eventos do Dia */}
+           <div className="xl:col-span-4 flex flex-col gap-6">
+              <div className="h-auto bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden">
+                 <CalendarView events={events} selectedDate={suggestedDate} onDateChange={onDateChange} onAddEvent={onAddEvent} />
+              </div>
+              
+              {/* Eventos do Dia Selecionado */}
+              <div className="bg-white rounded-[2rem] border border-blue-100 p-6 shadow-sm flex-1 min-h-[250px] relative overflow-hidden">
+                 <div className="absolute top-0 right-0 p-4 opacity-5"><CalendarDays className="w-24 h-24 text-blue-600" /></div>
+                 <h4 className="text-xs font-black text-blue-600 uppercase tracking-widest mb-4 flex items-center gap-2 relative z-10">
+                    <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                    Eventos do Dia <span className="text-slate-400">({dayName})</span>
+                 </h4>
+                 <div className="space-y-3 relative z-10">
+                     {selectedDayEvents.length > 0 ? selectedDayEvents.map((event: any) => (
+                         <div key={event.id} className="bg-slate-50 p-4 rounded-2xl border border-slate-100 hover:bg-blue-50/50 transition-colors">
+                             <p className="font-bold text-slate-800 text-sm leading-tight">{event.titulo}</p>
+                             <div className="flex justify-between items-center mt-2">
+                                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wide flex items-center gap-1">
+                                     <Clock className="w-3 h-3" /> {event.horarioInicio}
+                                 </p>
+                                 <button onClick={() => onTakeEventAttendance(event)} className="p-1.5 text-white bg-blue-600 rounded-lg shadow-sm hover:bg-blue-700 transition-colors" title="Lançar Presença">
+                                     <CheckCircle2 className="w-3 h-3" />
+                                 </button>
+                             </div>
+                         </div>
+                     )) : (
+                         <div className="text-center py-10 text-slate-400">
+                             <p className="text-xs italic">Nenhum evento para este dia.</p>
+                             <button onClick={() => onAddEvent(suggestedDate)} className="mt-2 text-[10px] font-bold text-blue-600 hover:underline">Agendar Agora</button>
+                         </div>
+                     )}
+                 </div>
+              </div>
            </div>
-           <div className="xl:col-span-9 bg-white rounded-[2.5rem] border border-sky-50 p-8 shadow-sm h-[500px] flex flex-col">
-              <h4 className="text-sm font-black text-slate-800 uppercase tracking-widest mb-4">Eventos em {dayName}</h4>
-              <div className="space-y-4 flex-1 overflow-y-auto">
-                  {selectedDayEvents.length > 0 ? selectedDayEvents.map((event: any) => (
-                      <div key={event.id} className="bg-sky-50/50 p-4 rounded-3xl border border-sky-100/50 flex justify-between items-center">
-                          <div>
-                              <p className="font-bold text-slate-800">{event.titulo}</p>
-                              <p className="text-xs text-slate-500">{event.horarioInicio} - {event.local}</p>
+
+           {/* Coluna Direita: Eventos Futuros */}
+           <div className="xl:col-span-8 bg-white rounded-[2.5rem] border border-slate-100 p-8 shadow-sm min-h-[500px] flex flex-col">
+              <div className="flex items-center gap-3 mb-6">
+                  <div className="p-2 bg-amber-50 rounded-xl"><CalendarDays className="w-5 h-5 text-amber-600" /></div>
+                  <h4 className="text-sm font-black text-slate-800 uppercase tracking-widest">Eventos Futuros</h4>
+              </div>
+              
+              <div className="space-y-4 flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                  {futureEvents.length > 0 ? futureEvents.map((event: any) => {
+                       const eventDate = new Date(event.dataInicio + 'T00:00:00');
+                       const month = eventDate.toLocaleDateString('pt-BR', { month: 'short' }).toUpperCase();
+                       const day = eventDate.getDate();
+                       
+                       return (
+                          <div key={event.id} className="flex items-center gap-4 p-4 hover:bg-slate-50 rounded-3xl border border-transparent hover:border-slate-100 transition-all group">
+                              <div className="flex flex-col items-center justify-center w-14 h-14 bg-slate-100 rounded-2xl shrink-0 group-hover:bg-white group-hover:shadow-md transition-all border border-slate-200">
+                                  <span className="text-[9px] font-black text-slate-400 uppercase leading-none">{month}</span>
+                                  <span className="text-xl font-black text-slate-800 leading-none mt-0.5">{day}</span>
+                              </div>
+                              <div className="flex-1">
+                                  <h5 className="font-bold text-slate-800 text-sm">{event.titulo}</h5>
+                                  <p className="text-xs text-slate-500 mt-0.5 flex items-center gap-2">
+                                      <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {event.horarioInicio}</span>
+                                      <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
+                                      <span>{event.local}</span>
+                                  </p>
+                              </div>
+                              <div className="text-right">
+                                   <span className="inline-flex items-center px-3 py-1 rounded-full text-[9px] font-black bg-white border border-slate-100 text-slate-500 uppercase tracking-widest group-hover:bg-blue-50 group-hover:text-blue-600 group-hover:border-blue-100 transition-colors">
+                                      {event.tipo}
+                                   </span>
+                              </div>
                           </div>
-                          <button onClick={() => onTakeEventAttendance(event)} className="p-2 text-sky-600 bg-white rounded-xl shadow-sm"><CheckCircle2 /></button>
+                       );
+                  }) : (
+                      <div className="flex flex-col items-center justify-center h-full text-slate-300">
+                          <CalendarDays className="w-12 h-12 mb-4 opacity-20" />
+                          <p className="text-sm font-bold uppercase tracking-widest opacity-50">Sem eventos futuros agendados</p>
                       </div>
-                  )) : <p className="text-center text-slate-400 py-10 italic">Sem eventos</p>}
+                  )}
               </div>
            </div>
         </div>
