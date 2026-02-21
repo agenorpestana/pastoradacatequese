@@ -248,81 +248,114 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
       )}
 
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md no-print">
-        {/* Rest of the component modal UI ... */}
-        <div className="relative h-32 md:h-40 bg-gradient-to-br from-indigo-600 via-blue-600 to-blue-700 shrink-0">
-          <button onClick={onClose} className="absolute top-6 right-6 p-2 bg-white/20 hover:bg-white/40 text-white rounded-full transition-all backdrop-blur-md">
-            <X className="w-5 h-5" />
-          </button>
-          <div className="absolute -bottom-10 left-6 md:left-10">
-            <div className="w-24 h-24 md:w-32 md:h-32 rounded-3xl bg-white p-1 border-4 border-white shadow-2xl flex items-center justify-center text-blue-600 font-black text-4xl md:text-5xl uppercase overflow-hidden">
-              {student.foto ? <img src={student.foto} className="w-full h-full object-cover" alt="" /> : (student.nomeCompleto || '?').charAt(0)}
-            </div>
-          </div>
-        </div>
-
-        <div className="pt-12 px-6 md:px-10 pb-10 space-y-8 overflow-y-auto flex-1">
-          <div className="flex flex-col md:flex-row justify-between items-start gap-4">
-            <div>
-              <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">{student.nomeCompleto}</h2>
-              <div className="flex gap-2 mt-2">
-                <span className="px-4 py-1 bg-blue-600 text-white text-[10px] font-bold rounded-full uppercase">{student.turma || 'Sem Turma'}</span>
-                <span className="px-4 py-1 bg-slate-100 text-slate-700 text-[10px] font-bold rounded-full uppercase">{student.sexo === 'M' ? 'Masc' : 'Fem'}</span>
+        <div className="bg-white w-full max-w-4xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300 flex flex-col max-h-[90vh]">
+          {/* Header Gradient */}
+          <div className="relative h-32 md:h-40 bg-gradient-to-br from-indigo-600 via-blue-600 to-blue-700 shrink-0">
+            <button 
+              onClick={onClose} 
+              className="absolute top-6 right-6 p-2 bg-white/20 hover:bg-white/40 text-white rounded-full transition-all backdrop-blur-md z-10"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            
+            {/* Profile Picture / Initial */}
+            <div className="absolute -bottom-12 left-6 md:left-10 z-20">
+              <div className="w-24 h-24 md:w-32 md:h-32 rounded-3xl bg-white p-1 border-4 border-white shadow-2xl flex items-center justify-center text-blue-600 font-black text-4xl md:text-5xl uppercase overflow-hidden">
+                {student.foto ? (
+                  <img src={student.foto} className="w-full h-full object-cover" alt={student.nomeCompleto} />
+                ) : (
+                  (student.nomeCompleto || '?').charAt(0)
+                )}
               </div>
-            </div>
-            <div className="flex gap-2 w-full md:w-auto">
-              <button onClick={handlePrint} className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 text-white text-xs font-bold rounded-2xl shadow-lg">
-                <Printer size={16} /> Imprimir Ficha Oficial
-              </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8">
-            <div className="md:col-span-7 space-y-6">
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 bg-slate-50 p-6 rounded-3xl border border-slate-100">
-                <div className="space-y-1">
-                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Nascimento</p>
-                  <p className="font-bold text-slate-800 text-xs">{student.dataNascimento ? new Date(student.dataNascimento + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Contatos</p>
-                  <p className="font-bold text-slate-800 text-[10px]">Tel: {student.telefone || '---'}</p>
-                  <p className="font-bold text-slate-800 text-[10px]">Zap: {student.whatsapp || '---'}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Batizado</p>
-                  <p className="font-bold text-slate-800 text-xs">{student.batizado ? 'Sim' : 'Não'}</p>
+          {/* Modal Content */}
+          <div className="pt-16 md:pt-14 px-6 md:px-10 pb-10 space-y-8 overflow-y-auto flex-1 custom-scrollbar">
+            <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+              <div>
+                <h2 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">{student.nomeCompleto}</h2>
+                <div className="flex gap-2 mt-2">
+                  <span className="px-4 py-1 bg-blue-600 text-white text-[10px] font-bold rounded-full uppercase tracking-wider">
+                    {student.turma || 'Sem Turma'}
+                  </span>
+                  <span className="px-4 py-1 bg-slate-100 text-slate-600 text-[10px] font-bold rounded-full uppercase tracking-wider">
+                    {student.sexo === 'M' ? 'Masc' : 'Fem'}
+                  </span>
                 </div>
               </div>
-
-              <div className="bg-white rounded-3xl border border-slate-100 p-6 space-y-6">
-                <h4 className="font-black text-slate-800 uppercase tracking-widest text-xs flex items-center gap-2">
-                   <BarChart size={16} className="text-blue-600" /> Histórico de Presença
-                </h4>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-green-50 p-4 rounded-2xl border border-green-100 text-center">
-                    <p className="text-[9px] font-black text-green-600 uppercase mb-1">Presença</p>
-                    <p className="text-2xl font-black text-green-700">{presenceRate}%</p>
-                  </div>
-                  <div className="bg-red-50 p-4 rounded-2xl border border-red-100 text-center">
-                    <p className="text-[9px] font-black text-red-600 uppercase mb-1">Faltas</p>
-                    <p className="text-2xl font-black text-red-700">{absenceRate}%</p>
-                  </div>
-                </div>
+              
+              <div className="flex gap-2 w-full md:w-auto">
+                <button 
+                  onClick={handlePrint} 
+                  className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 text-white text-xs font-bold rounded-2xl shadow-lg hover:bg-slate-800 transition-all active:scale-95"
+                >
+                  <Printer size={16} /> 
+                  <span className="uppercase tracking-widest">Imprimir Ficha Oficial</span>
+                </button>
               </div>
             </div>
 
-            <div className="md:col-span-5 space-y-6">
-              <div className="bg-blue-50/50 rounded-3xl p-6 border border-blue-100">
-                 <h4 className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-4 flex items-center gap-2">
-                   <Sparkles size={14} /> Mensagem da Pastoral (IA)
-                 </h4>
-                 {loadingGoal ? (
-                    <div className="flex items-center gap-2 text-blue-400 font-bold justify-center py-6 text-xs">
-                      <Loader2 className="w-4 h-4 animate-spin" /> Gerando acolhida...
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8">
+              {/* Left Column: Stats & Info */}
+              <div className="md:col-span-7 space-y-6">
+                {/* Basic Info Cards */}
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 bg-slate-50/50 p-6 rounded-[2rem] border border-slate-100">
+                  <div className="space-y-1">
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Nascimento</p>
+                    <p className="font-bold text-slate-800 text-xs">
+                      {student.dataNascimento ? new Date(student.dataNascimento + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}
+                    </p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Contatos</p>
+                    <p className="font-bold text-slate-800 text-[10px]">Tel: {student.telefone || '---'}</p>
+                    <p className="font-bold text-slate-800 text-[10px]">Zap: {student.whatsapp || '---'}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Batizado</p>
+                    <p className="font-bold text-slate-800 text-xs">{student.batizado ? 'Sim' : 'Não'}</p>
+                  </div>
+                </div>
+
+                {/* Presence History */}
+                <div className="bg-white rounded-[2rem] border border-slate-100 p-6 shadow-sm">
+                  <h4 className="font-black text-slate-800 uppercase tracking-widest text-xs flex items-center gap-2 mb-6">
+                    <BarChart size={16} className="text-blue-600" /> Histórico de Presença
+                  </h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-emerald-50/50 p-6 rounded-2xl border border-emerald-100 text-center">
+                      <p className="text-[10px] font-black text-emerald-600 uppercase mb-1 tracking-widest">Presença</p>
+                      <p className="text-3xl font-black text-emerald-700">{presenceRate}%</p>
                     </div>
-                 ) : (
-                    <p className="text-slate-700 text-sm leading-relaxed italic">"{goal || 'Que Deus ilumine sua caminhada de fé!'}"</p>
-                 )}
+                    <div className="bg-red-50/50 p-6 rounded-2xl border border-red-100 text-center">
+                      <p className="text-[10px] font-black text-red-600 uppercase mb-1 tracking-widest">Faltas</p>
+                      <p className="text-3xl font-black text-red-700">{absenceRate}%</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: AI Message */}
+              <div className="md:col-span-5">
+                <div className="bg-blue-50/30 rounded-[2rem] p-8 border border-blue-100 h-full">
+                  <h4 className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-6 flex items-center gap-2">
+                    <Sparkles size={14} /> Mensagem da Pastoral (IA)
+                  </h4>
+                  {loadingGoal ? (
+                    <div className="flex flex-col items-center gap-4 text-blue-400 font-bold justify-center py-10 text-xs">
+                      <Loader2 className="w-6 h-6 animate-spin" /> 
+                      <span className="uppercase tracking-widest">Gerando acolhida...</span>
+                    </div>
+                  ) : (
+                    <div className="relative">
+                      <Quote className="absolute -top-4 -left-4 w-8 h-8 text-blue-100 -z-10" />
+                      <p className="text-slate-700 text-base leading-relaxed italic font-medium">
+                        "{goal || 'Que Deus ilumine sua caminhada de fé!'}"
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
