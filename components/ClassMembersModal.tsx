@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { X, Printer, Users, User, Phone, BookOpen, Calendar } from 'lucide-react';
 import { Turma, Student, ParishConfig } from '../types';
 
@@ -21,78 +22,91 @@ export const ClassMembersModal: React.FC<ClassMembersModalProps> = ({ turma, mem
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
-      {/* PRINT ONLY SECTION */}
-      <div className="print-only p-10 w-full bg-white text-slate-900 font-sans relative min-h-screen hidden">
-        <style>{`
-          @media print {
-            @page { margin: 0; }
-            body { margin: 0; }
-            .print-only { display: block !important; padding: 10mm; height: 100vh; }
-            .no-print { display: none !important; }
-          }
-        `}</style>
-        <div className="border-b-4 border-slate-900 pb-4 mb-8 flex justify-between items-end">
-          <div>
-            <h1 className="text-2xl font-black uppercase tracking-tighter">Lista de Chamada</h1>
-            <p className="text-sm font-bold text-slate-600">Turma: {turma.nome}</p>
-            <p className="text-xs text-slate-500">Catequista: {turma.catequista} | Horário: {turma.diaSemana}, {turma.horario}</p>
+      {/* PRINT ONLY SECTION (PORTAL) */}
+      {createPortal(
+        <div className="print-only p-10 w-full bg-white text-slate-900 font-sans absolute inset-0 z-[9999] hidden">
+          <style>{`
+            @media print {
+              @page { margin: 0; }
+              body { margin: 0; }
+              body > *:not(.print-only) { display: none !important; }
+              .print-only { 
+                display: block !important; 
+                padding: 10mm; 
+                height: 100vh; 
+                position: absolute !important;
+                top: 0;
+                left: 0;
+                width: 100%;
+                background: white;
+              }
+              .no-print { display: none !important; }
+            }
+          `}</style>
+          <div className="border-b-4 border-slate-900 pb-4 mb-8 flex justify-between items-end">
+            <div>
+              <h1 className="text-2xl font-black uppercase tracking-tighter">Lista de Chamada</h1>
+              <p className="text-sm font-bold text-slate-600">Turma: {turma.nome}</p>
+              <p className="text-xs text-slate-500">Catequista: {turma.catequista} | Horário: {turma.diaSemana}, {turma.horario}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-xs font-bold uppercase">Mês: ____________________</p>
+              <p className="text-[10px] text-slate-400 mt-1">Gerado em: {new Date().toLocaleDateString('pt-BR')}</p>
+            </div>
           </div>
-          <div className="text-right">
-            <p className="text-xs font-bold uppercase">Mês: ____________________</p>
-            <p className="text-[10px] text-slate-400 mt-1">Gerado em: {new Date().toLocaleDateString('pt-BR')}</p>
-          </div>
-        </div>
 
-        <table className="w-full border-collapse border border-slate-300">
-          <thead>
-            <tr className="bg-slate-50">
-              <th className="border border-slate-300 px-3 py-2 text-left text-xs font-black uppercase w-10">Nº</th>
-              <th className="border border-slate-300 px-3 py-2 text-left text-xs font-black uppercase">Catequizando</th>
-              {[1, 2, 3, 4, 5].map(i => (
-                <th key={i} className="border border-slate-300 px-1 py-2 text-center text-[8px] font-black uppercase w-8">Dia</th>
-              ))}
-              <th className="border border-slate-300 px-3 py-2 text-left text-xs font-black uppercase w-24">Obs.</th>
-            </tr>
-          </thead>
-          <tbody>
-            {members.length > 0 ? (
-              members.sort((a,b) => a.nomeCompleto.localeCompare(b.nomeCompleto)).map((m, index) => (
-                <tr key={m.id}>
-                  <td className="border border-slate-300 px-3 py-2 text-xs font-bold text-center">{index + 1}</td>
-                  <td className="border border-slate-300 px-3 py-2 text-xs font-medium">{m.nomeCompleto}</td>
-                  {[1, 2, 3, 4, 5].map(i => (
-                    <td key={i} className="border border-slate-300 px-1 py-2"></td>
-                  ))}
-                  <td className="border border-slate-300 px-3 py-2"></td>
-                </tr>
-              ))
-            ) : (
-              <tr><td colSpan={8} className="border border-slate-300 p-10 text-center italic text-slate-400">Nenhum aluno vinculado.</td></tr>
-            )}
-          </tbody>
-        </table>
+          <table className="w-full border-collapse border border-slate-300">
+            <thead>
+              <tr className="bg-slate-50">
+                <th className="border border-slate-300 px-3 py-2 text-left text-xs font-black uppercase w-10">Nº</th>
+                <th className="border border-slate-300 px-3 py-2 text-left text-xs font-black uppercase">Catequizando</th>
+                {[1, 2, 3, 4, 5].map(i => (
+                  <th key={i} className="border border-slate-300 px-1 py-2 text-center text-[8px] font-black uppercase w-8">Dia</th>
+                ))}
+                <th className="border border-slate-300 px-3 py-2 text-left text-xs font-black uppercase w-24">Obs.</th>
+              </tr>
+            </thead>
+            <tbody>
+              {members.length > 0 ? (
+                members.sort((a,b) => a.nomeCompleto.localeCompare(b.nomeCompleto)).map((m, index) => (
+                  <tr key={m.id}>
+                    <td className="border border-slate-300 px-3 py-2 text-xs font-bold text-center">{index + 1}</td>
+                    <td className="border border-slate-300 px-3 py-2 text-xs font-medium">{m.nomeCompleto}</td>
+                    {[1, 2, 3, 4, 5].map(i => (
+                      <td key={i} className="border border-slate-300 px-1 py-2"></td>
+                    ))}
+                    <td className="border border-slate-300 px-3 py-2"></td>
+                  </tr>
+                ))
+              ) : (
+                <tr><td colSpan={8} className="border border-slate-300 p-10 text-center italic text-slate-400">Nenhum aluno vinculado.</td></tr>
+              )}
+            </tbody>
+          </table>
 
-        <div className="mt-12 grid grid-cols-2 gap-20">
-          <div className="border-t border-slate-900 pt-2 text-center text-[10px] font-bold uppercase">Assinatura do Catequista</div>
-          <div className="border-t border-slate-900 pt-2 text-center text-[10px] font-bold uppercase">Coordenação de Catequese</div>
-        </div>
+          <div className="mt-12 grid grid-cols-2 gap-20">
+            <div className="border-t border-slate-900 pt-2 text-center text-[10px] font-bold uppercase">Assinatura do Catequista</div>
+            <div className="border-t border-slate-900 pt-2 text-center text-[10px] font-bold uppercase">Coordenação de Catequese</div>
+          </div>
 
-        <div className="border-t-2 border-slate-900 pt-2 mt-auto text-center absolute bottom-10 left-0 right-0 px-10">
-          <p className="text-[8px] font-bold uppercase">
-            {config.address} - {config.city}/{config.state}
-          </p>
-          <div className="flex justify-center gap-4 mt-1 text-[8px] font-bold uppercase">
-            {config.phone && <span>Tel: {config.phone}</span>}
-            {config.whatsapp && <span>Zap: {config.whatsapp}</span>}
-            {config.email && <span>Email: {config.email}</span>}
+          <div className="border-t-2 border-slate-900 pt-2 mt-auto text-center absolute bottom-10 left-0 right-0 px-10">
+            <p className="text-[8px] font-bold uppercase">
+              {config.address} - {config.city}/{config.state}
+            </p>
+            <div className="flex justify-center gap-4 mt-1 text-[8px] font-bold uppercase">
+              {config.phone && <span>Tel: {config.phone}</span>}
+              {config.whatsapp && <span>Zap: {config.whatsapp}</span>}
+              {config.email && <span>Email: {config.email}</span>}
+            </div>
+            <div className="flex justify-center gap-4 mt-0.5 text-[8px] font-bold uppercase text-slate-600">
+              {config.instagram && <span>Insta: {config.instagram}</span>}
+              {config.facebook && <span>Face: {config.facebook}</span>}
+              {config.website && <span>Site: {config.website}</span>}
+            </div>
           </div>
-          <div className="flex justify-center gap-4 mt-0.5 text-[8px] font-bold uppercase text-slate-600">
-            {config.instagram && <span>Insta: {config.instagram}</span>}
-            {config.facebook && <span>Face: {config.facebook}</span>}
-            {config.website && <span>Site: {config.website}</span>}
-          </div>
-        </div>
-      </div>
+        </div>,
+        document.body
+      )}
 
       {/* UI MODAL SECTION */}
       <div className="no-print bg-white w-full max-w-3xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300 flex flex-col max-h-[90vh]">

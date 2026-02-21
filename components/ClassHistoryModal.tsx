@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { X, Calendar, BookOpenText, Users, Clock, CheckCircle2, XCircle, FileSpreadsheet, Printer, Church } from 'lucide-react';
 import { Turma, AttendanceSession, Student, ParishConfig } from '../types';
 
@@ -27,14 +28,16 @@ export const ClassHistoryModal: React.FC<ClassHistoryModalProps> = ({ turma, ses
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
       
       {/* PRINT ONLY SECTION - CONSOLIDADO DO DIÁRIO */}
-      <div className="print-only p-8 w-full bg-white text-slate-900 font-sans absolute inset-0 z-[100]">
-        <style>{`
-            @media print {
-              @page { size: landscape; margin: 10mm; }
-              body { -webkit-print-color-adjust: exact; }
-              .no-print { display: none !important; }
-            }
-        `}</style>
+      {createPortal(
+        <div className="print-only p-8 w-full bg-white text-slate-900 font-sans absolute inset-0 z-[100]">
+          <style>{`
+              @media print {
+                @page { size: landscape; margin: 10mm; }
+                body { -webkit-print-color-adjust: exact; }
+                body > *:not(.print-only) { display: none !important; }
+                .print-only { display: block !important; }
+              }
+          `}</style>
 
         {(() => {
           // Logic for Consolidated Diary
@@ -176,7 +179,9 @@ export const ClassHistoryModal: React.FC<ClassHistoryModalProps> = ({ turma, ses
             </>
           );
         })()}
-      </div>
+      </div>,
+      document.body
+    )}
 
       {/* UI MODAL SECTION */}
       <div className="no-print bg-white w-full max-w-4xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300 flex flex-col max-h-[90vh]">

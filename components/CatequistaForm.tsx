@@ -1,16 +1,18 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Save, UserCheck, ArrowLeft, Calendar, Phone, Mail, MapPin, ShieldCheck, MessageCircle, Sparkles, X, Camera, Heart, FileText } from 'lucide-react';
-import { Catequista } from '../types';
+import { createPortal } from 'react-dom';
+import { Save, UserCheck, ArrowLeft, Calendar, Phone, Mail, MapPin, ShieldCheck, MessageCircle, Sparkles, X, Camera, Heart, FileText, Printer } from 'lucide-react';
+import { Catequista, ParishConfig } from '../types';
 import { maskPhone, maskCpfCnpj } from '../utils/masks';
 
 interface CatequistaFormProps {
   onSave: (catequista: Catequista) => void;
   onCancel: () => void;
   initialData?: Catequista;
+  config: ParishConfig;
 }
 
-export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel, initialData }) => {
+export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel, initialData, config }) => {
   const [formData, setFormData] = useState<Partial<Catequista>>(initialData || {
     sexo: 'F',
     status: 'Ativo',
@@ -90,7 +92,123 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
   };
 
   return (
-    <div className="bg-white shadow-2xl rounded-[2.5rem] border border-sky-100 overflow-hidden mb-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="relative">
+      {/* PRINT ONLY SECTION (PORTAL) */}
+      {createPortal(
+        <div className="print-only p-10 w-full bg-white text-slate-900 font-sans absolute inset-0 z-[9999] hidden">
+          <style>{`
+            @media print {
+              @page { margin: 0; }
+              body { margin: 0; }
+              body > *:not(.print-only) { display: none !important; }
+              .print-only { 
+                display: block !important; 
+                padding: 10mm; 
+                height: 100vh; 
+                position: absolute !important;
+                top: 0;
+                left: 0;
+                width: 100%;
+                background: white;
+              }
+              .no-print { display: none !important; }
+            }
+          `}</style>
+
+          <div className="border-[2px] border-slate-900 p-5 h-full flex flex-col justify-between">
+            <div>
+              {/* Header */}
+              <div className="flex justify-between items-center border-b-2 border-slate-900 pb-3 mb-3">
+                <div className="flex items-center gap-3">
+                  {config.logo ? (
+                    <img src={config.logo} className="w-12 h-12 object-contain" />
+                  ) : (
+                    <UserCheck className="w-8 h-8" />
+                  )}
+                  <div>
+                    <h1 className="text-lg font-black uppercase tracking-tighter">Ficha de Inscrição de Catequista</h1>
+                    <p className="text-[10px] font-bold">{config.dioceseName} - {config.city}-{config.state}</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-[9px] font-bold uppercase">Matrícula</p>
+                  <p className="text-sm font-black">{formData.matricula || '________'}</p>
+                  <p className="text-[8px] uppercase font-bold text-slate-400 mt-0.5">
+                    Data: {new Date().toLocaleDateString('pt-BR')}
+                  </p>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="space-y-3">
+                <section className="relative">
+                  {formData.foto && (
+                    <div className="absolute top-0 right-0 w-20 h-24 border border-slate-900 overflow-hidden bg-white">
+                      <img src={formData.foto} className="w-full h-full object-cover" alt="Foto" />
+                    </div>
+                  )}
+                  <h3 className="bg-slate-100 px-2 py-0.5 text-[8px] font-black uppercase border-l-4 border-slate-900 mb-1.5 tracking-widest">1. Dados Pessoais</h3>
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[9px] pr-24">
+                    <p className="col-span-2"><strong>Nome:</strong> {formData.nome}</p>
+                    <p><strong>CPF:</strong> {formData.rgCpf || '___________'}</p>
+                    <p><strong>Nascimento:</strong> {formData.dataNascimento ? new Date(formData.dataNascimento + 'T00:00:00').toLocaleDateString('pt-BR') : '___/___/___'}</p>
+                    <p><strong>Estado Civil:</strong> {formData.estadoCivil || 'Solteiro(a)'}</p>
+                    <p><strong>Status:</strong> {formData.status || 'Ativo'}</p>
+                    <p><strong>Naturalidade:</strong> {formData.naturalidade} - {formData.ufNaturalidade}</p>
+                    <p><strong>Telefone/Zap:</strong> {formData.telefone} {formData.whatsapp && `/ ${formData.whatsapp}`}</p>
+                    <p><strong>E-mail:</strong> {formData.email}</p>
+                    <p className="col-span-2"><strong>Endereço:</strong> {formData.endereco}, {formData.numero} - {formData.bairro}, {formData.cidade}/{formData.ufEndereco}</p>
+                    <p className="col-span-2"><strong>Comunidade de Atuação:</strong> {formData.comunidade || 'Paróquia Central'}</p>
+                    <p className="col-span-2"><strong>Início na Catequese:</strong> {formData.desde ? new Date(formData.desde + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</p>
+                  </div>
+                </section>
+
+                {formData.estadoCivil === 'Casado(a)' && (
+                  <section>
+                    <h3 className="bg-slate-100 px-2 py-0.5 text-[8px] font-black uppercase border-l-4 border-slate-900 mb-1.5 tracking-widest">2. Dados do Cônjuge</h3>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[9px]">
+                      <p className="col-span-2"><strong>Nome do Cônjuge:</strong> {formData.conjuge || '---'}</p>
+                      <p><strong>CPF do Cônjuge:</strong> {formData.conjugeRgCpf || '---'}</p>
+                      <p><strong>Telefone do Cônjuge:</strong> {formData.conjugeTelefone || '---'}</p>
+                    </div>
+                  </section>
+                )}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div>
+              <div className="mt-24 grid grid-cols-2 gap-12 pb-4">
+                <div className="text-center">
+                  <div className="border-t border-slate-900 pt-1 text-[8px] font-bold uppercase">Assinatura do Catequista</div>
+                </div>
+                <div className="text-center">
+                  <div className="border-t border-slate-900 pt-1 text-[8px] font-bold uppercase">Coordenação de Catequese</div>
+                </div>
+              </div>
+
+              <div className="border-t-2 border-slate-900 pt-2 mt-auto text-center">
+                <p className="text-[8px] font-bold uppercase">
+                  {config.address} - {config.city}/{config.state}
+                </p>
+                <div className="flex justify-center gap-4 mt-1 text-[8px] font-bold uppercase">
+                  {config.phone && <span>Tel: {config.phone}</span>}
+                  {config.whatsapp && <span>Zap: {config.whatsapp}</span>}
+                  {config.email && <span>Email: {config.email}</span>}
+                </div>
+                <div className="flex justify-center gap-4 mt-0.5 text-[8px] font-bold uppercase text-slate-600">
+                  {config.instagram && <span>Insta: {config.instagram}</span>}
+                  {config.facebook && <span>Face: {config.facebook}</span>}
+                  {config.website && <span>Site: {config.website}</span>}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      <div className="bg-white shadow-2xl rounded-[2.5rem] border border-sky-100 overflow-hidden mb-10 animate-in fade-in slide-in-from-bottom-4 duration-500 no-print">
       <div className="bg-sky-600 p-8 relative overflow-hidden">
         <div className="absolute top-0 right-0 p-4 opacity-10"><Sparkles size={120} className="text-white" /></div>
         <div className="flex items-center gap-4 relative z-10">
@@ -103,6 +221,18 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
             </h2>
             <p className="text-sky-100 text-sm font-medium uppercase tracking-widest opacity-80">Cadastro de membros do corpo docente mariano</p>
           </div>
+          <div className="flex gap-2 w-full md:w-auto pr-8">
+            <button 
+              type="button" 
+              onClick={() => window.print()} 
+              className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-slate-800 text-white px-4 py-2.5 rounded-xl font-bold text-xs hover:bg-slate-700 transition-all shadow-lg"
+            >
+              <Printer className="w-4 h-4" /> Imprimir
+            </button>
+            <button type="submit" form="catequista-form" className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-amber-400 text-white px-6 py-2.5 rounded-xl font-black text-xs hover:bg-amber-500 transition-all shadow-xl shadow-amber-100">
+              <Save className="w-4 h-4" /> {initialData ? 'Atualizar' : 'Salvar'}
+            </button>
+          </div>
         </div>
         <button 
           onClick={onCancel}
@@ -113,7 +243,7 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="p-8 md:p-12 space-y-10">
+      <form id="catequista-form" onSubmit={handleSubmit} className="p-8 md:p-12 space-y-10">
         <div className="space-y-6">
           <div className="flex items-center gap-2 mb-2">
             <div className="p-1.5 bg-sky-100 rounded-lg"><ShieldCheck className="w-4 h-4 text-sky-600" /></div>
@@ -367,6 +497,7 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
           letter-spacing: 0.05em;
         }
       `}</style>
+    </div>
     </div>
   );
 };

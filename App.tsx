@@ -755,6 +755,7 @@ const App: React.FC = () => {
                   onSave={handleSaveCatequista}
                   onCancel={() => setView('catequista_list')}
                   initialData={editingCatequista || undefined}
+                  config={parishConfig}
                />;
       case 'formation_list': 
         return <FormationTable 

@@ -1,5 +1,6 @@
 
 import React, { useState, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { BarChart3, Calendar, Printer, School, UserCheck, TrendingUp, Search, ArrowLeft, FileSpreadsheet } from 'lucide-react';
 import { Turma, AttendanceSession, Catequista, ParishConfig, Student } from '../types';
 
@@ -137,16 +138,18 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
         </div>
 
         {/* Print Content */}
-        <div className="p-8 print:p-0 print:landscape">
-          <style>{`
-            @media print {
-              @page { size: landscape; margin: 10mm; }
-              body { -webkit-print-color-adjust: exact; }
-              .no-print { display: none !important; }
-            }
-          `}</style>
+        {createPortal(
+          <div className="print-only p-8 w-full bg-white text-slate-900 font-sans absolute inset-0 z-[100]">
+            <style>{`
+              @media print {
+                @page { size: landscape; margin: 10mm; }
+                body { -webkit-print-color-adjust: exact; }
+                body > *:not(.print-only) { display: none !important; }
+                .print-only { display: block !important; }
+              }
+            `}</style>
 
-          {/* Header */}
+            {/* Header */}
           <div className="border border-black mb-4">
             <div className="bg-slate-100 border-b border-black p-2 text-center font-black uppercase text-sm">
                DIÁRIO CONSOLIDADO DE FREQUÊNCIA
@@ -253,8 +256,10 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
               {config.facebook && <span>Face: {config.facebook}</span>}
               {config.website && <span>Site: {config.website}</span>}
             </div>
-          </div>
-        </div>
+            </div>
+          </div>,
+          document.body
+        )}
       </div>
     );
   };
@@ -267,8 +272,17 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
     <div className="space-y-8 animate-in fade-in duration-500">
       
       {/* SEÇÃO APENAS PARA IMPRESSÃO (RELATÓRIO GERAL) */}
-      <div className="print-only fixed inset-0 z-[200] bg-white p-8">
-        <div className="text-center border-b-2 border-slate-900 pb-6 mb-6">
+      {createPortal(
+        <div className="print-only fixed inset-0 z-[200] bg-white p-8">
+          <style>{`
+            @media print {
+              @page { size: portrait; margin: 10mm; }
+              body { -webkit-print-color-adjust: exact; }
+              body > *:not(.print-only) { display: none !important; }
+              .print-only { display: block !important; }
+            }
+          `}</style>
+          <div className="text-center border-b-2 border-slate-900 pb-6 mb-6">
           <h1 className="text-2xl font-black uppercase tracking-widest">{config.parishName}</h1>
           <h2 className="text-lg font-bold text-slate-600">Relatório Geral de Frequência - {selectedYear}</h2>
           <p className="text-sm mt-2">Pastoral da Catequese</p>
@@ -353,8 +367,10 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
             {config.facebook && <span>Face: {config.facebook}</span>}
             {config.website && <span>Site: {config.website}</span>}
           </div>
-        </div>
-      </div>
+          </div>
+        </div>,
+        document.body
+      )}
 
       {/* HEADER TELA */}
       <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col md:flex-row justify-between items-center gap-6 no-print">

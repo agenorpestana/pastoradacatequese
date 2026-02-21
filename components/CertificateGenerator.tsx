@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   Award, Printer, Search, GraduationCap, Church, Star, 
   ShieldCheck, FileCheck, User, Users, Calendar, 
@@ -65,105 +66,116 @@ export const CertificateGenerator: React.FC<CertificateGeneratorProps> = ({ stud
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       {/* SEÇÃO DE IMPRESSÃO - MODELO SOLENE DE CERTIFICADO */}
-      <div className="print-only fixed inset-0 bg-white z-[100] p-0 font-serif">
-        {printQueue.map((student, index) => (
-          <div key={student.id} className={`certificate-page ${index > 0 ? 'page-break' : ''}`}>
-            <div className="m-4 border-[12px] border-double border-slate-900 h-[calc(100vh-2rem)] w-[calc(100vw-2rem)] p-12 flex flex-col items-center justify-between relative bg-white overflow-hidden">
-              
-              <div className="absolute top-6 left-6 w-24 h-24 border-t-4 border-l-4 border-slate-900/20"></div>
-              <div className="absolute top-6 right-6 w-24 h-24 border-t-4 border-r-4 border-slate-900/20"></div>
-              <div className="absolute bottom-6 left-6 w-24 h-24 border-b-4 border-l-4 border-slate-900/20"></div>
-              <div className="absolute bottom-6 right-6 w-24 h-24 border-b-4 border-r-4 border-slate-900/20"></div>
+      {createPortal(
+        <div className="print-only fixed inset-0 bg-white z-[100] p-0 font-serif">
+          <style>{`
+            @media print {
+              @page { size: landscape; margin: 0; }
+              body { -webkit-print-color-adjust: exact; margin: 0; }
+              body > *:not(.print-only) { display: none !important; }
+              .print-only { display: block !important; }
+            }
+          `}</style>
+          {printQueue.map((student, index) => (
+            <div key={student.id} className={`certificate-page ${index > 0 ? 'page-break' : ''}`}>
+              <div className="m-4 border-[12px] border-double border-slate-900 h-[calc(100vh-2rem)] w-[calc(100vw-2rem)] p-12 flex flex-col items-center justify-between relative bg-white overflow-hidden">
+                
+                <div className="absolute top-6 left-6 w-24 h-24 border-t-4 border-l-4 border-slate-900/20"></div>
+                <div className="absolute top-6 right-6 w-24 h-24 border-t-4 border-r-4 border-slate-900/20"></div>
+                <div className="absolute bottom-6 left-6 w-24 h-24 border-b-4 border-l-4 border-slate-900/20"></div>
+                <div className="absolute bottom-6 right-6 w-24 h-24 border-b-4 border-r-4 border-slate-900/20"></div>
 
-              <div className="flex flex-col items-center gap-2">
-                {config.logo ? <img src={config.logo} className="w-32 h-32 object-contain" /> : <Church className="w-20 h-20 text-slate-900" />}
-                <div className="h-px w-48 bg-slate-300"></div>
-              </div>
-
-              <div className="text-center space-y-2">
-                <h1 className="text-xl font-bold uppercase tracking-[0.3em] text-slate-800">{config.dioceseName}</h1>
-                <h2 className="text-2xl font-black text-slate-900 uppercase font-serif">{config.parishName} - {config.city}-{config.state}</h2>
-                <p className="text-xs font-bold text-slate-500 italic mt-2">"Recebei, por este sinal, o Espírito Santo, o Dom de Deus"</p>
-              </div>
-
-              <div className="py-8 text-center">
-                <h3 className="text-6xl font-black text-slate-900 tracking-tight mb-2">Lembrança da Crisma</h3>
-                <div className="flex items-center justify-center gap-4">
-                  <div className="h-0.5 w-16 bg-slate-900"></div>
-                  <span className="text-sm font-bold uppercase tracking-widest text-slate-500">Certificado de Confirmação</span>
-                  <div className="h-0.5 w-16 bg-slate-900"></div>
-                </div>
-              </div>
-
-              <div className="w-full max-w-5xl text-center space-y-10 px-10">
-                <div className="space-y-4">
-                  <p className="text-2xl leading-relaxed text-slate-700">
-                    Certificamos para os devidos fins que o(a) cristão(ã)
-                  </p>
-                  <h4 className="text-6xl font-black text-slate-950 uppercase py-4 border-b-2 border-slate-200">
-                    {student.nomeCompleto}
-                  </h4>
+                <div className="flex flex-col items-center gap-2">
+                  {config.logo ? <img src={config.logo} className="w-32 h-32 object-contain" /> : <Church className="w-20 h-20 text-slate-900" />}
+                  <div className="h-px w-48 bg-slate-300"></div>
                 </div>
 
-                <div className="text-xl leading-loose text-slate-800">
-                  tendo feito a sua preparação catequética, recebeu o <strong>Sacramento da Confirmação (Crisma)</strong>, 
-                  pela imposition das mãos e unção do Crisma, no dia <strong>{student.dataCelebracao ? new Date(student.dataCelebracao + 'T00:00:00').toLocaleDateString('pt-BR') : '___/___/___'}</strong>, 
-                  nesta Igreja Paroquial, tendo como celebrante o <strong>{student.celebrante || 'Exmo. e Revmo. Bispo Diocesano'}</strong>.
+                <div className="text-center space-y-2">
+                  <h1 className="text-xl font-bold uppercase tracking-[0.3em] text-slate-800">{config.dioceseName}</h1>
+                  <h2 className="text-2xl font-black text-slate-900 uppercase font-serif">{config.parishName} - {config.city}-{config.state}</h2>
+                  <p className="text-xs font-bold text-slate-500 italic mt-2">"Recebei, por este sinal, o Espírito Santo, o Dom de Deus"</p>
                 </div>
 
-                <div className="flex justify-center gap-12 text-xl font-bold text-slate-900 pt-4">
-                  <p>Padrinho / Madrinha: <span className="underline decoration-slate-300 underline-offset-8">{student.padrinhoCrisma?.nome || '__________________________________'}</span></p>
-                </div>
-              </div>
-
-              <div className="w-full flex flex-col items-center gap-10 pb-6">
-                <div className="border border-slate-200 bg-slate-50/50 px-10 py-4 rounded-2xl flex gap-8">
-                  <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Registrado no Livro: <span className="text-slate-900">{student.livro || '___'}</span></p>
-                  <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Folha: <span className="text-slate-900">{student.folha || '___'}</span></p>
-                  <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Termo: <span className="text-slate-900">{student.numeroRegistro || '___'}</span></p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-32 w-full max-w-4xl px-20 pt-10">
-                  <div className="text-center">
-                    <div className="border-t border-slate-900 pt-3">
-                      <p className="text-sm font-bold uppercase tracking-tight text-slate-900">Pároco ou Celebrante</p>
-                      <p className="text-[10px] text-slate-400 mt-1 uppercase">Assinatura</p>
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="border-t border-slate-900 pt-3">
-                      <p className="text-sm font-bold uppercase tracking-tight text-slate-900">Secretaria Paroquial</p>
-                      <p className="text-[10px] text-slate-400 mt-1 uppercase">Selo e Carimbo</p>
-                    </div>
+                <div className="py-8 text-center">
+                  <h3 className="text-6xl font-black text-slate-900 tracking-tight mb-2">Lembrança da Crisma</h3>
+                  <div className="flex items-center justify-center gap-4">
+                    <div className="h-0.5 w-16 bg-slate-900"></div>
+                    <span className="text-sm font-bold uppercase tracking-widest text-slate-500">Certificado de Confirmação</span>
+                    <div className="h-0.5 w-16 bg-slate-900"></div>
                   </div>
                 </div>
 
-                <div className="text-center mt-4">
-                  <p className="text-[11px] text-slate-400 font-bold uppercase tracking-[0.4em]">
-                    {config.city}-{config.state}, {new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' })}
-                  </p>
-                  
-                  <div className="mt-6 pt-4 border-t border-slate-100 w-full max-w-2xl mx-auto">
-                    <p className="text-[8px] font-bold uppercase text-slate-400">
-                      {config.address} - {config.city}/{config.state}
+                <div className="w-full max-w-5xl text-center space-y-10 px-10">
+                  <div className="space-y-4">
+                    <p className="text-2xl leading-relaxed text-slate-700">
+                      Certificamos para os devidos fins que o(a) cristão(ã)
                     </p>
-                    <div className="flex justify-center gap-4 mt-1 text-[8px] font-bold uppercase text-slate-400">
-                      {config.phone && <span>Tel: {config.phone}</span>}
-                      {config.whatsapp && <span>Zap: {config.whatsapp}</span>}
-                      {config.email && <span>Email: {config.email}</span>}
+                    <h4 className="text-6xl font-black text-slate-950 uppercase py-4 border-b-2 border-slate-200">
+                      {student.nomeCompleto}
+                    </h4>
+                  </div>
+
+                  <div className="text-xl leading-loose text-slate-800">
+                    tendo feito a sua preparação catequética, recebeu o <strong>Sacramento da Confirmação (Crisma)</strong>, 
+                    pela imposition das mãos e unção do Crisma, no dia <strong>{student.dataCelebracao ? new Date(student.dataCelebracao + 'T00:00:00').toLocaleDateString('pt-BR') : '___/___/___'}</strong>, 
+                    nesta Igreja Paroquial, tendo como celebrante o <strong>{student.celebrante || 'Exmo. e Revmo. Bispo Diocesano'}</strong>.
+                  </div>
+
+                  <div className="flex justify-center gap-12 text-xl font-bold text-slate-900 pt-4">
+                    <p>Padrinho / Madrinha: <span className="underline decoration-slate-300 underline-offset-8">{student.padrinhoCrisma?.nome || '__________________________________'}</span></p>
+                  </div>
+                </div>
+
+                <div className="w-full flex flex-col items-center gap-10 pb-6">
+                  <div className="border border-slate-200 bg-slate-50/50 px-10 py-4 rounded-2xl flex gap-8">
+                    <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Registrado no Livro: <span className="text-slate-900">{student.livro || '___'}</span></p>
+                    <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Folha: <span className="text-slate-900">{student.folha || '___'}</span></p>
+                    <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Termo: <span className="text-slate-900">{student.numeroRegistro || '___'}</span></p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-32 w-full max-w-4xl px-20 pt-10">
+                    <div className="text-center">
+                      <div className="border-t border-slate-900 pt-3">
+                        <p className="text-sm font-bold uppercase tracking-tight text-slate-900">Pároco ou Celebrante</p>
+                        <p className="text-[10px] text-slate-400 mt-1 uppercase">Assinatura</p>
+                      </div>
                     </div>
-                    <div className="flex justify-center gap-4 mt-0.5 text-[8px] font-bold uppercase text-slate-300">
-                      {config.instagram && <span>Insta: {config.instagram}</span>}
-                      {config.facebook && <span>Face: {config.facebook}</span>}
-                      {config.website && <span>Site: {config.website}</span>}
+                    <div className="text-center">
+                      <div className="border-t border-slate-900 pt-3">
+                        <p className="text-sm font-bold uppercase tracking-tight text-slate-900">Secretaria Paroquial</p>
+                        <p className="text-[10px] text-slate-400 mt-1 uppercase">Selo e Carimbo</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="text-center mt-4">
+                    <p className="text-[11px] text-slate-400 font-bold uppercase tracking-[0.4em]">
+                      {config.city}-{config.state}, {new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    </p>
+                    
+                    <div className="mt-6 pt-4 border-t border-slate-100 w-full max-w-2xl mx-auto">
+                      <p className="text-[8px] font-bold uppercase text-slate-400">
+                        {config.address} - {config.city}/{config.state}
+                      </p>
+                      <div className="flex justify-center gap-4 mt-1 text-[8px] font-bold uppercase text-slate-400">
+                        {config.phone && <span>Tel: {config.phone}</span>}
+                        {config.whatsapp && <span>Zap: {config.whatsapp}</span>}
+                        {config.email && <span>Email: {config.email}</span>}
+                      </div>
+                      <div className="flex justify-center gap-4 mt-0.5 text-[8px] font-bold uppercase text-slate-300">
+                        {config.instagram && <span>Insta: {config.instagram}</span>}
+                        {config.facebook && <span>Face: {config.facebook}</span>}
+                        {config.website && <span>Site: {config.website}</span>}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>,
+        document.body
+      )}
       {/* Rest of the component selection UI remains ... */}
       <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col xl:flex-row justify-between items-center gap-6 no-print animate-in slide-in-from-top-4 duration-500">
         <div className="flex items-center gap-4">
