@@ -1,11 +1,12 @@
 
 import React, { useState } from 'react';
 import { Search, Filter, MoreHorizontal, Eye, Trash2, Calendar, Phone, MapPin, Edit, UserCheck, UserX, GraduationCap, Fingerprint, UserPlus, BookOpen, FileText, Users, Sparkles } from 'lucide-react';
-import { Student, TurmaLevel, Turma } from '../types';
+import { Student, TurmaLevel, Turma, NivelEtapa } from '../types';
 
 interface StudentTableProps {
   students: Student[];
   allClasses: Turma[];
+  niveis: NivelEtapa[];
   onDelete: (id: string) => void;
   onView: (student: Student) => void;
   onEdit: (student: Student) => void;
@@ -13,9 +14,9 @@ interface StudentTableProps {
   onAddNew?: () => void;
 }
 
-export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses, onDelete, onView, onEdit, onManageDocuments, onAddNew }) => {
+export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses, niveis, onDelete, onView, onEdit, onManageDocuments, onAddNew }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedTurma, setSelectedTurma] = useState<TurmaLevel | 'all'>('all');
+  const [selectedTurma, setSelectedTurma] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<'all' | 'Ativo' | 'Inativo' | 'Concluido'>('all');
 
   const getStudentLevel = (turmaNome: string) => {
@@ -101,9 +102,15 @@ export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses
               className="w-full bg-slate-50 border border-slate-100 text-slate-700 py-3 px-6 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 font-bold text-[10px] md:text-xs uppercase tracking-wider"
             >
               <option value="all">Todas as Turmas</option>
-              {Object.values(TurmaLevel).map(level => (
-                <option key={level} value={level}>{level}</option>
-              ))}
+              {niveis.length > 0 ? (
+                niveis.map(nivel => (
+                  <option key={nivel.id} value={nivel.nome}>{nivel.nome}</option>
+                ))
+              ) : (
+                Object.values(TurmaLevel).map(level => (
+                  <option key={level} value={level}>{level}</option>
+                ))
+              )}
             </select>
           </div>
         </div>

@@ -778,6 +778,7 @@ const App: React.FC = () => {
         return <StudentTable 
                   students={visibleStudents}
                   allClasses={visibleClasses}
+                  niveis={niveisEtapas}
                   onDelete={user.permissions.students_delete ? handleDeleteStudent : () => alert('Sem permissão')}
                   onEdit={user.permissions.students_edit ? (s) => { setEditingStudent(s); setView('register'); } : () => alert('Sem permissão')}
                   onView={(s) => setViewingStudent(s)}

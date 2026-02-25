@@ -235,6 +235,10 @@ app.post('/api/:resource', async (req, res) => {
         query = 'INSERT INTO library (id, name, category, url, type, upload_date) VALUES (?, ?, ?, ?, ?, ?)';
         params = [data.id, data.name, data.category, data.url, data.type, data.upload_date];
         break;
+      case 'niveis_etapas':
+        query = 'INSERT INTO niveis_etapas (id, nome) VALUES (?, ?)';
+        params = [data.id, data.nome];
+        break;
     }
 
     if (query) {
@@ -293,6 +297,10 @@ app.put('/api/:resource/:id', async (req, res) => {
         case 'gallery':
           query = 'UPDATE gallery SET title=?, url=?, date=?, turma_id=? WHERE id=?';
           params = [data.title, data.url, data.date, data.turmaId || null, id];
+          break;
+        case 'niveis_etapas':
+          query = 'UPDATE niveis_etapas SET nome=? WHERE id=?';
+          params = [data.nome, id];
           break;
     }
 
