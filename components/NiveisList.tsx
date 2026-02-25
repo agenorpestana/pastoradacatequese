@@ -157,6 +157,34 @@ export const NiveisList: React.FC<NiveisListProps> = ({ niveis, onUpdate }) => {
           </tbody>
         </table>
       </div>
+
+      <style>{`
+        .input-style {
+          width: 100%;
+          padding: 0.875rem 1.25rem;
+          border-radius: 1rem;
+          border: 2px solid #f1f5f9;
+          background-color: #f8fafc;
+          outline: none;
+          transition: all 0.3s;
+          font-size: 0.95rem;
+          color: #1e293b;
+        }
+        .input-style:focus {
+          border-color: #3b82f6;
+          background-color: #fff;
+          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+        .label-style {
+          display: block;
+          font-size: 0.75rem;
+          font-weight: 800;
+          color: #475569;
+          text-transform: uppercase;
+          margin-bottom: 0.5rem;
+          letter-spacing: 0.05em;
+        }
+      `}</style>
     </div>
   );
 };
