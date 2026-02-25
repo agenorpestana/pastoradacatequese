@@ -29,11 +29,12 @@ import { ConfigForm } from './components/ConfigForm';
 import { StudentDocumentsModal } from './components/StudentDocumentsModal';
 import { CalendarView } from './components/CalendarView';
 import { PwaInstallPrompt } from './components/PwaInstallPrompt';
+import { NiveisList } from './components/NiveisList';
 import { api } from './services/api';
 import { 
   AppView, User, Student, Turma, Catequista, FormationEvent, 
   ParishEvent, GalleryImage, LibraryFile, AttendanceSession, 
-  ParishConfig, StudentDocument
+  ParishConfig, StudentDocument, NivelEtapa
 } from './types';
 import { 
   LayoutDashboard, CheckCircle2, Loader2, ClipboardList, BookOpen, 
@@ -331,6 +332,7 @@ const App: React.FC = () => {
   const [attendanceSessions, setAttendanceSessions] = useState<AttendanceSession[]>([]);
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
   const [libraryFiles, setLibraryFiles] = useState<LibraryFile[]>([]);
+  const [niveisEtapas, setNiveisEtapas] = useState<NivelEtapa[]>([]);
   const [parishConfig, setParishConfig] = useState<ParishConfig>({
     pastoralName: 'Pastoral da Catequese',
     parishName: 'Paróquia',
@@ -392,7 +394,7 @@ const App: React.FC = () => {
   const fetchData = useCallback(async () => {
     if (!user) return;
     try {
-      const [s, c, cat, u, e, f, att, gal, lib, conf] = await Promise.all([
+      const [s, c, cat, u, e, f, att, gal, lib, conf, n] = await Promise.all([
         api.get('students'),
         api.get('turmas'),
         api.get('catequistas'),
@@ -402,7 +404,8 @@ const App: React.FC = () => {
         api.get('attendance_sessions'),
         api.get('gallery'),
         api.get('library'),
-        api.get('parish_config')
+        api.get('parish_config'),
+        api.get('niveis_etapas')
       ]);
       setStudents(s);
       setClasses(c);
@@ -413,6 +416,7 @@ const App: React.FC = () => {
       setAttendanceSessions(att);
       setGalleryImages(gal);
       setLibraryFiles(lib);
+      setNiveisEtapas(n);
       if (conf && conf.pastoralName) setParishConfig(conf);
     } catch (err) {
       console.error("Error fetching data:", err);
@@ -797,6 +801,12 @@ const App: React.FC = () => {
                   initialData={editingClass || undefined}
                   allStudents={visibleStudents}
                   catequistas={catequistas}
+                  niveis={niveisEtapas}
+               />;
+      case 'niveis_list':
+        return <NiveisList 
+                  niveis={niveisEtapas}
+                  onUpdate={fetchData}
                />;
       case 'catequista_list':
         return <CatequistaTable 

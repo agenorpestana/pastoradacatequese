@@ -66,6 +66,20 @@ const runMigrations = async () => {
             console.log("✅ Database Schema Check: 'gallery' table is up to date.");
         }
 
+        // Migration 3: niveis_etapas table
+        try {
+            await conn.query(`
+                CREATE TABLE IF NOT EXISTS niveis_etapas (
+                    id VARCHAR(50) PRIMARY KEY,
+                    nome VARCHAR(255) NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            `);
+            console.log("✅ Database Schema Check: 'niveis_etapas' table is ready.");
+        } catch (e) {
+            console.error("❌ Failed to create 'niveis_etapas' table:", e.message);
+        }
+
     } catch (err) {
         console.error("❌ Migration Failed:", err.message);
         // Don't crash, purely log the error as it might be a connection issue handled later
@@ -86,7 +100,7 @@ pool.getConnection()
         console.error("Error Code:", err.code);
     });
 
-const ALLOWED_TABLES = ['users', 'turmas', 'catequistas', 'students', 'attendance_sessions', 'events', 'gallery', 'library', 'formations', 'parish_config'];
+const ALLOWED_TABLES = ['users', 'turmas', 'catequistas', 'students', 'attendance_sessions', 'events', 'gallery', 'library', 'formations', 'parish_config', 'niveis_etapas'];
 
 const parseRow = (row) => {
   if (!row) return row;

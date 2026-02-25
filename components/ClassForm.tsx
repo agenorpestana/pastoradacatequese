@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Save, BookOpen, User, Clock, ArrowLeft, Users, Search, Plus, X, Check, ChevronDown, UserCheck } from 'lucide-react';
-import { Turma, TurmaLevel, Student, Catequista } from '../types';
+import { Turma, TurmaLevel, Student, Catequista, NivelEtapa } from '../types';
 
 interface ClassFormProps {
   onSave: (turma: Turma, studentIds: string[]) => void;
@@ -9,12 +9,13 @@ interface ClassFormProps {
   initialData?: Turma;
   allStudents: Student[];
   catequistas: Catequista[];
+  niveis: NivelEtapa[];
 }
 
-export const ClassForm: React.FC<ClassFormProps> = ({ onSave, onCancel, initialData, allStudents, catequistas }) => {
+export const ClassForm: React.FC<ClassFormProps> = ({ onSave, onCancel, initialData, allStudents, catequistas, niveis }) => {
   const [formData, setFormData] = useState<Partial<Turma>>(initialData || {
     nome: '',
-    nivel: TurmaLevel.SEMENTINHA,
+    nivel: niveis.length > 0 ? niveis[0].nome : TurmaLevel.SEMENTINHA,
     catequista: '',
     diaSemana: 'Sábado',
     horario: '',
@@ -148,9 +149,15 @@ export const ClassForm: React.FC<ClassFormProps> = ({ onSave, onCancel, initialD
                 onChange={e => setFormData({...formData, nivel: e.target.value})} 
                 className="input-style"
               >
-                {Object.values(TurmaLevel).map(level => (
-                  <option key={level} value={level}>{level}</option>
-                ))}
+                {niveis.length > 0 ? (
+                  niveis.map(nivel => (
+                    <option key={nivel.id} value={nivel.nome}>{nivel.nome}</option>
+                  ))
+                ) : (
+                  Object.values(TurmaLevel).map(level => (
+                    <option key={level} value={level}>{level}</option>
+                  ))
+                )}
               </select>
             </div>
 
