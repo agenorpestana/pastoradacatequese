@@ -231,15 +231,23 @@ const DashboardContent = ({ events, students, classes, catequistas, suggestedDat
                  </h4>
                  <div className="space-y-3 relative z-10">
                      {selectedDayEvents.length > 0 ? selectedDayEvents.map((event: any) => (
-                         <div key={event.id} className="bg-slate-50 p-4 rounded-2xl border border-slate-100 hover:bg-blue-50/50 transition-colors">
+                         <div key={event.id} className="bg-slate-50 p-4 rounded-2xl border border-slate-100 hover:bg-blue-50/50 transition-colors group">
                              <p className="font-bold text-slate-800 text-sm leading-tight">{event.titulo}</p>
                              <div className="flex justify-between items-center mt-2">
                                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wide flex items-center gap-1">
                                      <Clock className="w-3 h-3" /> {event.horarioInicio}
                                  </p>
-                                 <button onClick={() => onTakeEventAttendance(event)} className="p-1.5 text-white bg-blue-600 rounded-lg shadow-sm hover:bg-blue-700 transition-colors" title="Lançar Presença">
-                                     <CheckCircle2 className="w-3 h-3" />
-                                 </button>
+                                 <div className="flex items-center gap-1">
+                                     <button onClick={() => onEditEvent(event)} className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100" title="Editar Evento">
+                                         <Edit2 className="w-3.5 h-3.5" />
+                                     </button>
+                                     <button onClick={() => onDeleteEvent(event.id)} className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100" title="Excluir Evento">
+                                         <Trash2 className="w-3.5 h-3.5" />
+                                     </button>
+                                     <button onClick={() => onTakeEventAttendance(event)} className="p-1.5 text-white bg-blue-600 rounded-lg shadow-sm hover:bg-blue-700 transition-colors" title="Lançar Presença">
+                                         <CheckCircle2 className="w-3 h-3" />
+                                     </button>
+                                 </div>
                              </div>
                          </div>
                      )) : (
@@ -724,31 +732,48 @@ const App: React.FC = () => {
   }
 
   const renderContent = () => {
+    // Filter classes and students based on user role and linked catequista
+    let visibleClasses = classes;
+    let visibleStudents = students;
+
+    if (user.role === 'catequista' || user.role === 'catequista_auxiliar') {
+      if (user.linkedCatequistaId) {
+        const linkedCat = catequistas.find(c => c.id === user.linkedCatequistaId);
+        if (linkedCat) {
+          visibleClasses = classes.filter(c => c.catequista.includes(linkedCat.nome));
+          const visibleClassNames = visibleClasses.map(c => c.nome);
+          visibleStudents = students.filter(s => visibleClassNames.includes(s.turma));
+        }
+      }
+    }
+
     switch (view) {
       case 'dashboard':
         return <DashboardContent 
                   events={events} 
-                  students={students} 
-                  classes={classes} 
+                  students={visibleStudents} 
+                  classes={visibleClasses} 
                   catequistas={catequistas}
                   suggestedDate={selectedDate}
                   onDateChange={setSelectedDate}
                   onAddEvent={handleAddEvent}
                   user={user}
                   onTakeEventAttendance={setTakingEventAttendance}
+                  onEditEvent={handleEditEvent}
+                  onDeleteEvent={handleDeleteEvent}
                />;
       case 'register':
         return <RegistrationForm 
                   onSave={handleSaveStudent} 
                   onCancel={() => { setView('list'); setEditingStudent(null); }} 
                   initialData={editingStudent}
-                  allClasses={classes}
+                  allClasses={visibleClasses}
                   config={parishConfig}
                />;
       case 'list':
         return <StudentTable 
-                  students={students}
-                  allClasses={classes}
+                  students={visibleStudents}
+                  allClasses={visibleClasses}
                   onDelete={user.permissions.students_delete ? handleDeleteStudent : () => alert('Sem permissão')}
                   onEdit={user.permissions.students_edit ? (s) => { setEditingStudent(s); setView('register'); } : () => alert('Sem permissão')}
                   onView={(s) => setViewingStudent(s)}
@@ -757,7 +782,7 @@ const App: React.FC = () => {
                />;
       case 'classes_list':
         return <ClassTable 
-                  classes={classes}
+                  classes={visibleClasses}
                   onDelete={handleDeleteClass}
                   onEdit={(c) => { setEditingClass(c); setView('classes_create'); }}
                   onViewMembers={(c) => setViewingClassMembers(c)}
@@ -770,7 +795,7 @@ const App: React.FC = () => {
                   onSave={handleSaveClass} 
                   onCancel={() => setView('classes_list')} 
                   initialData={editingClass || undefined}
-                  allStudents={students}
+                  allStudents={visibleStudents}
                   catequistas={catequistas}
                />;
       case 'catequista_list':
@@ -802,11 +827,11 @@ const App: React.FC = () => {
                   initialData={editingFormation || undefined}
                />;
       case 'reports':
-        return <Reports students={students} classes={classes} attendanceSessions={attendanceSessions} />;
+        return <Reports students={visibleStudents} classes={visibleClasses} attendanceSessions={attendanceSessions} />;
       case 'attendance_report':
-        return <AttendanceReport classes={classes} attendanceSessions={attendanceSessions} catequistas={catequistas} config={parishConfig} students={students} />;
+        return <AttendanceReport classes={visibleClasses} attendanceSessions={attendanceSessions} catequistas={catequistas} config={parishConfig} students={visibleStudents} />;
       case 'certificates':
-        return <CertificateGenerator students={students} config={parishConfig} />;
+        return <CertificateGenerator students={visibleStudents} config={parishConfig} />;
       case 'profile':
         return <ProfileForm currentUser={user} onSave={handleUpdateProfile} onCancel={() => setView('dashboard')} />;
       case 'users_list':
@@ -834,7 +859,7 @@ const App: React.FC = () => {
                   onDeleteMultiple={handleDeleteMultipleImages}
                   canUpload={user.permissions.gallery_upload}
                   canDelete={user.permissions.gallery_delete}
-                  availableClasses={classes}
+                  availableClasses={visibleClasses}
                />;
       case 'library':
         return <LibraryView 
@@ -849,8 +874,8 @@ const App: React.FC = () => {
       default:
         return <DashboardContent 
                   events={events} 
-                  students={students} 
-                  classes={classes} 
+                  students={visibleStudents} 
+                  classes={visibleClasses} 
                   catequistas={catequistas}
                   suggestedDate={selectedDate}
                   onDateChange={setSelectedDate}

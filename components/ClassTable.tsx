@@ -75,6 +75,7 @@ export const ClassTable: React.FC<ClassTableProps> = ({
                         </div>
                         <div>
                           <p className="font-bold text-slate-800 group-hover/item:text-indigo-600 transition-colors">{turma.nome}</p>
+                          {turma.comunidade && <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">{turma.comunidade}</p>}
                           <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">{turma.diaSemana}</p>
                         </div>
                       </div>

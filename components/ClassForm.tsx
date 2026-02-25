@@ -50,9 +50,21 @@ export const ClassForm: React.FC<ClassFormProps> = ({ onSave, onCancel, initialD
   };
 
   const toggleStudent = (id: string) => {
-    setSelectedStudentIds(prev => 
-      prev.includes(id) ? prev.filter(sid => sid !== id) : [...prev, id]
-    );
+    const student = allStudents.find(s => s.id === id);
+    if (!student) return;
+
+    if (!selectedStudentIds.includes(id)) {
+      // Trying to add
+      if (student.turma && student.turma !== formData.nome) {
+        if (!confirm(`O catequizando ${student.nomeCompleto} já está vinculado à turma "${student.turma}". Deseja transferi-lo para esta turma?`)) {
+          return;
+        }
+      }
+      setSelectedStudentIds(prev => [...prev, id]);
+    } else {
+      // Trying to remove
+      setSelectedStudentIds(prev => prev.filter(sid => sid !== id));
+    }
   };
 
   // Logic for Multi-Select Catequistas
