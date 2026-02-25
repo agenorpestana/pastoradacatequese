@@ -88,6 +88,7 @@ export interface AttendanceSession {
   date: string;
   tema?: string;
   entries: AttendanceEntry[];
+  locked?: boolean;
 }
 
 export interface FormationEvent {
@@ -109,6 +110,7 @@ export interface ParishEvent {
   tipo: 'Formação' | 'Reunião' | 'Celebração' | 'Retiro' | 'Outros';
   tipoCustomizado?: string;
   presentes?: string[];
+  locked?: boolean;
 }
 
 export interface GalleryImage {

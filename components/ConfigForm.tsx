@@ -62,7 +62,7 @@ export const ConfigForm: React.FC<ConfigFormProps> = ({ config, onSave }) => {
                  className="group relative w-48 h-48 bg-slate-50 border-2 border-dashed border-slate-200 rounded-[2.5rem] flex items-center justify-center cursor-pointer overflow-hidden hover:border-blue-400 transition-all"
                >
                  {formData.logo ? (
-                   <img src={formData.logo} className="w-full h-full object-cover" alt="Logo" />
+                   <img src={formData.logo} className="w-full h-full object-contain p-2" alt="Logo" />
                  ) : (
                    <div className="text-center p-4">
                      <ImageIcon className="w-10 h-10 text-slate-300 mx-auto mb-2" />

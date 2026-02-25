@@ -37,11 +37,12 @@ import {
 } from './types';
 import { 
   LayoutDashboard, CheckCircle2, Loader2, ClipboardList, BookOpen, 
-  UsersRound, Droplets, Wine, Flame, Sparkles, CalendarDays, Clock 
+  UsersRound, Droplets, Wine, Flame, Sparkles, CalendarDays, Clock,
+  Edit2, Trash2, Lock
 } from 'lucide-react';
 
 // DashboardContent Component
-const DashboardContent = ({ events, students, classes, catequistas, suggestedDate, onDateChange, onAddEvent, user, onTakeEventAttendance }: any) => {
+const DashboardContent = ({ events, students, classes, catequistas, suggestedDate, onDateChange, onAddEvent, user, onTakeEventAttendance, onEditEvent, onDeleteEvent }: any) => {
     // Eventos do dia selecionado
     const selectedDayEvents = events.filter((e: any) => e.dataInicio === suggestedDate);
     const dateObj = new Date(suggestedDate + 'T00:00:00');
@@ -159,14 +160,15 @@ const DashboardContent = ({ events, students, classes, catequistas, suggestedDat
            <div className="bg-white p-7 rounded-[2rem] border border-sky-50 shadow-sm flex flex-col justify-between group transition-all hover:shadow-lg h-48">
              <div className="flex justify-between items-start">
                <div>
-                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Sacr. do Batismo (Ativos)</p>
-                 <h3 className="text-4xl font-black text-slate-800">{activeBatizadosCount}</h3>
+                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Sacr. do Batismo</p>
+                 <h3 className="text-4xl font-black text-slate-800">{activeStudents.length}</h3>
                </div>
                <div className="bg-cyan-50 p-3 rounded-2xl text-cyan-600">
                   <Droplets className="w-6 h-6" />
                </div>
              </div>
              <div className="flex gap-4 pt-4 border-t border-slate-50 text-[9px] font-black uppercase tracking-wide">
+               <span className="text-green-600">Ativos: {activeStudents.length}</span>
                <span className="text-cyan-600">Batizados: {activeBatizadosCount}</span>
                <span className="text-slate-400">Sem Batizar: {activeSemBatismoCount}</span>
              </div>
@@ -176,14 +178,15 @@ const DashboardContent = ({ events, students, classes, catequistas, suggestedDat
            <div className="bg-white p-7 rounded-[2rem] border border-sky-50 shadow-sm flex flex-col justify-between group transition-all hover:shadow-lg h-48">
              <div className="flex justify-between items-start">
                <div>
-                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Sacr. da Eucaristia (Ativos)</p>
-                 <h3 className="text-4xl font-black text-slate-800">{activeEucaristiaCount}</h3>
+                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Sacr. da Eucaristia</p>
+                 <h3 className="text-4xl font-black text-slate-800">{activeStudents.length}</h3>
                </div>
                <div className="bg-amber-50 p-3 rounded-2xl text-amber-600">
                   <Wine className="w-6 h-6" />
                </div>
              </div>
              <div className="flex gap-4 pt-4 border-t border-slate-50 text-[9px] font-black uppercase tracking-wide">
+               <span className="text-green-600">Ativos: {activeStudents.length}</span>
                <span className="text-amber-600">Com Eucaristia: {activeEucaristiaCount}</span>
                <span className="text-slate-400">Sem Eucaristia: {activeSemEucaristiaCount}</span>
              </div>
@@ -276,10 +279,18 @@ const DashboardContent = ({ events, students, classes, catequistas, suggestedDat
                                       <span>{event.local}</span>
                                   </p>
                               </div>
-                              <div className="text-right">
+                              <div className="text-right flex flex-col items-end gap-2">
                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-[9px] font-black bg-white border border-slate-100 text-slate-500 uppercase tracking-widest group-hover:bg-blue-50 group-hover:text-blue-600 group-hover:border-blue-100 transition-colors">
                                       {event.tipo}
                                    </span>
+                                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                       <button onClick={() => onEditEvent(event)} className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Editar Evento">
+                                           <Edit2 className="w-3.5 h-3.5" />
+                                       </button>
+                                       <button onClick={() => onDeleteEvent(event.id)} className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Excluir Evento">
+                                           <Trash2 className="w-3.5 h-3.5" />
+                                       </button>
+                                   </div>
                               </div>
                           </div>
                        );
@@ -343,6 +354,7 @@ const App: React.FC = () => {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   
   const [addingEventDate, setAddingEventDate] = useState<string | null>(null);
+  const [editingEvent, setEditingEvent] = useState<ParishEvent | null>(null);
   const [takingEventAttendance, setTakingEventAttendance] = useState<ParishEvent | null>(null);
 
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -572,16 +584,35 @@ const App: React.FC = () => {
 
   const handleSaveEvent = async (event: ParishEvent) => {
     try {
-      const res = await api.post('events', event);
-      setEvents(prev => [...prev, { ...event, id: res.id }]);
+      if (events.find(e => e.id === event.id)) {
+        await api.put('events', event.id, event);
+        setEvents(prev => prev.map(e => e.id === event.id ? event : e));
+      } else {
+        const res = await api.post('events', event);
+        setEvents(prev => [...prev, { ...event, id: res.id }]);
+      }
       setAddingEventDate(null);
+      setEditingEvent(null);
     } catch (e) { alert(e); }
   };
+
+  const handleEditEvent = (event: ParishEvent) => {
+    setEditingEvent(event);
+  };
+
+  const handleDeleteEvent = async (id: string) => {
+    if (confirm('Tem certeza que deseja excluir este evento?')) {
+      try {
+        await api.delete('events', id);
+        setEvents(prev => prev.filter(e => e.id !== id));
+      } catch (e) { alert(e); }
+    }
+  };
   
-  const handleSaveEventAttendance = async (eventId: string, presentIds: string[]) => {
+  const handleSaveEventAttendance = async (eventId: string, presentIds: string[], locked?: boolean) => {
     const event = events.find(e => e.id === eventId);
     if (event) {
-      const updated = { ...event, presentes: presentIds };
+      const updated = { ...event, presentes: presentIds, locked: locked !== undefined ? locked : event.locked };
       await api.put('events', eventId, updated);
       setEvents(prev => prev.map(e => e.id === eventId ? updated : e));
       setTakingEventAttendance(null);
@@ -826,6 +857,8 @@ const App: React.FC = () => {
                   onAddEvent={handleAddEvent}
                   user={user}
                   onTakeEventAttendance={setTakingEventAttendance}
+                  onEditEvent={handleEditEvent}
+                  onDeleteEvent={handleDeleteEvent}
                />;
     }
   };
@@ -907,6 +940,14 @@ const App: React.FC = () => {
             onSave={handleSaveEvent}
             onClose={() => setAddingEventDate(null)}
             initialDate={addingEventDate}
+          />
+        )}
+
+        {editingEvent && (
+          <EventFormModal 
+            onSave={handleSaveEvent}
+            onClose={() => setEditingEvent(null)}
+            eventToEdit={editingEvent}
           />
         )}
 

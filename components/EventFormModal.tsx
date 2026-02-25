@@ -7,10 +7,11 @@ interface EventFormModalProps {
   onSave: (event: ParishEvent) => void;
   onClose: () => void;
   initialDate?: string;
+  eventToEdit?: ParishEvent | null;
 }
 
-export const EventFormModal: React.FC<EventFormModalProps> = ({ onSave, onClose, initialDate }) => {
-  const [formData, setFormData] = useState<Partial<ParishEvent>>({
+export const EventFormModal: React.FC<EventFormModalProps> = ({ onSave, onClose, initialDate, eventToEdit }) => {
+  const [formData, setFormData] = useState<Partial<ParishEvent>>(eventToEdit || {
     titulo: '',
     dataInicio: initialDate || new Date().toISOString().split('T')[0],
     horarioInicio: '',
@@ -26,7 +27,7 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({ onSave, onClose,
     if (!formData.titulo || !formData.dataInicio) return;
 
     const newEvent: ParishEvent = {
-      id: Math.random().toString(36).substr(2, 9),
+      id: eventToEdit?.id || Math.random().toString(36).substr(2, 9),
       titulo: formData.titulo!,
       dataInicio: formData.dataInicio!,
       horarioInicio: formData.horarioInicio || '--:--',
@@ -34,7 +35,9 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({ onSave, onClose,
       horarioFim: formData.horarioFim || '--:--',
       local: formData.local || 'Paróquia',
       tipo: formData.tipo as any,
-      tipoCustomizado: formData.tipo === 'Outros' ? formData.tipoCustomizado : undefined
+      tipoCustomizado: formData.tipo === 'Outros' ? formData.tipoCustomizado : undefined,
+      presentes: eventToEdit?.presentes,
+      locked: eventToEdit?.locked
     };
 
     onSave(newEvent);

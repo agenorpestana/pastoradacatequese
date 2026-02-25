@@ -1,13 +1,13 @@
 
 import React, { useState } from 'react';
-import { X, Save, UserCheck, CheckCircle2, Search, Users } from 'lucide-react';
+import { X, Save, UserCheck, CheckCircle2, Search, Users, Lock } from 'lucide-react';
 import { ParishEvent, Catequista } from '../types';
 
 interface ParishEventAttendanceModalProps {
   event: ParishEvent;
   catequistas: Catequista[];
   onClose: () => void;
-  onSave: (eventId: string, presentIds: string[]) => void;
+  onSave: (eventId: string, presentIds: string[], locked?: boolean) => void;
 }
 
 export const ParishEventAttendanceModal: React.FC<ParishEventAttendanceModalProps> = ({ 
@@ -20,7 +20,14 @@ export const ParishEventAttendanceModal: React.FC<ParishEventAttendanceModalProp
   const [searchTerm, setSearchTerm] = useState('');
 
   const toggleAttendance = (id: string) => {
+    if (event.locked) return;
     setPresentIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
+
+  const handleLock = () => {
+    if (confirm('Tem certeza que deseja trancar as chamadas? Ninguém mais poderá alterar.')) {
+      onSave(event.id, presentIds, true);
+    }
   };
 
   const filtered = catequistas
@@ -101,13 +108,28 @@ export const ParishEventAttendanceModal: React.FC<ParishEventAttendanceModalProp
           )}
         </div>
 
-        <div className="p-8 border-t border-slate-100 bg-slate-50 flex justify-end shrink-0">
-          <button 
-            onClick={() => onSave(event.id, presentIds)}
-            className="flex items-center gap-2 px-12 py-4 bg-slate-900 text-white font-black rounded-2xl hover:bg-slate-800 transition-all shadow-xl shadow-slate-200 uppercase tracking-widest text-xs"
-          >
-            <Save className="w-4 h-4" /> Finalizar Chamada
-          </button>
+        <div className="p-8 border-t border-slate-100 bg-slate-50 flex justify-between shrink-0">
+          {!event.locked ? (
+            <button 
+              onClick={handleLock}
+              className="flex items-center gap-2 px-6 py-4 bg-red-50 text-red-600 font-black rounded-2xl hover:bg-red-100 transition-all uppercase tracking-widest text-xs"
+            >
+              <Lock className="w-4 h-4" /> Trancar Chamadas
+            </button>
+          ) : (
+            <div className="flex items-center gap-2 px-6 py-4 bg-slate-200 text-slate-500 font-black rounded-2xl uppercase tracking-widest text-xs">
+              <Lock className="w-4 h-4" /> Chamada Trancada
+            </div>
+          )}
+          
+          {!event.locked && (
+            <button 
+              onClick={() => onSave(event.id, presentIds)}
+              className="flex items-center gap-2 px-12 py-4 bg-slate-900 text-white font-black rounded-2xl hover:bg-slate-800 transition-all shadow-xl shadow-slate-200 uppercase tracking-widest text-xs"
+            >
+              <Save className="w-4 h-4" /> Finalizar Chamada
+            </button>
+          )}
         </div>
       </div>
     </div>

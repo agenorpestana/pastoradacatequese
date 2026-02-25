@@ -253,7 +253,7 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
             {/* FOTO E MATRÍCULA */}
             <div className="md:col-span-12 flex flex-col md:flex-row gap-6 items-center mb-4">
-              <div className="relative group w-32 h-32 rounded-full border-4 border-sky-100 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0">
+              <div className="relative group w-32 h-32 rounded-3xl border-4 border-sky-100 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0">
                 {isCameraActive ? (
                    <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover" />
                 ) : formData.foto ? (
@@ -285,7 +285,8 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
                 <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handlePhotoChange} />
               </div>
 
-              <div className="flex-1 w-full">
+              {/* Matrícula oculta no formulário */}
+              <div className="hidden">
                  <label className="label-style">Nº de Registro (Matrícula)</label>
                  <input 
                    type="text" 
@@ -293,7 +294,6 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
                    readOnly 
                    className="input-style bg-slate-100 text-slate-500 font-mono tracking-widest" 
                  />
-                 <p className="text-[10px] text-slate-400 mt-1">Gerado automaticamente pelo sistema.</p>
               </div>
             </div>
 
