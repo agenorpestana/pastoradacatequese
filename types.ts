@@ -179,6 +179,18 @@ export interface Catequista {
   cidade: string;
   ufEndereco: string;
   cep: string;
+  batizado?: boolean;
+  batismoData?: string;
+  batismoParoquia?: string;
+  batismoCidade?: string;
+  fezPrimeiraEucaristia?: boolean;
+  eucaristiaData?: string;
+  eucaristiaParoquia?: string;
+  eucaristiaCidade?: string;
+  temCrisma?: boolean;
+  crismaData?: string;
+  crismaParoquia?: string;
+  crismaCidade?: string;
   documentos?: StudentDocument[];
   dataCadastro?: string;
 }
@@ -223,6 +235,7 @@ export interface Student {
   batismoData?: string;
   batismoCelebrante?: string;
   fezPrimeiraEucaristia: boolean;
+  temCrisma?: boolean;
   eucaristiaDiocese?: string;
   eucaristiaParoquia?: string;
   eucaristiaComunidade?: string;

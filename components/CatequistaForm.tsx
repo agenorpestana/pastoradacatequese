@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Save, UserCheck, ArrowLeft, Calendar, Phone, Mail, MapPin, ShieldCheck, MessageCircle, Sparkles, X, Camera, Heart, FileText, Printer } from 'lucide-react';
+import { Save, UserCheck, ArrowLeft, Calendar, Phone, Mail, MapPin, ShieldCheck, MessageCircle, Sparkles, X, Camera, Heart, FileText, Printer, Church, Wine, ClipboardList, Award, Users, Home, User } from 'lucide-react';
 import { Catequista, ParishConfig } from '../types';
 import { maskPhone, maskCpfCnpj } from '../utils/masks';
 
@@ -12,14 +12,20 @@ interface CatequistaFormProps {
   config: ParishConfig;
 }
 
+type TabType = 'pessoal' | 'contato' | 'endereco' | 'sacramentos';
+
 export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel, initialData, config }) => {
+  const [activeTab, setActiveTab] = useState<TabType>('pessoal');
   const [formData, setFormData] = useState<Partial<Catequista>>(initialData || {
     sexo: 'F',
-    status: 'Ativo',
+    status: '' as any,
     estadoCivil: 'Solteiro(a)',
     whatsapp: '',
     telefone: '',
     email: '',
+    batizado: false,
+    fezPrimeiraEucaristia: false,
+    temCrisma: false,
     matricula: Math.floor(100000 + Math.random() * 900000).toString() // Generate random 6-digit matricula
   });
 
@@ -82,8 +88,20 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
     }
   };
 
+  const tabs: { id: TabType; label: string; icon: any }[] = [
+    { id: 'pessoal', label: 'Pessoal', icon: User },
+    { id: 'contato', label: 'Contato', icon: Phone },
+    { id: 'endereco', label: 'Endereço', icon: MapPin },
+    { id: 'sacramentos', label: 'Sacramentos', icon: Church },
+  ];
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.status) {
+      alert("Por favor, selecione um Status.");
+      setActiveTab('pessoal');
+      return;
+    }
     const newCatequista = {
       ...formData,
       id: formData.id || Math.random().toString(36).substr(2, 9),
@@ -122,34 +140,34 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
               <div className="flex justify-between items-center border-b-2 border-slate-900 pb-3 mb-3">
                 <div className="flex items-center gap-3">
                   {config.logo ? (
-                    <img src={config.logo} className="w-12 h-12 object-contain" />
+                    <img src={config.logo} className="w-16 h-16 object-contain" />
                   ) : (
-                    <UserCheck className="w-8 h-8" />
+                    <UserCheck className="w-10 h-10" />
                   )}
                   <div>
-                    <h1 className="text-lg font-black uppercase tracking-tighter">Ficha de Inscrição de Catequista</h1>
-                    <p className="text-[10px] font-bold">{config.dioceseName} - {config.city}-{config.state}</p>
+                    <h1 className="text-xl font-black uppercase tracking-tighter">Ficha de Inscrição de Catequista</h1>
+                    <p className="text-[12px] font-bold">{config.dioceseName} - {config.city}-{config.state}</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-[9px] font-bold uppercase">Matrícula</p>
-                  <p className="text-sm font-black">{formData.matricula || '________'}</p>
-                  <p className="text-[8px] uppercase font-bold text-slate-400 mt-0.5">
+                  <p className="text-[10px] font-bold uppercase">Matrícula</p>
+                  <p className="text-lg font-black">{formData.matricula || '________'}</p>
+                  <p className="text-[9px] uppercase font-bold text-slate-400 mt-0.5">
                     Data: {new Date().toLocaleDateString('pt-BR')}
                   </p>
                 </div>
               </div>
 
               {/* Content */}
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <section className="relative">
                   {formData.foto && (
-                    <div className="absolute top-0 right-0 w-20 h-24 border border-slate-900 overflow-hidden bg-white">
+                    <div className="absolute top-0 right-0 w-24 h-28 border border-slate-900 overflow-hidden bg-white">
                       <img src={formData.foto} className="w-full h-full object-cover" alt="Foto" />
                     </div>
                   )}
-                  <h3 className="bg-slate-100 px-2 py-0.5 text-[8px] font-black uppercase border-l-4 border-slate-900 mb-1.5 tracking-widest">1. Dados Pessoais</h3>
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[9px] pr-24">
+                  <h3 className="bg-slate-100 px-2 py-1 text-[10px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">1. Dados Pessoais</h3>
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[11px] pr-28">
                     <p className="col-span-2"><strong>Nome:</strong> {formData.nome}</p>
                     <p><strong>CPF:</strong> {formData.rgCpf || '___________'}</p>
                     <p><strong>Nascimento:</strong> {formData.dataNascimento ? new Date(formData.dataNascimento + 'T00:00:00').toLocaleDateString('pt-BR') : '___/___/___'}</p>
@@ -166,38 +184,57 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
 
                 {formData.estadoCivil === 'Casado(a)' && (
                   <section>
-                    <h3 className="bg-slate-100 px-2 py-0.5 text-[8px] font-black uppercase border-l-4 border-slate-900 mb-1.5 tracking-widest">2. Dados do Cônjuge</h3>
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[9px]">
+                    <h3 className="bg-slate-100 px-2 py-1 text-[10px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">2. Dados do Cônjuge</h3>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[11px]">
                       <p className="col-span-2"><strong>Nome do Cônjuge:</strong> {formData.conjuge || '---'}</p>
                       <p><strong>CPF do Cônjuge:</strong> {formData.conjugeRgCpf || '---'}</p>
                       <p><strong>Telefone do Cônjuge:</strong> {formData.conjugeTelefone || '---'}</p>
                     </div>
                   </section>
                 )}
+
+                <section>
+                  <h3 className="bg-slate-100 px-2 py-1 text-[10px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">3. Vida Sacramental</h3>
+                  <div className="grid grid-cols-1 gap-y-1.5 text-[11px]">
+                    <p><strong>Batizado(a):</strong> {formData.batizado ? `Sim (${formData.batismoData ? new Date(formData.batismoData + 'T00:00:00').toLocaleDateString('pt-BR') : ''} - ${formData.batismoParoquia || ''})` : 'Não'}</p>
+                    <p><strong>1ª Eucaristia:</strong> {formData.fezPrimeiraEucaristia ? `Sim (${formData.eucaristiaData ? new Date(formData.eucaristiaData + 'T00:00:00').toLocaleDateString('pt-BR') : ''} - ${formData.eucaristiaParoquia || ''})` : 'Não'}</p>
+                    <p><strong>Crisma:</strong> {formData.temCrisma ? `Sim (${formData.crismaData ? new Date(formData.crismaData + 'T00:00:00').toLocaleDateString('pt-BR') : ''} - ${formData.crismaParoquia || ''})` : 'Não'}</p>
+                  </div>
+                </section>
               </div>
             </div>
 
             {/* Footer */}
             <div>
-              <div className="mt-24 grid grid-cols-2 gap-12 pb-4">
+              <section className="mt-6 pt-4 border-t border-slate-200">
+                 <h3 className="text-[11px] font-black uppercase mb-2 tracking-widest text-center">Termo de compromisso e Responsabilidade</h3>
+                 <p className="text-[10px] leading-relaxed text-justify italic text-slate-700">
+                   "Catequese é processo permanente de educação na fé". Ao se inscrever na catequese como Catequista/voluntario, você está se comprometendo a fazer parte deste processo, ou seja, ter um compromisso de participar das atividades da Pastoral e da Paróquia (Missa das crianças, Missas Festivas, Reuniões, Retiros, Encontros de Formação...). É responsabilidade sua a educação religiosa dos Catequizandos a você confiados, com a efetiva participação dos Pais pois, “os pais são os primeiros catequistas dos filhos”. Sem o seu compromisso e apoio, o trabalho catequético não será possível.
+                 </p>
+                 <div className="mt-3 text-right">
+                   <p className="text-[10px] font-bold">{config.city}-{config.state}, _____ /_____/_________</p>
+                 </div>
+              </section>
+
+              <div className="mt-20 grid grid-cols-2 gap-12 pb-4">
                 <div className="text-center">
-                  <div className="border-t border-slate-900 pt-1 text-[8px] font-bold uppercase">Assinatura do Catequista</div>
+                  <div className="border-t border-slate-900 pt-1 text-[10px] font-bold uppercase">Assinatura do Catequista</div>
                 </div>
                 <div className="text-center">
-                  <div className="border-t border-slate-900 pt-1 text-[8px] font-bold uppercase">Coordenação de Catequese</div>
+                  <div className="border-t border-slate-900 pt-1 text-[10px] font-bold uppercase">Coordenação de Catequese</div>
                 </div>
               </div>
 
               <div className="border-t-2 border-slate-900 pt-2 mt-auto text-center">
-                <p className="text-[8px] font-bold uppercase">
+                <p className="text-[10px] font-bold uppercase">
                   {config.address} - {config.city}/{config.state}
                 </p>
-                <div className="flex justify-center gap-4 mt-1 text-[8px] font-bold uppercase">
+                <div className="flex justify-center gap-4 mt-1 text-[10px] font-bold uppercase">
                   {config.phone && <span>Tel: {config.phone}</span>}
                   {config.whatsapp && <span>Zap: {config.whatsapp}</span>}
                   {config.email && <span>Email: {config.email}</span>}
                 </div>
-                <div className="flex justify-center gap-4 mt-0.5 text-[8px] font-bold uppercase text-slate-600">
+                <div className="flex justify-center gap-4 mt-0.5 text-[10px] font-bold uppercase text-slate-600">
                   {config.instagram && <span>Insta: {config.instagram}</span>}
                   {config.facebook && <span>Face: {config.facebook}</span>}
                   {config.website && <span>Site: {config.website}</span>}
@@ -245,227 +282,333 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
       </div>
 
       <form id="catequista-form" onSubmit={handleSubmit} className="p-8 md:p-12 space-y-10">
-        <div className="space-y-6">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="p-1.5 bg-sky-100 rounded-lg"><ShieldCheck className="w-4 h-4 text-sky-600" /></div>
-            <h4 className="font-black text-slate-800 uppercase tracking-wide text-xs">Identificação e Pessoal</h4>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-            {/* FOTO E MATRÍCULA */}
-            <div className="md:col-span-12 flex flex-col md:flex-row gap-6 items-center mb-4">
-              <div className="relative group w-32 h-32 rounded-3xl border-4 border-sky-100 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0">
-                {isCameraActive ? (
-                   <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover" />
-                ) : formData.foto ? (
-                  <img src={formData.foto} alt="Foto" className="w-full h-full object-cover" />
-                ) : (
-                  <Camera className="w-10 h-10 text-slate-300" />
-                )}
-                
-                {/* Overlay Buttons */}
-                <div className={`absolute inset-0 bg-black/40 flex items-center justify-center gap-2 transition-opacity ${isCameraActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
-                   {!isCameraActive ? (
-                     <>
-                       <button type="button" onClick={startCamera} className="p-2 bg-white rounded-full hover:bg-sky-50 transition-colors" title="Tirar Foto">
-                         <Camera size={16} className="text-sky-600" />
+        
+        <div className="bg-slate-50 border-b border-slate-100 flex overflow-x-auto scrollbar-hide -mx-8 md:-mx-12 -mt-8 md:-mt-12 mb-10">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-8 py-5 font-bold text-[10px] md:text-xs transition-all border-b-2 whitespace-nowrap uppercase tracking-widest ${
+                activeTab === tab.id ? 'border-sky-600 text-sky-600 bg-white' : 'border-transparent text-slate-400 hover:text-slate-600'
+              }`}
+            >
+              <tab.icon className="w-4 h-4" /> {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {activeTab === 'pessoal' && (
+          <div className="space-y-6 animate-in slide-in-from-left-4 duration-300">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="p-1.5 bg-sky-100 rounded-lg"><ShieldCheck className="w-4 h-4 text-sky-600" /></div>
+              <h4 className="font-black text-slate-800 uppercase tracking-wide text-xs">Identificação e Pessoal</h4>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+              {/* FOTO E MATRÍCULA */}
+              <div className="md:col-span-12 flex flex-col md:flex-row gap-6 items-center mb-4">
+                <div className="relative group w-32 h-32 rounded-3xl border-4 border-sky-100 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0">
+                  {isCameraActive ? (
+                     <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover" />
+                  ) : formData.foto ? (
+                    <img src={formData.foto} alt="Foto" className="w-full h-full object-cover" />
+                  ) : (
+                    <Camera className="w-10 h-10 text-slate-300" />
+                  )}
+                  
+                  {/* Overlay Buttons */}
+                  <div className={`absolute inset-0 bg-black/40 flex items-center justify-center gap-2 transition-opacity ${isCameraActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+                     {!isCameraActive ? (
+                       <>
+                         <button type="button" onClick={startCamera} className="p-2 bg-white rounded-full hover:bg-sky-50 transition-colors" title="Tirar Foto">
+                           <Camera size={16} className="text-sky-600" />
+                         </button>
+                         <button type="button" onClick={() => fileInputRef.current?.click()} className="p-2 bg-white rounded-full hover:bg-sky-50 transition-colors" title="Escolher da Galeria">
+                           <FileText size={16} className="text-sky-600" />
+                         </button>
+                       </>
+                     ) : (
+                       <button type="button" onClick={capturePhoto} className="px-3 py-1 bg-white rounded-full text-[10px] font-black uppercase text-sky-600">
+                         Capturar
                        </button>
-                       <button type="button" onClick={() => fileInputRef.current?.click()} className="p-2 bg-white rounded-full hover:bg-sky-50 transition-colors" title="Escolher da Galeria">
-                         <FileText size={16} className="text-sky-600" />
-                       </button>
-                     </>
-                   ) : (
-                     <button type="button" onClick={capturePhoto} className="px-3 py-1 bg-white rounded-full text-[10px] font-black uppercase text-sky-600">
-                       Capturar
-                     </button>
-                   )}
-                </div>
-                
-                {/* Hidden Canvas for Capture */}
-                <canvas ref={canvasRef} className="hidden" />
-                <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handlePhotoChange} />
-              </div>
-
-              {/* Matrícula oculta no formulário */}
-              <div className="hidden">
-                 <label className="label-style">Nº de Registro (Matrícula)</label>
-                 <input 
-                   type="text" 
-                   value={formData.matricula || ''} 
-                   readOnly 
-                   className="input-style bg-slate-100 text-slate-500 font-mono tracking-widest" 
-                 />
-              </div>
-            </div>
-
-            <div className="md:col-span-9">
-              <label className="label-style">Nome Completo</label>
-              <input required type="text" value={formData.nome || ''} onChange={e => setFormData({...formData, nome: e.target.value})} className="input-style" placeholder="Ex: Maria de Fátima Souza" />
-            </div>
-            <div className="md:col-span-3">
-              <label className="label-style">Status Pastoral</label>
-              <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value as any})} className="input-style font-black text-sky-600">
-                <option value="Ativo">Ativo</option>
-                <option value="Inativo">Inativo</option>
-              </select>
-            </div>
-
-            <div className="md:col-span-3">
-              <label className="label-style">Sexo</label>
-              <select value={formData.sexo} onChange={e => setFormData({...formData, sexo: e.target.value as any})} className="input-style">
-                <option value="F">Feminino</option>
-                <option value="M">Masculino</option>
-              </select>
-            </div>
-            <div className="md:col-span-3">
-              <label className="label-style">Data de Nasc.</label>
-              <input required type="date" value={formData.dataNascimento || ''} onChange={e => setFormData({...formData, dataNascimento: e.target.value})} className="input-style" />
-            </div>
-            <div className="md:col-span-3">
-              <label className="label-style">CPF</label>
-              <input type="text" value={formData.rgCpf || ''} onChange={e => setFormData({...formData, rgCpf: maskCpfCnpj(e.target.value)})} className="input-style" placeholder="000.000.000-00" />
-            </div>
-            <div className="md:col-span-3">
-              <label className="label-style">Estado Civil</label>
-              <select value={formData.estadoCivil} onChange={e => setFormData({...formData, estadoCivil: e.target.value})} className="input-style">
-                <option>Solteiro(a)</option>
-                <option>Casado(a)</option>
-                <option>Viúvo(a)</option>
-                <option>Divorciado(a)</option>
-                <option>U. Estável</option>
-              </select>
-            </div>
-
-            {/* DADOS DO CÔNJUGE (CONDICIONAL) */}
-            {formData.estadoCivil === 'Casado(a)' && (
-              <div className="md:col-span-12 bg-pink-50/50 border border-pink-100 rounded-2xl p-6 animate-in fade-in slide-in-from-top-4">
-                <div className="flex items-center gap-2 mb-4">
-                  <Heart className="w-4 h-4 text-pink-500" />
-                  <h5 className="text-xs font-black text-pink-700 uppercase tracking-widest">Dados do Cônjuge</h5>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="md:col-span-1">
-                    <label className="label-style">Nome do Cônjuge</label>
-                    <input 
-                      type="text" 
-                      value={formData.conjuge || ''} 
-                      onChange={e => setFormData({...formData, conjuge: e.target.value})} 
-                      className="input-style bg-white" 
-                    />
+                     )}
                   </div>
-                  <div className="md:col-span-1">
-                    <label className="label-style">CPF do Cônjuge</label>
-                    <input 
-                      type="text" 
-                      value={formData.conjugeRgCpf || ''} 
-                      onChange={e => setFormData({...formData, conjugeRgCpf: maskCpfCnpj(e.target.value)})} 
-                      className="input-style bg-white" 
-                      placeholder="000.000.000-00"
-                    />
-                  </div>
-                  <div className="md:col-span-1">
-                    <label className="label-style">Telefone do Cônjuge</label>
-                    <input 
-                      type="tel" 
-                      value={formData.conjugeTelefone || ''} 
-                      onChange={e => setFormData({...formData, conjugeTelefone: maskPhone(e.target.value)})} 
-                      className="input-style bg-white" 
-                      placeholder="(00) 00000-0000"
-                    />
-                  </div>
+                  
+                  {/* Hidden Canvas for Capture */}
+                  <canvas ref={canvasRef} className="hidden" />
+                  <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handlePhotoChange} />
                 </div>
               </div>
-            )}
 
-            <div className="md:col-span-10">
-              <label className="label-style">Naturalidade</label>
-              <input type="text" value={formData.naturalidade || ''} onChange={e => setFormData({...formData, naturalidade: e.target.value})} className="input-style" placeholder="Cidade natal" />
-            </div>
-            <div className="md:col-span-2">
-              <label className="label-style">UF</label>
-              <input type="text" maxLength={2} value={formData.ufNaturalidade || ''} onChange={e => setFormData({...formData, ufNaturalidade: e.target.value.toUpperCase()})} className="input-style text-center font-bold" placeholder="BA" />
-            </div>
+              <div className="md:col-span-9">
+                <label className="label-style">Nome Completo</label>
+                <input required type="text" value={formData.nome || ''} onChange={e => setFormData({...formData, nome: e.target.value})} className="input-style" placeholder="Ex: Maria de Fátima Souza" />
+              </div>
+              <div className="md:col-span-3">
+                <label className="label-style">Status Pastoral</label>
+                <select required value={formData.status || ''} onChange={e => setFormData({...formData, status: e.target.value as any})} className="input-style font-black text-sky-600">
+                  <option value="">Selecione um Status</option>
+                  <option value="Ativo">Ativo</option>
+                  <option value="Inativo">Inativo</option>
+                </select>
+              </div>
 
-            <div className="md:col-span-8">
-              <label className="label-style">Comunidade de Atuação</label>
-              <input type="text" value={formData.comunidade || ''} onChange={e => setFormData({...formData, comunidade: e.target.value})} className="input-style" placeholder="Ex: Matriz, Nossa Senhora das Graças..." />
-            </div>
-            <div className="md:col-span-4">
-              <label className="label-style">Início na Catequese</label>
-              <input type="date" value={formData.desde || ''} onChange={e => setFormData({...formData, desde: e.target.value})} className="input-style" />
-            </div>
-          </div>
-        </div>
+              <div className="md:col-span-3">
+                <label className="label-style">Sexo</label>
+                <select value={formData.sexo} onChange={e => setFormData({...formData, sexo: e.target.value as any})} className="input-style">
+                  <option value="F">Feminino</option>
+                  <option value="M">Masculino</option>
+                </select>
+              </div>
+              <div className="md:col-span-3">
+                <label className="label-style">Data de Nasc.</label>
+                <input required type="date" value={formData.dataNascimento || ''} onChange={e => setFormData({...formData, dataNascimento: e.target.value})} className="input-style" />
+              </div>
+              <div className="md:col-span-3">
+                <label className="label-style">CPF</label>
+                <input type="text" value={formData.rgCpf || ''} onChange={e => setFormData({...formData, rgCpf: maskCpfCnpj(e.target.value)})} className="input-style" placeholder="000.000.000-00" />
+              </div>
+              <div className="md:col-span-3">
+                <label className="label-style">Estado Civil</label>
+                <select value={formData.estadoCivil} onChange={e => setFormData({...formData, estadoCivil: e.target.value})} className="input-style">
+                  <option>Solteiro(a)</option>
+                  <option>Casado(a)</option>
+                  <option>Viúvo(a)</option>
+                  <option>Divorciado(a)</option>
+                  <option>U. Estável</option>
+                </select>
+              </div>
 
-        <div className="space-y-6 pt-6 border-t border-sky-50">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="p-1.5 bg-amber-100 rounded-lg"><Phone className="w-4 h-4 text-amber-600" /></div>
-            <h4 className="font-black text-slate-800 uppercase tracking-wide text-xs">Contatos e Comunicação</h4>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <label className="label-style">Telefone Fixo</label>
-              <div className="relative">
-                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-sky-300 w-4 h-4" />
-                <input type="tel" value={formData.telefone || ''} onChange={e => setFormData({...formData, telefone: maskPhone(e.target.value)})} className="input-style pl-11" placeholder="(00) 0000-0000" />
+              {/* DADOS DO CÔNJUGE (CONDICIONAL) */}
+              {formData.estadoCivil === 'Casado(a)' && (
+                <div className="md:col-span-12 bg-pink-50/50 border border-pink-100 rounded-2xl p-6 animate-in fade-in slide-in-from-top-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Heart className="w-4 h-4 text-pink-500" />
+                    <h5 className="text-xs font-black text-pink-700 uppercase tracking-widest">Dados do Cônjuge</h5>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="md:col-span-1">
+                      <label className="label-style">Nome do Cônjuge</label>
+                      <input 
+                        type="text" 
+                        value={formData.conjuge || ''} 
+                        onChange={e => setFormData({...formData, conjuge: e.target.value})} 
+                        className="input-style bg-white" 
+                      />
+                    </div>
+                    <div className="md:col-span-1">
+                      <label className="label-style">CPF do Cônjuge</label>
+                      <input 
+                        type="text" 
+                        value={formData.conjugeRgCpf || ''} 
+                        onChange={e => setFormData({...formData, conjugeRgCpf: maskCpfCnpj(e.target.value)})} 
+                        className="input-style bg-white" 
+                        placeholder="000.000.000-00"
+                      />
+                    </div>
+                    <div className="md:col-span-1">
+                      <label className="label-style">Telefone do Cônjuge</label>
+                      <input 
+                        type="tel" 
+                        value={formData.conjugeTelefone || ''} 
+                        onChange={e => setFormData({...formData, conjugeTelefone: maskPhone(e.target.value)})} 
+                        className="input-style bg-white" 
+                        placeholder="(00) 00000-0000"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="md:col-span-10">
+                <label className="label-style">Naturalidade</label>
+                <input type="text" value={formData.naturalidade || ''} onChange={e => setFormData({...formData, naturalidade: e.target.value})} className="input-style" placeholder="Cidade natal" />
+              </div>
+              <div className="md:col-span-2">
+                <label className="label-style">UF</label>
+                <input type="text" maxLength={2} value={formData.ufNaturalidade || ''} onChange={e => setFormData({...formData, ufNaturalidade: e.target.value.toUpperCase()})} className="input-style text-center font-bold" placeholder="BA" />
+              </div>
+
+              <div className="md:col-span-8">
+                <label className="label-style">Comunidade de Atuação</label>
+                <input type="text" value={formData.comunidade || ''} onChange={e => setFormData({...formData, comunidade: e.target.value})} className="input-style" placeholder="Ex: Matriz, Nossa Senhora das Graças..." />
+              </div>
+              <div className="md:col-span-4">
+                <label className="label-style">Início na Catequese</label>
+                <input type="date" value={formData.desde || ''} onChange={e => setFormData({...formData, desde: e.target.value})} className="input-style" />
               </div>
             </div>
-            <div>
-              <label className="label-style">WhatsApp</label>
-              <div className="relative">
-                <MessageCircle className="absolute left-4 top-1/2 -translate-y-1/2 text-green-400 w-5 h-5" />
-                <input type="tel" value={formData.whatsapp || ''} onChange={e => setFormData({...formData, whatsapp: maskPhone(e.target.value)})} className="input-style pl-11 border-green-50 focus:border-green-400" placeholder="(00) 90000-0000" />
-              </div>
-            </div>
-            <div>
-              <label className="label-style">E-mail Pessoal</label>
-              <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-sky-300 w-4 h-4" />
-                <input type="email" value={formData.email || ''} onChange={e => setFormData({...formData, email: e.target.value})} className="input-style pl-11" placeholder="email@exemplo.com" />
-              </div>
-            </div>
           </div>
-        </div>
+        )}
 
-        <div className="space-y-6 pt-6 border-t border-sky-50">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="p-1.5 bg-sky-50 rounded-lg"><MapPin className="w-4 h-4 text-sky-500" /></div>
-            <h4 className="font-black text-slate-800 uppercase tracking-wide text-xs">Endereço Residencial</h4>
+        {activeTab === 'contato' && (
+          <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="p-1.5 bg-amber-100 rounded-lg"><Phone className="w-4 h-4 text-amber-600" /></div>
+              <h4 className="font-black text-slate-800 uppercase tracking-wide text-xs">Contatos e Comunicação</h4>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label className="label-style">Telefone Fixo</label>
+                <div className="relative">
+                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-sky-300 w-4 h-4" />
+                  <input type="tel" value={formData.telefone || ''} onChange={e => setFormData({...formData, telefone: maskPhone(e.target.value)})} className="input-style pl-11" placeholder="(00) 0000-0000" />
+                </div>
+              </div>
+              <div>
+                <label className="label-style">WhatsApp</label>
+                <div className="relative">
+                  <MessageCircle className="absolute left-4 top-1/2 -translate-y-1/2 text-green-400 w-5 h-5" />
+                  <input type="tel" value={formData.whatsapp || ''} onChange={e => setFormData({...formData, whatsapp: maskPhone(e.target.value)})} className="input-style pl-11 border-green-50 focus:border-green-400" placeholder="(00) 90000-0000" />
+                </div>
+              </div>
+              <div>
+                <label className="label-style">E-mail Pessoal</label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-sky-300 w-4 h-4" />
+                  <input type="email" value={formData.email || ''} onChange={e => setFormData({...formData, email: e.target.value})} className="input-style pl-11" placeholder="email@exemplo.com" />
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-            <div className="md:col-span-9">
-              <label className="label-style">Rua / Avenida</label>
-              <input type="text" value={formData.endereco || ''} onChange={e => setFormData({...formData, endereco: e.target.value})} className="input-style" placeholder="Endereço completo" />
+        )}
+
+        {activeTab === 'endereco' && (
+          <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="p-1.5 bg-sky-50 rounded-lg"><MapPin className="w-4 h-4 text-sky-500" /></div>
+              <h4 className="font-black text-slate-800 uppercase tracking-wide text-xs">Endereço Residencial</h4>
             </div>
-            <div className="md:col-span-3">
-              <label className="label-style">Nº</label>
-              <input type="text" value={formData.numero || ''} onChange={e => setFormData({...formData, numero: e.target.value})} className="input-style text-center" placeholder="00" />
-            </div>
-            <div className="md:col-span-5">
-              <label className="label-style">Bairro</label>
-              <input type="text" value={formData.bairro || ''} onChange={e => setFormData({...formData, bairro: e.target.value})} className="input-style" placeholder="Bairro" />
-            </div>
-            <div className="md:col-span-4">
-              <label className="label-style">Cidade</label>
-              <input type="text" value={formData.cidade || ''} onChange={e => setFormData({...formData, cidade: e.target.value})} className="input-style" placeholder="Cidade" />
-            </div>
-            <div className="md:col-span-1">
-              <label className="label-style">UF</label>
-              <input type="text" maxLength={2} value={formData.ufEndereco || ''} onChange={e => setFormData({...formData, ufEndereco: e.target.value.toUpperCase()})} className="input-style text-center font-bold" placeholder="BA" />
-            </div>
-            <div className="md:col-span-2">
-              <label className="label-style">CEP</label>
-              <input type="text" maxLength={10} value={formData.cep || ''} onChange={e => setFormData({...formData, cep: e.target.value})} className="input-style text-center" placeholder="00.000-000" />
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+              <div className="md:col-span-9">
+                <label className="label-style">Rua / Avenida</label>
+                <input type="text" value={formData.endereco || ''} onChange={e => setFormData({...formData, endereco: e.target.value})} className="input-style" placeholder="Endereço completo" />
+              </div>
+              <div className="md:col-span-3">
+                <label className="label-style">Nº</label>
+                <input type="text" value={formData.numero || ''} onChange={e => setFormData({...formData, numero: e.target.value})} className="input-style text-center" placeholder="00" />
+              </div>
+              <div className="md:col-span-5">
+                <label className="label-style">Bairro</label>
+                <input type="text" value={formData.bairro || ''} onChange={e => setFormData({...formData, bairro: e.target.value})} className="input-style" placeholder="Bairro" />
+              </div>
+              <div className="md:col-span-4">
+                <label className="label-style">Cidade</label>
+                <input type="text" value={formData.cidade || ''} onChange={e => setFormData({...formData, cidade: e.target.value})} className="input-style" placeholder="Cidade" />
+              </div>
+              <div className="md:col-span-1">
+                <label className="label-style">UF</label>
+                <input type="text" maxLength={2} value={formData.ufEndereco || ''} onChange={e => setFormData({...formData, ufEndereco: e.target.value.toUpperCase()})} className="input-style text-center font-bold" placeholder="BA" />
+              </div>
+              <div className="md:col-span-2">
+                <label className="label-style">CEP</label>
+                <input type="text" maxLength={10} value={formData.cep || ''} onChange={e => setFormData({...formData, cep: e.target.value})} className="input-style text-center" placeholder="00.000-000" />
+              </div>
             </div>
           </div>
-        </div>
+        )}
+
+        {activeTab === 'sacramentos' && (
+          <div className="space-y-8 animate-in slide-in-from-right-4 duration-300">
+            {/* BATISMO */}
+            <div className="bg-blue-50/30 p-6 rounded-3xl border border-blue-100">
+              <div className="flex items-center gap-3 mb-6">
+                <input 
+                  type="checkbox" 
+                  checked={formData.batizado} 
+                  onChange={e => setFormData({...formData, batizado: e.target.checked})} 
+                  className="w-5 h-5 rounded cursor-pointer accent-blue-600" 
+                  id="chkBatizado" 
+                />
+                <label htmlFor="chkBatizado" className="font-bold text-slate-700 cursor-pointer">Já é Batizado(a)?</label>
+              </div>
+              {formData.batizado && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-in slide-in-from-top-2">
+                  <div>
+                    <label className="label-style">Data do Batismo</label>
+                    <input type="date" value={formData.batismoData || ''} onChange={e => setFormData({...formData, batismoData: e.target.value})} className="input-style bg-white" />
+                  </div>
+                  <div>
+                    <label className="label-style">Paróquia</label>
+                    <input type="text" value={formData.batismoParoquia || ''} onChange={e => setFormData({...formData, batismoParoquia: e.target.value})} className="input-style bg-white" />
+                  </div>
+                  <div>
+                    <label className="label-style">Cidade</label>
+                    <input type="text" value={formData.batismoCidade || ''} onChange={e => setFormData({...formData, batismoCidade: e.target.value})} className="input-style bg-white" />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* EUCARISTIA */}
+            <div className="bg-amber-50/30 p-6 rounded-3xl border border-amber-100">
+              <div className="flex items-center gap-3 mb-6">
+                <input 
+                  type="checkbox" 
+                  checked={formData.fezPrimeiraEucaristia} 
+                  onChange={e => setFormData({...formData, fezPrimeiraEucaristia: e.target.checked})} 
+                  className="w-5 h-5 rounded cursor-pointer accent-amber-600" 
+                  id="chkEuc" 
+                />
+                <label htmlFor="chkEuc" className="font-bold text-slate-700 cursor-pointer">Já fez a 1ª Eucaristia?</label>
+              </div>
+              {formData.fezPrimeiraEucaristia && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-in slide-in-from-top-2">
+                  <div>
+                    <label className="label-style">Data da Eucaristia</label>
+                    <input type="date" value={formData.eucaristiaData || ''} onChange={e => setFormData({...formData, eucaristiaData: e.target.value})} className="input-style bg-white" />
+                  </div>
+                  <div>
+                    <label className="label-style">Paróquia</label>
+                    <input type="text" value={formData.eucaristiaParoquia || ''} onChange={e => setFormData({...formData, eucaristiaParoquia: e.target.value})} className="input-style bg-white" />
+                  </div>
+                  <div>
+                    <label className="label-style">Cidade</label>
+                    <input type="text" value={formData.eucaristiaCidade || ''} onChange={e => setFormData({...formData, eucaristiaCidade: e.target.value})} className="input-style bg-white" />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* CRISMA */}
+            <div className="bg-indigo-50/30 p-6 rounded-3xl border border-indigo-100">
+              <div className="flex items-center gap-3 mb-6">
+                <input 
+                  type="checkbox" 
+                  checked={formData.temCrisma} 
+                  onChange={e => setFormData({...formData, temCrisma: e.target.checked})} 
+                  className="w-5 h-5 rounded cursor-pointer accent-indigo-600" 
+                  id="chkCrisma" 
+                />
+                <label htmlFor="chkCrisma" className="font-bold text-slate-700 cursor-pointer">Já tem Crisma?</label>
+              </div>
+              {formData.temCrisma && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-in slide-in-from-top-2">
+                  <div>
+                    <label className="label-style">Data da Crisma</label>
+                    <input type="date" value={formData.crismaData || ''} onChange={e => setFormData({...formData, crismaData: e.target.value})} className="input-style bg-white" />
+                  </div>
+                  <div>
+                    <label className="label-style">Paróquia</label>
+                    <input type="text" value={formData.crismaParoquia || ''} onChange={e => setFormData({...formData, crismaParoquia: e.target.value})} className="input-style bg-white" />
+                  </div>
+                  <div>
+                    <label className="label-style">Cidade</label>
+                    <input type="text" value={formData.crismaCidade || ''} onChange={e => setFormData({...formData, crismaCidade: e.target.value})} className="input-style bg-white" />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         <div className="flex items-center justify-between pt-8 border-t border-sky-50">
-          <button type="button" onClick={onCancel} className="flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-slate-400 hover:bg-slate-100 transition-all">
-            <ArrowLeft className="w-5 h-5" /> Cancelar
+          <button type="button" onClick={() => activeTab !== 'pessoal' ? setActiveTab(tabs[tabs.findIndex(t => t.id === activeTab) - 1].id) : onCancel()} className="flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-slate-400 hover:bg-slate-100 transition-all">
+            <ArrowLeft className="w-5 h-5" /> {activeTab === 'pessoal' ? 'Cancelar' : 'Anterior'}
           </button>
-          <button type="submit" className="flex items-center gap-2 px-12 py-4 rounded-2xl bg-amber-400 text-white font-black hover:bg-amber-500 shadow-xl shadow-amber-100 transition-all transform hover:-translate-y-0.5 uppercase tracking-widest text-xs">
-            <Save className="w-6 h-6" /> {initialData ? 'Atualizar Cadastro' : 'Salvar Catequista'}
+          <button type="button" onClick={() => activeTab !== 'sacramentos' ? setActiveTab(tabs[tabs.findIndex(t => t.id === activeTab) + 1].id) : handleSubmit({ preventDefault: () => {} } as any)} className="flex items-center gap-2 px-12 py-4 rounded-2xl bg-amber-400 text-white font-black hover:bg-amber-500 shadow-xl shadow-amber-100 transition-all transform hover:-translate-y-0.5 uppercase tracking-widest text-xs">
+            {activeTab === 'sacramentos' ? (initialData ? 'Atualizar Cadastro' : 'Salvar Catequista') : 'Próxima Etapa'} <Save className="w-6 h-6" />
           </button>
         </div>
       </form>
