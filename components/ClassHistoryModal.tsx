@@ -40,33 +40,40 @@ export const ClassHistoryModal: React.FC<ClassHistoryModalProps> = ({ turma, ses
           `}</style>
 
         {(() => {
-          // Logic for Consolidated Diary
-          const sessionsByMonth = sortedSessions.reduce((acc, session) => {
-            // session.date is YYYY-MM-DD
-            const parts = session.date.split('-');
-            let month = 0;
-            if (parts.length >= 3) {
-               month = parseInt(parts[1]) - 1;
+          // Logic for Consolidated Diary - Group by Year and Month chronologically
+          const sessionsByYearMonth = sortedSessions.reduce((acc, session) => {
+            const dateParts = session.date.split('-');
+            let year, month;
+            if (dateParts.length >= 3) {
+              year = parseInt(dateParts[0]);
+              month = parseInt(dateParts[1]) - 1;
             } else {
-               month = new Date(session.date).getMonth();
+              const d = new Date(session.date);
+              year = d.getFullYear();
+              month = d.getMonth();
             }
             
-            if (!acc[month]) acc[month] = [];
-            acc[month].push(session);
+            const key = `${year}-${month}`;
+            if (!acc[key]) acc[key] = { year, month, sessions: [] };
+            acc[key].sessions.push(session);
             return acc;
-          }, {} as Record<number, AttendanceSession[]>);
+          }, {} as Record<string, { year: number, month: number, sessions: AttendanceSession[] }>);
 
-          // Sort sessions within each month by date ascending
-          Object.keys(sessionsByMonth).forEach(key => {
-            const monthKey = Number(key);
-            sessionsByMonth[monthKey].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+          // Sort keys chronologically
+          const sortedKeys = Object.keys(sessionsByYearMonth).sort((a, b) => {
+            const [yA, mA] = a.split('-').map(Number);
+            const [yB, mB] = b.split('-').map(Number);
+            return yA !== yB ? yA - yB : mA - mB;
           });
 
-          const months = Object.keys(sessionsByMonth).map(Number).sort((a, b) => a - b);
+          // Sort sessions within each group by date ascending
+          sortedKeys.forEach(key => {
+            sessionsByYearMonth[key].sessions.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+          });
 
           const monthNames = [
-            'JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO',
-            'JULHO', 'AGOSTO', 'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO'
+            'JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN',
+            'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'
           ];
 
           return (
@@ -76,7 +83,9 @@ export const ClassHistoryModal: React.FC<ClassHistoryModalProps> = ({ turma, ses
                 <div className="flex justify-between items-end mb-2">
                   <div>
                     <h1 className="text-3xl font-black uppercase tracking-tighter text-slate-900">LISTA DE CHAMADA</h1>
-                    <p className="text-sm font-bold text-slate-600 uppercase mt-1">Turma: {turma.nome}</p>
+                    <p className="text-sm font-bold text-slate-600 uppercase mt-1">
+                      Turma: {turma.comunidade ? `${turma.comunidade} - ` : ''}{turma.nome}
+                    </p>
                     <p className="text-xs text-slate-500 uppercase mt-0.5">
                       Catequista: {turma.catequista} | Horário: {turma.horario}
                     </p>
@@ -89,26 +98,38 @@ export const ClassHistoryModal: React.FC<ClassHistoryModalProps> = ({ turma, ses
               </div>
 
               {/* Matrix Table */}
-              <table className="w-full border-collapse border border-black text-[10px]">
+              <table className="w-full border-collapse border border-black text-[9px]">
                 <thead>
+                  {/* Year Row */}
+                  <tr>
+                    <th className="border border-black p-1 w-10 text-center bg-slate-50 font-black" rowSpan={3}>Nº</th>
+                    <th className="border border-black p-1 text-left bg-slate-50 min-w-[200px] font-black" rowSpan={3}>CATEQUIZANDO</th>
+                    {sortedKeys.map(key => (
+                      <th 
+                        key={`year-${key}`} 
+                        colSpan={sessionsByYearMonth[key].sessions.length} 
+                        className="border border-black p-0.5 text-center bg-slate-200 text-[8px] font-black"
+                      >
+                        {sessionsByYearMonth[key].year}
+                      </th>
+                    ))}
+                  </tr>
                   {/* Month Row */}
                   <tr>
-                    <th className="border border-black p-2 w-10 text-center bg-slate-50 font-black" rowSpan={2}>Nº</th>
-                    <th className="border border-black p-2 text-left bg-slate-50 min-w-[250px] font-black" rowSpan={2}>CATEQUIZANDO</th>
-                    {months.map(month => (
+                    {sortedKeys.map(key => (
                       <th 
-                        key={month} 
-                        colSpan={sessionsByMonth[month].length} 
+                        key={`month-${key}`} 
+                        colSpan={sessionsByYearMonth[key].sessions.length} 
                         className="border border-black p-1 text-center bg-slate-100 font-black uppercase"
                       >
-                        {monthNames[month]}
+                        {monthNames[sessionsByYearMonth[key].month]}
                       </th>
                     ))}
                   </tr>
                   {/* Day Row */}
                   <tr>
-                    {months.map(month => (
-                      sessionsByMonth[month].map(session => {
+                    {sortedKeys.map(key => (
+                      sessionsByYearMonth[key].sessions.map(session => {
                         let day = '00';
                         const parts = session.date.split('-');
                         if (parts.length >= 3) {
@@ -117,7 +138,7 @@ export const ClassHistoryModal: React.FC<ClassHistoryModalProps> = ({ turma, ses
                             day = new Date(session.date).getDate().toString().padStart(2, '0');
                         }
                         return (
-                          <th key={session.id} className="border border-black p-1 text-center w-8 font-bold bg-white">
+                          <th key={session.id} className="border border-black p-1 text-center w-7 font-bold bg-white">
                             {day}
                           </th>
                         );
@@ -129,17 +150,17 @@ export const ClassHistoryModal: React.FC<ClassHistoryModalProps> = ({ turma, ses
                   {sortedMembers.map((student, index) => (
                     <tr key={student.id}>
                       <td className="border border-black p-1 text-center font-bold">{index + 1}</td>
-                      <td className="border border-black p-1 font-medium truncate max-w-[250px] uppercase">{student.nomeCompleto}</td>
-                      {months.map(month => (
-                        sessionsByMonth[month].map(session => {
+                      <td className="border border-black p-1 font-medium truncate max-w-[200px] uppercase">{student.nomeCompleto}</td>
+                      {sortedKeys.map(key => (
+                        sessionsByYearMonth[key].sessions.map(session => {
                           const entry = session.entries.find(e => e.studentId === student.id);
                           const isPresent = entry?.status === 'present';
                           const isAbsent = entry?.status === 'absent';
                           
                           return (
                             <td key={`${student.id}-${session.id}`} className="border border-black p-1 text-center font-bold">
-                              {isPresent && <span className="text-green-600">V</span>}
-                              {isAbsent && <span className="text-red-600">X</span>}
+                              {isPresent && <span className="text-green-600">P</span>}
+                              {isAbsent && <span className="text-red-600">F</span>}
                               {!entry && <span className="text-slate-300">-</span>}
                             </td>
                           );
@@ -158,7 +179,7 @@ export const ClassHistoryModal: React.FC<ClassHistoryModalProps> = ({ turma, ses
               </table>
 
               <div className="mt-4 text-[10px] text-slate-500 flex justify-end">
-                 <span>Legenda: V = Presente, X = Ausente</span>
+                 <span>Legenda: P = Presente, F = Falta</span>
               </div>
 
               <div className="border-t border-black pt-2 mt-4 text-center">
