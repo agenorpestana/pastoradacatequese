@@ -121,7 +121,7 @@ export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50/50 border-b border-slate-100">
-                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] w-1/3">Matrícula / Catequizando</th>
+                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Matrícula / Catequizando</th>
                 <th className="px-4 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Status</th>
                 <th className="px-4 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Turma</th>
                 <th className="px-4 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Nível / Etapa</th>
@@ -136,7 +136,7 @@ export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses
                     className="hover:bg-slate-50/80 transition-all group cursor-pointer"
                     onClick={() => onView(student)}
                   >
-                    <td className="px-8 py-5 min-w-[200px]">
+                    <td className="px-8 py-5">
                       <div className="flex items-center gap-4">
                         <div className={`w-12 h-12 rounded-2xl flex flex-col items-center justify-center shadow-sm transition-transform group-hover:scale-105 border-2 border-white overflow-hidden shrink-0 ${
                           student.foto ? '' :
@@ -154,7 +154,7 @@ export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses
                           )}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="font-bold text-slate-800 group-hover:text-blue-600 transition-colors truncate text-sm md:text-base">{student.nomeCompleto}</p>
+                          <p className="font-bold text-slate-800 group-hover:text-blue-600 transition-colors text-sm md:text-base break-words">{student.nomeCompleto}</p>
                           <div className="flex items-center gap-3 text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1">
                             <span className="flex items-center gap-1 shrink-0"><Fingerprint className="w-3 h-3" /> {student.matricula || '---'}</span>
                             <span className="flex items-center gap-1 hidden sm:flex"><Calendar className="w-3 h-3" /> {student.dataNascimento ? new Date(student.dataNascimento).toLocaleDateString('pt-BR') : '--/--'}</span>
