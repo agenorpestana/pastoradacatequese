@@ -39,6 +39,10 @@ export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses
     const matchesStatus = selectedStatus === 'all' || status === selectedStatus;
     
     return matchesSearch && matchesTurma && matchesStatus;
+  }).sort((a, b) => {
+    const dateA = a.dataCadastro ? new Date(a.dataCadastro).getTime() : 0;
+    const dateB = b.dataCadastro ? new Date(b.dataCadastro).getTime() : 0;
+    return dateB - dateA;
   });
 
   return (

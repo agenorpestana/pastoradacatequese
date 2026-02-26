@@ -75,6 +75,7 @@ export interface Turma {
   ano: string;
   ativa: boolean;
   comunidade?: string;
+  dataCadastro?: string;
 }
 
 export interface AttendanceEntry {
@@ -178,6 +179,8 @@ export interface Catequista {
   cidade: string;
   ufEndereco: string;
   cep: string;
+  documentos?: StudentDocument[];
+  dataCadastro?: string;
 }
 
 export interface StudentDocument {

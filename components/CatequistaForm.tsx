@@ -87,6 +87,7 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
     const newCatequista = {
       ...formData,
       id: formData.id || Math.random().toString(36).substr(2, 9),
+      dataCadastro: formData.dataCadastro || new Date().toISOString(),
     } as Catequista;
     onSave(newCatequista);
   };

@@ -46,6 +46,7 @@ export const ClassForm: React.FC<ClassFormProps> = ({ onSave, onCancel, initialD
     const newTurma = {
       ...formData,
       id: formData.id || Math.random().toString(36).substr(2, 9),
+      dataCadastro: formData.dataCadastro || new Date().toISOString(),
     } as Turma;
     onSave(newTurma, selectedStudentIds);
   };

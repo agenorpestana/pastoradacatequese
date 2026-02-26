@@ -8,17 +8,24 @@ interface CatequistaTableProps {
   onDelete: (id: string) => void;
   onEdit: (catequista: Catequista) => void;
   onViewHistory: (catequista: Catequista) => void;
+  onManageDocuments: (catequista: Catequista) => void;
   onAddNew?: () => void;
 }
 
-export const CatequistaTable: React.FC<CatequistaTableProps> = ({ catequistas, onDelete, onEdit, onViewHistory, onAddNew }) => {
+export const CatequistaTable: React.FC<CatequistaTableProps> = ({ catequistas, onDelete, onEdit, onViewHistory, onManageDocuments, onAddNew }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filtered = catequistas.filter(c => 
-    c.nome.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    (c.rgCpf && c.rgCpf.includes(searchTerm)) ||
-    (c.comunidade && c.comunidade.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const filtered = (catequistas || [])
+    .filter(c => 
+      c.nome.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      (c.rgCpf && c.rgCpf.includes(searchTerm)) ||
+      (c.comunidade && c.comunidade.toLowerCase().includes(searchTerm.toLowerCase()))
+    )
+    .sort((a, b) => {
+      const dateA = a.dataCadastro ? new Date(a.dataCadastro).getTime() : 0;
+      const dateB = b.dataCadastro ? new Date(b.dataCadastro).getTime() : 0;
+      return dateB - dateA;
+    });
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-10">
@@ -30,7 +37,7 @@ export const CatequistaTable: React.FC<CatequistaTableProps> = ({ catequistas, o
             <UsersRound className="w-8 h-8 text-white relative z-10" />
           </div>
           <div>
-            <h2 className="text-2xl font-black text-slate-800 tracking-tight">Corpo de Catequistas</h2>
+            <h2 className="text-2xl font-black text-slate-800 tracking-tight">Lista de Catequistas</h2>
             <p className="text-slate-500 text-sm flex items-center gap-1.5">
               <Sparkles size={12} className="text-sky-500" /> Gestão de voluntários e educadores da fé.
             </p>
@@ -78,8 +85,12 @@ export const CatequistaTable: React.FC<CatequistaTableProps> = ({ catequistas, o
                   <tr key={c.id} className="hover:bg-sky-50/30 group transition-all">
                     <td className="px-8 py-5">
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-2xl bg-sky-100 flex items-center justify-center text-sky-600 font-black uppercase text-lg border-2 border-white shadow-sm">
-                          {c.nome.charAt(0)}
+                        <div className="w-12 h-12 rounded-2xl bg-sky-100 flex items-center justify-center text-sky-600 font-black uppercase text-lg border-2 border-white shadow-sm overflow-hidden">
+                          {c.foto ? (
+                            <img src={c.foto} className="w-full h-full object-cover" alt={c.nome} />
+                          ) : (
+                            c.nome.charAt(0)
+                          )}
                         </div>
                         <div>
                           <p className="font-bold text-slate-800 group-hover:text-sky-600 transition-colors">{c.nome}</p>
@@ -120,6 +131,13 @@ export const CatequistaTable: React.FC<CatequistaTableProps> = ({ catequistas, o
                           title="Histórico de Presença"
                         >
                           <History className="w-4.5 h-4.5" />
+                        </button>
+                        <button 
+                          onClick={() => onManageDocuments(c)} 
+                          className="p-2.5 bg-white text-slate-400 hover:text-indigo-600 rounded-xl border border-sky-50 shadow-sm transition-all"
+                          title="Anexar Documentos"
+                        >
+                          <FileText className="w-4.5 h-4.5" />
                         </button>
                         <button onClick={() => onEdit(c)} className="p-2.5 bg-white text-slate-400 hover:text-amber-500 rounded-xl border border-sky-50 shadow-sm transition-all">
                           <Edit className="w-4.5 h-4.5" />

@@ -1,25 +1,19 @@
 
 import React, { useState, useRef } from 'react';
 import { X, Upload, FileText, Trash2, Eye, Download, Plus, File, Loader2 } from 'lucide-react';
-import { Student, StudentDocument } from '../types';
+import { Catequista, StudentDocument } from '../types';
 
-interface DocumentsModalProps {
-  entity: {
-    nome?: string;
-    nomeCompleto?: string;
-    documentos?: StudentDocument[];
-  };
+interface CatequistaDocumentsModalProps {
+  catequista: Catequista;
   onClose: () => void;
   onUpdateDocuments: (documents: StudentDocument[]) => void;
 }
 
-export const StudentDocumentsModal: React.FC<DocumentsModalProps> = ({ entity, onClose, onUpdateDocuments }) => {
-  const [documents, setDocuments] = useState<StudentDocument[]>(entity.documentos || []);
+export const CatequistaDocumentsModal: React.FC<CatequistaDocumentsModalProps> = ({ catequista, onClose, onUpdateDocuments }) => {
+  const [documents, setDocuments] = useState<StudentDocument[]>(catequista.documentos || []);
   const [isUploading, setIsUploading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const entityName = entity.nomeCompleto || entity.nome || '---';
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -68,12 +62,12 @@ export const StudentDocumentsModal: React.FC<DocumentsModalProps> = ({ entity, o
       <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[85vh]">
         <div className="bg-slate-900 p-8 flex justify-between items-center shrink-0">
           <div className="flex items-center gap-4">
-            <div className="bg-blue-600 p-3 rounded-2xl shadow-lg">
+            <div className="bg-amber-600 p-3 rounded-2xl shadow-lg">
               <FileText className="text-white w-6 h-6" />
             </div>
             <div>
               <h2 className="text-xl font-black text-white">Documentos em Anexo</h2>
-              <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">{entityName}</p>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">{catequista.nome}</p>
             </div>
           </div>
           <button onClick={onClose} className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all"><X /></button>
@@ -86,13 +80,13 @@ export const StudentDocumentsModal: React.FC<DocumentsModalProps> = ({ entity, o
               placeholder="Buscar documento..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="w-full pl-5 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:ring-4 focus:ring-blue-500/10 transition-all font-medium"
+              className="w-full pl-5 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:ring-4 focus:ring-amber-500/10 transition-all font-medium"
             />
           </div>
           <button 
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploading}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl flex items-center justify-center gap-2 font-black text-[10px] uppercase tracking-widest shadow-lg shadow-blue-500/20 transition-all disabled:opacity-50"
+            className="bg-amber-600 hover:bg-amber-700 text-white px-6 py-2.5 rounded-xl flex items-center justify-center gap-2 font-black text-[10px] uppercase tracking-widest shadow-lg shadow-amber-500/20 transition-all disabled:opacity-50"
           >
             {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
             Anexar Arquivo
@@ -103,9 +97,9 @@ export const StudentDocumentsModal: React.FC<DocumentsModalProps> = ({ entity, o
         <div className="flex-1 overflow-y-auto p-6 space-y-3 custom-scrollbar">
           {filteredDocs.length > 0 ? (
             filteredDocs.map(doc => (
-              <div key={doc.id} className="flex items-center justify-between p-4 bg-white rounded-2xl border border-slate-100 hover:border-blue-200 transition-all group shadow-sm">
+              <div key={doc.id} className="flex items-center justify-between p-4 bg-white rounded-2xl border border-slate-100 hover:border-amber-200 transition-all group shadow-sm">
                 <div className="flex items-center gap-4 truncate">
-                  <div className="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
+                  <div className="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:text-amber-500 transition-colors">
                     <File size={24} />
                   </div>
                   <div className="truncate">
@@ -119,7 +113,7 @@ export const StudentDocumentsModal: React.FC<DocumentsModalProps> = ({ entity, o
                 <div className="flex items-center gap-1">
                   <button 
                     onClick={() => handleView(doc)}
-                    className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
+                    className="p-2.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-all"
                     title="Visualizar"
                   >
                     <Eye size={18} />
@@ -140,7 +134,7 @@ export const StudentDocumentsModal: React.FC<DocumentsModalProps> = ({ entity, o
                <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Nenhum documento anexado</p>
                <button 
                  onClick={() => fileInputRef.current?.click()}
-                 className="mt-4 text-blue-600 text-xs font-black uppercase tracking-widest hover:underline"
+                 className="mt-4 text-amber-600 text-xs font-black uppercase tracking-widest hover:underline"
                >
                  Clique para enviar o primeiro arquivo
                </button>

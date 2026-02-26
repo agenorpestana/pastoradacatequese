@@ -159,7 +159,7 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
                 ANO: {selectedYear}
               </div>
               <div className="flex-[2] p-2 border-r border-black">
-                TURMA: {turma.nome}
+                TURMA: {turma.comunidade ? `${turma.comunidade} - ` : ''}{turma.nome}
               </div>
               <div className="flex-1 p-2">
                 RESUMO: {classStudents.length} CATEQUIZANDOS
@@ -218,8 +218,8 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
                       
                       return (
                         <td key={`${student.id}-${session.id}`} className="border border-black p-1 text-center font-bold">
-                          {isPresent && <span className="text-green-600">V</span>}
-                          {isAbsent && <span className="text-red-600">X</span>}
+                          {isPresent && <span className="text-green-600">P</span>}
+                          {isAbsent && <span className="text-red-600">F</span>}
                           {!entry && <span className="text-slate-300">-</span>}
                         </td>
                       );
@@ -239,7 +239,7 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
           
           <div className="mt-4 text-[10px] text-slate-500 flex justify-between">
              <span>Gerado em {new Date().toLocaleDateString('pt-BR')}</span>
-             <span>Legenda: V = Presente, X = Ausente</span>
+             <span>Legenda: P = Presente, F = Falta</span>
           </div>
 
           <div className="border-t border-black pt-2 mt-4 text-center hidden print:block">

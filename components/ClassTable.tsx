@@ -22,6 +22,12 @@ export const ClassTable: React.FC<ClassTableProps> = ({
   onViewHistory,
   onAddNew
 }) => {
+  const sortedClasses = [...(classes || [])].sort((a, b) => {
+    const dateA = a.dataCadastro ? new Date(a.dataCadastro).getTime() : 0;
+    const dateB = b.dataCadastro ? new Date(b.dataCadastro).getTime() : 0;
+    return dateB - dateA;
+  });
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-10">
       {/* HEADER CARD - Standardized Style */}
@@ -62,8 +68,8 @@ export const ClassTable: React.FC<ClassTableProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {classes.length > 0 ? (
-                classes.map((turma) => (
+              {sortedClasses.length > 0 ? (
+                sortedClasses.map((turma) => (
                   <tr key={turma.id} className="hover:bg-slate-50 transition-colors group">
                     <td className="px-8 py-5">
                       <div 

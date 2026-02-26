@@ -349,6 +349,7 @@ const App: React.FC = () => {
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
   const [viewingStudent, setViewingStudent] = useState<Student | null>(null);
   const [managingDocumentsStudent, setManagingDocumentsStudent] = useState<Student | null>(null);
+  const [managingDocumentsCatequista, setManagingDocumentsCatequista] = useState<Catequista | null>(null);
   
   const [editingClass, setEditingClass] = useState<Turma | null>(null);
   const [viewingClassMembers, setViewingClassMembers] = useState<Turma | null>(null);
@@ -479,6 +480,14 @@ const App: React.FC = () => {
     await api.put('students', updated.id, updated);
     setStudents(prev => prev.map(s => s.id === updated.id ? updated : s));
     setManagingDocumentsStudent(updated);
+  };
+
+  const handleUpdateCatequistaDocuments = async (docs: StudentDocument[]) => {
+    if (!managingDocumentsCatequista) return;
+    const updated = { ...managingDocumentsCatequista, documentos: docs };
+    await api.put('catequistas', updated.id, updated);
+    setCatequistas(prev => prev.map(c => c.id === updated.id ? updated : c));
+    setManagingDocumentsCatequista(updated);
   };
 
   // Classes
@@ -816,6 +825,7 @@ const App: React.FC = () => {
                   onDelete={handleDeleteCatequista}
                   onEdit={(c) => { setEditingCatequista(c); setView('catequista_create'); }}
                   onViewHistory={(c) => setViewingCatequistaHistory(c)}
+                  onManageDocuments={(c) => setManagingDocumentsCatequista(c)}
                   onAddNew={user.permissions.catequistas ? () => { setEditingCatequista(null); setView('catequista_create'); } : undefined}
                />;
       case 'catequista_create':
@@ -918,9 +928,17 @@ const App: React.FC = () => {
 
         {managingDocumentsStudent && (
           <StudentDocumentsModal 
-            student={managingDocumentsStudent}
+            entity={managingDocumentsStudent}
             onClose={() => setManagingDocumentsStudent(null)}
             onUpdateDocuments={handleUpdateDocuments}
+          />
+        )}
+
+        {managingDocumentsCatequista && (
+          <StudentDocumentsModal 
+            entity={managingDocumentsCatequista}
+            onClose={() => setManagingDocumentsCatequista(null)}
+            onUpdateDocuments={handleUpdateCatequistaDocuments}
           />
         )}
 
