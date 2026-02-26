@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Search, Edit, Trash2, Calendar, Phone, Mail, UserCheck, History, MapPin, UserPlus, MessageCircle, UsersRound, Sparkles } from 'lucide-react';
+import { Search, Edit, Trash2, Calendar, Phone, Mail, UserCheck, History, MapPin, UserPlus, MessageCircle, UsersRound, Sparkles, FileText } from 'lucide-react';
 import { Catequista } from '../types';
 
 interface CatequistaTableProps {
