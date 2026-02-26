@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Save, Printer, User, Home, Users, Church, MapPin, Calendar, ArrowRight, ArrowLeft, ClipboardList, Wine, UserPlus, CheckCircle2, Mail, Phone, ShieldCheck, Heart, FileText, BookOpen, Fingerprint, UserCheck, Camera, Upload, RotateCcw, Image as ImageIcon, BookOpenText, Star, MessageSquare, Waves, Award, X } from 'lucide-react';
-import { Student, PersonFull, PersonBasic, Turma, ParishConfig } from '../types';
+import { Student, PersonFull, PersonBasic, Turma, ParishConfig, NivelEtapa } from '../types';
 import { maskPhone, maskCpfCnpj } from '../utils/masks';
 
 interface RegistrationFormProps {
@@ -11,11 +11,12 @@ interface RegistrationFormProps {
   initialData?: Student | null;
   allClasses?: Turma[];
   config: ParishConfig;
+  niveis: NivelEtapa[];
 }
 
 type TabType = 'crismando' | 'pais' | 'padrinhos_batismo' | 'eucaristia' | 'celebracao';
 
-export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCancel, initialData, allClasses, config }) => {
+export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCancel, initialData, allClasses, config, niveis }) => {
   const [activeTab, setActiveTab] = useState<TabType>('crismando');
   const [isCameraActive, setIsCameraActive] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -663,6 +664,41 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                       <option value="Concluido">Crismado</option>
                     </select>
                   </div>
+
+                  <div className="md:col-span-6">
+                    <label className="label-style">Nível / Etapa</label>
+                    <select 
+                      value={formData.nivel || ''} 
+                      onChange={e => {
+                        const newNivel = e.target.value;
+                        setFormData({
+                          ...formData, 
+                          nivel: newNivel,
+                          turma: '' // Reset turma when nivel changes to avoid inconsistency
+                        });
+                      }} 
+                      className="input-style font-bold"
+                    >
+                      <option value="">Selecione o Nível</option>
+                      {niveis.map(n => (
+                        <option key={n.id} value={n.nome}>{n.nome}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="md:col-span-6">
+                    <label className="label-style">Turma</label>
+                    <select 
+                      value={formData.turma || ''} 
+                      onChange={e => setFormData({...formData, turma: e.target.value})} 
+                      className="input-style font-bold"
+                    >
+                      <option value="">Selecione uma turma</option>
+                      {allClasses?.filter(c => !formData.nivel || c.nivel === formData.nivel).map(c => (
+                        <option key={c.id} value={c.nome}>{c.nome}</option>
+                      ))}
+                    </select>
+                  </div>
                   
                   <div className="md:col-span-4">
                     <label className="label-style">Moro com:</label>
@@ -875,22 +911,9 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-                    <div className="md:col-span-8">
+                    <div className="md:col-span-12">
                       <label className="label-style">Comunidade</label>
                       <input type="text" value={formData.comunidade || ''} onChange={e => setFormData({...formData, comunidade: e.target.value})} className="input-style" />
-                    </div>
-                    <div className="md:col-span-4">
-                      <label className="label-style">Turma</label>
-                      <select 
-                        value={formData.turma || ''} 
-                        onChange={e => setFormData({...formData, turma: e.target.value})} 
-                        className="input-style font-bold"
-                      >
-                        <option value="">Selecione uma turma</option>
-                        {allClasses?.map(c => (
-                          <option key={c.id} value={c.nome}>{c.nome}</option>
-                        ))}
-                      </select>
                     </div>
                   </div>
                   <div>

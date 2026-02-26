@@ -773,6 +773,7 @@ const App: React.FC = () => {
                   initialData={editingStudent}
                   allClasses={visibleClasses}
                   config={parishConfig}
+                  niveis={niveisEtapas}
                />;
       case 'list':
         return <StudentTable 

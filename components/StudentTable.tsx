@@ -116,16 +116,15 @@ export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses
         </div>
       </div>
 
-      {/* TABLE CONTAINER */}
       <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
-          <table className="w-full text-left border-collapse min-w-[800px]">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50/50 border-b border-slate-100">
-                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Matrícula / Catequizando</th>
-                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Status</th>
-                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Turma</th>
-                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Nível / Etapa</th>
+                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] w-1/3">Matrícula / Catequizando</th>
+                <th className="px-4 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Status</th>
+                <th className="px-4 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Turma</th>
+                <th className="px-4 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">Nível / Etapa</th>
                 <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] text-right">Ações</th>
               </tr>
             </thead>
@@ -137,7 +136,7 @@ export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses
                     className="hover:bg-slate-50/80 transition-all group cursor-pointer"
                     onClick={() => onView(student)}
                   >
-                    <td className="px-8 py-5">
+                    <td className="px-8 py-5 min-w-[200px]">
                       <div className="flex items-center gap-4">
                         <div className={`w-12 h-12 rounded-2xl flex flex-col items-center justify-center shadow-sm transition-transform group-hover:scale-105 border-2 border-white overflow-hidden shrink-0 ${
                           student.foto ? '' :
@@ -154,7 +153,7 @@ export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses
                             </>
                           )}
                         </div>
-                        <div className="truncate">
+                        <div className="min-w-0 flex-1">
                           <p className="font-bold text-slate-800 group-hover:text-blue-600 transition-colors truncate text-sm md:text-base">{student.nomeCompleto}</p>
                           <div className="flex items-center gap-3 text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-1">
                             <span className="flex items-center gap-1 shrink-0"><Fingerprint className="w-3 h-3" /> {student.matricula || '---'}</span>
@@ -163,7 +162,7 @@ export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses
                         </div>
                       </div>
                     </td>
-                    <td className="px-8 py-5">
+                    <td className="px-4 py-5">
                       {student.status === 'Concluido' ? (
                         <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[9px] font-black bg-indigo-50 text-indigo-600 border border-indigo-100 uppercase tracking-widest whitespace-nowrap">
                           <GraduationCap className="w-3 h-3" /> Crismado
@@ -178,12 +177,12 @@ export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses
                         </span>
                       )}
                     </td>
-                    <td className="px-8 py-5">
+                    <td className="px-4 py-5">
                       <span className="inline-flex items-center px-4 py-1.5 rounded-xl text-[9px] font-black bg-slate-100 text-slate-600 border border-slate-200 uppercase tracking-widest whitespace-nowrap">
                         {student.turma || 'Sem Turma'}
                       </span>
                     </td>
-                    <td className="px-8 py-5">
+                    <td className="px-4 py-5">
                       <span className="inline-flex items-center px-4 py-1.5 rounded-xl text-[9px] font-black bg-indigo-50 text-indigo-700 border border-indigo-100 uppercase tracking-widest whitespace-nowrap">
                         <BookOpen className="w-3 h-3 mr-1" />
                         {getStudentLevel(student.turma)}
