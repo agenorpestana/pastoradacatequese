@@ -79,6 +79,14 @@ const runMigrations = async () => {
         } catch (e) {
             console.error("❌ Failed to create 'niveis_etapas' table:", e.message);
         }
+        
+        // Migration 4: comunidade in turmas
+        const [columnsTurmas] = await conn.query("SHOW COLUMNS FROM turmas LIKE 'comunidade'");
+        if (columnsTurmas.length === 0) {
+            console.log("⚠️ Migration Required: Adding 'comunidade' to 'turmas' table...");
+            await conn.query("ALTER TABLE turmas ADD COLUMN comunidade VARCHAR(255)");
+            console.log("✅ Migration Successful: Column added to turmas.");
+        }
 
     } catch (err) {
         console.error("❌ Migration Failed:", err.message);
@@ -204,8 +212,8 @@ app.post('/api/:resource', async (req, res) => {
         params = [data.id, data.nome, data.email, data.senha, data.role, json(data.permissions), data.linkedCatequistaId || null];
         break;
       case 'turmas':
-        query = 'INSERT INTO turmas (id, nome, nivel, catequista, dia_semana, horario, ano, ativa) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
-        params = [data.id, data.nome, data.nivel, data.catequista, data.diaSemana, data.horario, data.ano, data.ativa];
+        query = 'INSERT INTO turmas (id, nome, nivel, catequista, dia_semana, horario, ano, ativa, comunidade) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
+        params = [data.id, data.nome, data.nivel, data.catequista, data.diaSemana, data.horario, data.ano, data.ativa, data.comunidade || null];
         break;
       case 'students':
         query = 'INSERT INTO students (id, matricula, nome_completo, turma_id, status, data_nascimento, sexo, telefone, batizado, fez_primeira_eucaristia, full_data) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
@@ -271,8 +279,8 @@ app.put('/api/:resource/:id', async (req, res) => {
           params = [data.nome, data.email, data.senha, data.role, json(data.permissions), data.linkedCatequistaId || null, id];
           break;
         case 'turmas':
-          query = 'UPDATE turmas SET nome=?, nivel=?, catequista=?, dia_semana=?, horario=?, ano=?, ativa=? WHERE id=?';
-          params = [data.nome, data.nivel, data.catequista, data.diaSemana, data.horario, data.ano, data.ativa, id];
+          query = 'UPDATE turmas SET nome=?, nivel=?, catequista=?, dia_semana=?, horario=?, ano=?, ativa=?, comunidade=? WHERE id=?';
+          params = [data.nome, data.nivel, data.catequista, data.diaSemana, data.horario, data.ano, data.ativa, data.comunidade || null, id];
           break;
         case 'students':
           query = 'UPDATE students SET matricula=?, nome_completo=?, status=?, data_nascimento=?, sexo=?, telefone=?, batizado=?, fez_primeira_eucaristia=?, full_data=? WHERE id=?';

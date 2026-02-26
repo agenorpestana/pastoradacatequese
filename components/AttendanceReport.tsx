@@ -90,31 +90,37 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
       .sort((a, b) => a.nomeCompleto.localeCompare(b.nomeCompleto));
 
     const classSessions = attendanceSessions
-      .filter(s => s.turmaId === turma.id && new Date(s.date).getFullYear() === selectedYear)
+      .filter(s => s.turmaId === turma.id) // Removed year filter to show all sessions chronologically
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-    // Group sessions by month
-    const sessionsByMonth = classSessions.reduce((acc, session) => {
-      // session.date is YYYY-MM-DD
-      const parts = session.date.split('-');
-      // Fallback if date is not YYYY-MM-DD (e.g. ISO with time)
-      let month = 0;
-      if (parts.length >= 3) {
-         month = parseInt(parts[1]) - 1;
+    // Group sessions by year and month for chronological display
+    const sessionsByYearMonth = classSessions.reduce((acc, session) => {
+      const dateParts = session.date.split('-');
+      let year, month;
+      if (dateParts.length >= 3) {
+        year = parseInt(dateParts[0]);
+        month = parseInt(dateParts[1]) - 1;
       } else {
-         month = new Date(session.date).getMonth();
+        const d = new Date(session.date);
+        year = d.getFullYear();
+        month = d.getMonth();
       }
       
-      if (!acc[month]) acc[month] = [];
-      acc[month].push(session);
+      const key = `${year}-${month}`;
+      if (!acc[key]) acc[key] = { year, month, sessions: [] };
+      acc[key].sessions.push(session);
       return acc;
-    }, {} as Record<number, AttendanceSession[]>);
+    }, {} as Record<string, { year: number, month: number, sessions: AttendanceSession[] }>);
 
-    const months = Object.keys(sessionsByMonth).map(Number).sort((a, b) => a - b);
+    const sortedKeys = Object.keys(sessionsByYearMonth).sort((a, b) => {
+      const [yA, mA] = a.split('-').map(Number);
+      const [yB, mB] = b.split('-').map(Number);
+      return yA !== yB ? yA - yB : mA - mB;
+    });
 
     const monthNames = [
-      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+      'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
+      'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'
     ];
 
     return (
@@ -156,9 +162,6 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
             </div>
             <div className="flex text-xs font-bold uppercase">
               <div className="flex-1 p-2 border-r border-black">
-                ANO: {selectedYear}
-              </div>
-              <div className="flex-[2] p-2 border-r border-black">
                 TURMA: {turma.comunidade ? `${turma.comunidade} - ` : ''}{turma.nome}
               </div>
               <div className="flex-1 p-2">
@@ -168,26 +171,38 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
           </div>
 
           {/* Matrix Table */}
-          <table className="w-full border-collapse border border-black text-[10px]">
+          <table className="w-full border-collapse border border-black text-[9px]">
             <thead>
+              {/* Year Row */}
+              <tr>
+                <th className="border border-black p-1 w-8 text-center bg-slate-50" rowSpan={3}>Nº</th>
+                <th className="border border-black p-1 text-left bg-slate-50 min-w-[180px]" rowSpan={3}>CATEQUIZANDO</th>
+                {sortedKeys.map(key => (
+                  <th 
+                    key={`year-${key}`} 
+                    colSpan={sessionsByYearMonth[key].sessions.length} 
+                    className="border border-black p-0.5 text-center bg-slate-200 text-[8px]"
+                  >
+                    {sessionsByYearMonth[key].year}
+                  </th>
+                ))}
+              </tr>
               {/* Month Row */}
               <tr>
-                <th className="border border-black p-1 w-8 text-center bg-slate-50" rowSpan={2}>Nº</th>
-                <th className="border border-black p-1 text-left bg-slate-50 min-w-[200px]" rowSpan={2}>CATEQUIZANDO</th>
-                {months.map(month => (
+                {sortedKeys.map(key => (
                   <th 
-                    key={month} 
-                    colSpan={sessionsByMonth[month].length} 
+                    key={`month-${key}`} 
+                    colSpan={sessionsByYearMonth[key].sessions.length} 
                     className="border border-black p-1 text-center bg-slate-100 uppercase"
                   >
-                    {monthNames[month]}
+                    {monthNames[sessionsByYearMonth[key].month]}
                   </th>
                 ))}
               </tr>
               {/* Day Row */}
               <tr>
-                {months.map(month => (
-                  sessionsByMonth[month].map(session => {
+                {sortedKeys.map(key => (
+                  sessionsByYearMonth[key].sessions.map(session => {
                     let day = '00';
                     const parts = session.date.split('-');
                     if (parts.length >= 3) {
@@ -197,7 +212,7 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
                     }
                     
                     return (
-                      <th key={session.id} className="border border-black p-1 text-center w-8">
+                      <th key={session.id} className="border border-black p-1 text-center w-6">
                         {day}
                       </th>
                     );
@@ -209,16 +224,16 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
               {classStudents.map((student, index) => (
                 <tr key={student.id}>
                   <td className="border border-black p-1 text-center font-bold">{index + 1}</td>
-                  <td className="border border-black p-1 font-medium truncate max-w-[200px]">{student.nomeCompleto}</td>
-                  {months.map(month => (
-                    sessionsByMonth[month].map(session => {
+                  <td className="border border-black p-1 font-medium truncate max-w-[180px]">{student.nomeCompleto}</td>
+                  {sortedKeys.map(key => (
+                    sessionsByYearMonth[key].sessions.map(session => {
                       const entry = session.entries.find(e => e.studentId === student.id);
                       const isPresent = entry?.status === 'present';
                       const isAbsent = entry?.status === 'absent';
                       
                       return (
                         <td key={`${student.id}-${session.id}`} className="border border-black p-1 text-center font-bold">
-                          {isPresent && <span className="text-green-600">P</span>}
+                          {isPresent && <span className="text-green-600">V</span>}
                           {isAbsent && <span className="text-red-600">F</span>}
                           {!entry && <span className="text-slate-300">-</span>}
                         </td>
@@ -239,7 +254,7 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
           
           <div className="mt-4 text-[10px] text-slate-500 flex justify-between">
              <span>Gerado em {new Date().toLocaleDateString('pt-BR')}</span>
-             <span>Legenda: P = Presente, F = Falta</span>
+             <span>Legenda: V = Presente, F = Falta</span>
           </div>
 
           <div className="border-t border-black pt-2 mt-4 text-center hidden print:block">
