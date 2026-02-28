@@ -600,6 +600,34 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
                 </div>
               )}
             </div>
+
+            <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 space-y-6">
+              <h4 className="text-sm font-black text-slate-800 uppercase flex items-center gap-2">
+                <Users size={18} className="text-slate-600" /> Preferências de Atuação
+              </h4>
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <label className="label-style">Qual Turma/Etapa você atua?</label>
+                  <input 
+                    type="text" 
+                    value={formData.atuacao || ''} 
+                    onChange={e => setFormData({...formData, atuacao: e.target.value})} 
+                    className="input-style" 
+                    placeholder="Ex: 1ª Etapa, Crisma..."
+                  />
+                </div>
+                <div>
+                  <label className="label-style">Qual Turma/Etapa você gosta de atuar?</label>
+                  <input 
+                    type="text" 
+                    value={formData.atuacaoDesejada || ''} 
+                    onChange={e => setFormData({...formData, atuacaoDesejada: e.target.value})} 
+                    className="input-style" 
+                    placeholder="Ex: Perseverança, Adultos..."
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         )}
 

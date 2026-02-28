@@ -230,6 +230,11 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
       setActiveTab('crismando');
       return;
     }
+    if (!formData.status) {
+      alert("Por favor, selecione um Status.");
+      setActiveTab('crismando');
+      return;
+    }
     const finalMatricula = formData.matricula || Math.floor(100000 + Math.random() * 900000).toString();
     onSave({
       ...formData,
@@ -660,6 +665,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                   <div className="md:col-span-3">
                     <label className="label-style">Status</label>
                     <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value as any})} className="input-style font-bold">
+                      <option value="">Selecione um Status</option>
                       <option value="Ativo">Ativo</option>
                       <option value="Inativo">Inativo</option>
                       <option value="Concluido">Crismado</option>
@@ -685,6 +691,17 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                         <option key={n.id} value={n.nome}>{n.nome}</option>
                       ))}
                     </select>
+                  </div>
+
+                  <div className="md:col-span-6">
+                    <label className="label-style">Comunidade</label>
+                    <input 
+                      type="text" 
+                      value={formData.comunidade || ''} 
+                      onChange={e => setFormData({...formData, comunidade: e.target.value})} 
+                      className="input-style" 
+                      placeholder="Comunidade de participação"
+                    />
                   </div>
 
                   <div className="md:col-span-6">
@@ -914,26 +931,30 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="label-style">Início da Preparação</label>
-                      <input type="date" value={formData.inicioPreparacao || ''} onChange={e => setFormData({...formData, inicioPreparacao: e.target.value})} className="input-style" />
+                  {formData.temCrisma && (
+                    <div className="space-y-6 animate-in slide-in-from-top-4 duration-300">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="label-style">Início da Preparação</label>
+                          <input type="date" value={formData.inicioPreparacao || ''} onChange={e => setFormData({...formData, inicioPreparacao: e.target.value})} className="input-style" />
+                        </div>
+                        <div>
+                          <label className="label-style">Fim da Preparação</label>
+                          <input type="date" value={formData.fimPreparacao || ''} onChange={e => setFormData({...formData, fimPreparacao: e.target.value})} className="input-style" />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                        <div className="md:col-span-12">
+                          <label className="label-style">Comunidade</label>
+                          <input type="text" value={formData.comunidade || ''} onChange={e => setFormData({...formData, comunidade: e.target.value})} className="input-style" />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="label-style">Catequistas</label>
+                        <input type="text" value={formData.catequistas || ''} onChange={e => setFormData({...formData, catequistas: e.target.value})} className="input-style" placeholder="Nomes dos catequistas responsáveis" />
+                      </div>
                     </div>
-                    <div>
-                      <label className="label-style">Fim da Preparação</label>
-                      <input type="date" value={formData.fimPreparacao || ''} onChange={e => setFormData({...formData, fimPreparacao: e.target.value})} className="input-style" />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-                    <div className="md:col-span-12">
-                      <label className="label-style">Comunidade</label>
-                      <input type="text" value={formData.comunidade || ''} onChange={e => setFormData({...formData, comunidade: e.target.value})} className="input-style" />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="label-style">Catequistas</label>
-                    <input type="text" value={formData.catequistas || ''} onChange={e => setFormData({...formData, catequistas: e.target.value})} className="input-style" placeholder="Nomes dos catequistas responsáveis" />
-                  </div>
+                  )}
                 </div>
 
                 {formData.temCrisma && (
@@ -953,9 +974,26 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                           <label className="label-style text-indigo-700">Celebrante (Bispo ou Delegado)</label>
                           <input type="text" value={formData.celebrante || ''} onChange={e => setFormData({...formData, celebrante: e.target.value})} className="input-style border-indigo-100 bg-white" placeholder="Ex: Dom Jailton de Oliveira Lino" />
                         </div>
-                        <div className="md:col-span-12">
-                          <label className="label-style text-indigo-700">Local / Comunidade da Celebração</label>
-                          <input type="text" value={formData.localCelebracao || ''} onChange={e => setFormData({...formData, localCelebracao: e.target.value})} className="input-style border-indigo-100 bg-white" placeholder={config.parishName} />
+                        <div className="md:col-span-6">
+                          <label className="label-style text-indigo-700">Local / Cidade</label>
+                          <input type="text" value={formData.localCelebracao || ''} onChange={e => setFormData({...formData, localCelebracao: e.target.value})} className="input-style border-indigo-100 bg-white" placeholder="Ex: Catedral, Ginásio..." />
+                        </div>
+                        <div className="md:col-span-6">
+                          <label className="label-style text-indigo-700">Comunidade</label>
+                          <input type="text" value={formData.comunidadeCelebracao || ''} onChange={e => setFormData({...formData, comunidadeCelebracao: e.target.value})} className="input-style border-indigo-100 bg-white" placeholder="Ex: Matriz, São José..." />
+                        </div>
+
+                        <div className="md:col-span-5">
+                          <label className="label-style text-indigo-700">Paróquia</label>
+                          <input type="text" value={formData.paroquiaCelebracao || ''} onChange={e => setFormData({...formData, paroquiaCelebracao: e.target.value})} className="input-style border-indigo-100 bg-white" />
+                        </div>
+                        <div className="md:col-span-5">
+                          <label className="label-style text-indigo-700">Diocese</label>
+                          <input type="text" value={formData.dioceseCelebracao || ''} onChange={e => setFormData({...formData, dioceseCelebracao: e.target.value})} className="input-style border-indigo-100 bg-white" />
+                        </div>
+                        <div className="md:col-span-2">
+                          <label className="label-style text-indigo-700 text-center">UF</label>
+                          <input type="text" maxLength={2} value={formData.ufCelebracao || ''} onChange={e => setFormData({...formData, ufCelebracao: e.target.value.toUpperCase()})} className="input-style border-indigo-100 bg-white text-center" />
                         </div>
                         
                         <div className="md:col-span-4">

@@ -193,6 +193,8 @@ export interface Catequista {
   crismaCidade?: string;
   documentos?: StudentDocument[];
   dataCadastro?: string;
+  atuacao?: string;
+  atuacaoDesejada?: string;
 }
 
 export interface StudentDocument {
@@ -250,6 +252,10 @@ export interface Student {
   madrinhaBatismo: Partial<PersonFull>;
   celebrante?: string;
   localCelebracao?: string;
+  comunidadeCelebracao?: string;
+  paroquiaCelebracao?: string;
+  dioceseCelebracao?: string;
+  ufCelebracao?: string;
   dataCelebracao?: string;
   livro?: string;
   folha?: string;
