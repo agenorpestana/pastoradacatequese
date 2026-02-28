@@ -44,7 +44,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
     matricula: '',
     foto: '',
     novoCatequizando: true,
-    status: 'Ativo',
+    status: '' as any,
     sexo: 'F',
     estadoCivil: 'Solteiro(a)',
     dataNascimento: '',

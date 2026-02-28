@@ -44,21 +44,31 @@ import {
 
 // DashboardContent Component
 const DashboardContent = ({ events, students, classes, catequistas, suggestedDate, onDateChange, onAddEvent, user, onTakeEventAttendance, onEditEvent, onDeleteEvent }: any) => {
+    const isRestrictedUser = user?.role === 'catequista' || user?.role === 'catequista_auxiliar';
+
     // Eventos do dia selecionado
     const selectedDayEvents = events.filter((e: any) => e.dataInicio === suggestedDate);
     const dateObj = new Date(suggestedDate + 'T00:00:00');
     const dayName = dateObj.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' });
     
     // Eventos Futuros (A partir de hoje)
-    const today = new Date().toISOString().split('T')[0];
+    const now = new Date();
+    const todayStr = now.toISOString().split('T')[0];
+    
     const futureEvents = events
-        .filter((e: any) => e.dataInicio >= today)
+        .filter((e: any) => e.dataInicio >= todayStr)
         .sort((a: any, b: any) => {
             const dateA = new Date(a.dataInicio + 'T' + (a.horarioInicio || '00:00'));
             const dateB = new Date(b.dataInicio + 'T' + (b.horarioInicio || '00:00'));
             return dateA.getTime() - dateB.getTime();
         })
-        .slice(0, 10); // Limitar aos próximos 10 eventos
+        .slice(0, 10);
+
+    const isEventExpired = (event: any) => {
+        if (!event.dataFim || !event.horarioFim) return false;
+        const endDateTime = new Date(`${event.dataFim}T${event.horarioFim}`);
+        return now > endDateTime;
+    };
 
     // Statistics Calculations
     const totalStudents = students.length;
@@ -83,6 +93,35 @@ const DashboardContent = ({ events, students, classes, catequistas, suggestedDat
     const crismaClasses = classes.filter((c:any) => crismaLevels.some((l: string) => (c.nivel || '').includes(l) || c.nivel === l));
     const crismaClassNames = crismaClasses.map((c:any) => c.nome);
     const studentsInCrismaPrep = activeStudents.filter((s:any) => crismaClassNames.includes(s.turma)).length;
+
+    if (isRestrictedUser) {
+      return (
+        <div className="space-y-10 pb-10">
+          <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="flex items-center gap-4">
+              <div className="bg-blue-600 p-4 rounded-3xl shadow-xl shadow-blue-100 relative group overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <LayoutDashboard className="text-white w-8 h-8 relative z-10" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-black text-slate-800 tracking-tight">Painel Pastoral</h2>
+                <p className="text-slate-500 text-sm mt-1 flex items-center gap-2">
+                  Bem-vindo(a), <span className="text-blue-600 font-black">{user?.nome}</span>.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+             <div className="xl:col-span-12 flex flex-col gap-6">
+                <div className="h-auto bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
+                   <CalendarView events={events} selectedDate={suggestedDate} onDateChange={onDateChange} onAddEvent={null} />
+                </div>
+             </div>
+          </div>
+        </div>
+      );
+    }
 
     return (
       <div className="space-y-10 pb-10">
@@ -231,27 +270,35 @@ const DashboardContent = ({ events, students, classes, catequistas, suggestedDat
                     Eventos do Dia <span className="text-slate-400">({dayName})</span>
                  </h4>
                  <div className="space-y-3 relative z-10">
-                     {selectedDayEvents.length > 0 ? selectedDayEvents.map((event: any) => (
+                     {selectedDayEvents.length > 0 ? selectedDayEvents.map((event: any) => {
+                         const expired = isEventExpired(event);
+                         return (
                          <div key={event.id} className="bg-slate-50 p-4 rounded-2xl border border-slate-100 hover:bg-blue-50/50 transition-colors group">
                              <p className="font-bold text-slate-800 text-sm leading-tight">{event.titulo}</p>
                              <div className="flex justify-between items-center mt-2">
                                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wide flex items-center gap-1">
                                      <Clock className="w-3 h-3" /> {event.horarioInicio}
+                                     {expired && <span className="text-red-500 ml-2 font-black">Encerrado</span>}
                                  </p>
                                  <div className="flex items-center gap-1">
-                                     <button onClick={() => onEditEvent(event)} className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100" title="Editar Evento">
-                                         <Edit2 className="w-3.5 h-3.5" />
-                                     </button>
-                                     <button onClick={() => onDeleteEvent(event.id)} className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100" title="Excluir Evento">
-                                         <Trash2 className="w-3.5 h-3.5" />
-                                     </button>
+                                     {!expired && (
+                                       <>
+                                         <button onClick={() => onEditEvent(event)} className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100" title="Editar Evento">
+                                             <Edit2 className="w-3.5 h-3.5" />
+                                         </button>
+                                         <button onClick={() => onDeleteEvent(event.id)} className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100" title="Excluir Evento">
+                                             <Trash2 className="w-3.5 h-3.5" />
+                                         </button>
+                                       </>
+                                     )}
                                      <button onClick={() => onTakeEventAttendance(event)} className="p-1.5 text-white bg-blue-600 rounded-lg shadow-sm hover:bg-blue-700 transition-colors" title="Lançar Presença">
                                          <CheckCircle2 className="w-3 h-3" />
                                      </button>
                                  </div>
                              </div>
                          </div>
-                     )) : (
+                         );
+                     }) : (
                          <div className="text-center py-10 text-slate-400">
                              <p className="text-xs italic">Nenhum evento para este dia.</p>
                              <button onClick={() => onAddEvent(suggestedDate)} className="mt-2 text-[10px] font-bold text-blue-600 hover:underline">Agendar Agora</button>
@@ -273,6 +320,7 @@ const DashboardContent = ({ events, students, classes, catequistas, suggestedDat
                        const eventDate = new Date(event.dataInicio + 'T00:00:00');
                        const month = eventDate.toLocaleDateString('pt-BR', { month: 'short' }).toUpperCase();
                        const day = eventDate.getDate();
+                       const expired = isEventExpired(event);
                        
                        return (
                           <div key={event.id} className="flex items-center gap-4 p-4 hover:bg-slate-50 rounded-3xl border border-transparent hover:border-slate-100 transition-all group">
@@ -286,6 +334,7 @@ const DashboardContent = ({ events, students, classes, catequistas, suggestedDat
                                       <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {event.horarioInicio}</span>
                                       <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
                                       <span>{event.local}</span>
+                                      {expired && <span className="text-red-500 ml-2 font-black uppercase text-[9px]">Encerrado</span>}
                                   </p>
                               </div>
                               <div className="text-right flex flex-col items-end gap-2">
@@ -293,12 +342,16 @@ const DashboardContent = ({ events, students, classes, catequistas, suggestedDat
                                       {event.tipo}
                                    </span>
                                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                       <button onClick={() => onEditEvent(event)} className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Editar Evento">
-                                           <Edit2 className="w-3.5 h-3.5" />
-                                       </button>
-                                       <button onClick={() => onDeleteEvent(event.id)} className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Excluir Evento">
-                                           <Trash2 className="w-3.5 h-3.5" />
-                                       </button>
+                                       {!expired && (
+                                         <>
+                                           <button onClick={() => onEditEvent(event)} className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Editar Evento">
+                                               <Edit2 className="w-3.5 h-3.5" />
+                                           </button>
+                                           <button onClick={() => onDeleteEvent(event.id)} className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Excluir Evento">
+                                               <Trash2 className="w-3.5 h-3.5" />
+                                           </button>
+                                         </>
+                                       )}
                                    </div>
                               </div>
                           </div>
@@ -408,8 +461,23 @@ const App: React.FC = () => {
         api.get('parish_config'),
         api.get('niveis_etapas')
       ]);
-      setStudents(s);
-      setClasses(c);
+
+      let filteredStudents = s;
+      let filteredClasses = c;
+
+      if (user.role === 'catequista' || user.role === 'catequista_auxiliar') {
+        if (user.linkedCatequistaId) {
+          const linkedCat = cat.find((ct: Catequista) => ct.id === user.linkedCatequistaId);
+          if (linkedCat) {
+            filteredClasses = c.filter((t: Turma) => t.catequista === linkedCat.nome);
+            const classNames = filteredClasses.map((t: Turma) => t.nome);
+            filteredStudents = s.filter((st: Student) => classNames.includes(st.turma || ''));
+          }
+        }
+      }
+
+      setStudents(filteredStudents);
+      setClasses(filteredClasses);
       setCatequistas(cat);
       setUsers(u);
       setEvents(e);
@@ -426,6 +494,10 @@ const App: React.FC = () => {
 
   useEffect(() => {
     fetchData();
+    
+    // Auto-refresh every 1 minute
+    const interval = setInterval(fetchData, 60000);
+    return () => clearInterval(interval);
   }, [fetchData]);
 
   const onLoginSubmit = async (u: string, p: string) => {
