@@ -56,6 +56,8 @@ export const Layout: React.FC<LayoutProps> = ({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   const perms = currentUser.permissions;
+  const isRestrictedRole = currentUser.role === 'catequista' || currentUser.role === 'catequista_auxiliar';
+  const isLinked = !!currentUser.linkedCatequistaId;
 
   const handleNavClick = (view: AppView) => {
     setView(view);
@@ -142,7 +144,7 @@ export const Layout: React.FC<LayoutProps> = ({
                   </button>
                 )}
 
-                {perms.students_view && (
+                {perms.students_view && (!isRestrictedRole || isLinked) && (
                   <button 
                     onClick={() => handleNavClick('list')} 
                     className={`flex items-center gap-4 p-4 rounded-2xl transition-all ${isCatequizandoView ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-slate-600 bg-slate-50 hover:bg-slate-100'}`}
@@ -152,7 +154,7 @@ export const Layout: React.FC<LayoutProps> = ({
                   </button>
                 )}
 
-                {perms.catequistas && (
+                {perms.catequistas && !isRestrictedRole && (
                   <button 
                     onClick={() => handleNavClick('catequista_list')} 
                     className={`flex items-center gap-4 p-4 rounded-2xl transition-all ${currentView === 'catequista_list' ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-slate-600 bg-slate-50 hover:bg-slate-100'}`}
@@ -162,7 +164,7 @@ export const Layout: React.FC<LayoutProps> = ({
                   </button>
                 )}
 
-                {perms.classes && (
+                {perms.classes && (!isRestrictedRole || isLinked) && (
                   <button 
                     onClick={() => handleNavClick('classes_list')} 
                     className={`flex items-center gap-4 p-4 rounded-2xl transition-all ${currentView.includes('classes') ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-slate-600 bg-slate-50 hover:bg-slate-100'}`}
@@ -172,7 +174,7 @@ export const Layout: React.FC<LayoutProps> = ({
                   </button>
                 )}
 
-                {perms.attendance_report && (
+                {perms.attendance_report && !isRestrictedRole && (
                   <button 
                     onClick={() => handleNavClick('attendance_report')} 
                     className={`flex items-center gap-4 p-4 rounded-2xl transition-all ${currentView === 'attendance_report' ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-slate-600 bg-slate-50 hover:bg-slate-100'}`}
@@ -263,7 +265,7 @@ export const Layout: React.FC<LayoutProps> = ({
             </button>
           )}
 
-          {perms.students_view && (
+          {perms.students_view && (!isRestrictedRole || isLinked) && (
             <button
               onClick={() => setView('list')}
               className={`w-full flex items-center transition-all duration-300 rounded-2xl group ${isCollapsed ? 'justify-center p-4' : 'gap-4 px-5 py-3.5'} ${isCatequizandoView ? 'bg-blue-600 text-white shadow-xl shadow-blue-200' : 'text-slate-500 hover:bg-white'}`}
@@ -273,21 +275,21 @@ export const Layout: React.FC<LayoutProps> = ({
             </button>
           )}
 
-          {perms.catequistas && (
+          {perms.catequistas && !isRestrictedRole && (
             <button onClick={() => setView('catequista_list')} className={`w-full flex items-center transition-all duration-300 rounded-2xl group ${isCollapsed ? 'justify-center p-4' : 'gap-4 px-5 py-3.5'} ${currentView.includes('catequista') ? 'bg-blue-600 text-white shadow-xl shadow-blue-200' : 'text-slate-500 hover:bg-white'}`}>
               <UsersRound size={isCollapsed ? 24 : 20} className={`transition-transform duration-300 ${!isCollapsed && 'group-hover:scale-110'}`} />
               {!isCollapsed && <span className="font-bold text-sm tracking-tight">Catequistas</span>}
             </button>
           )}
 
-          {perms.classes && (
+          {perms.classes && (!isRestrictedRole || isLinked) && (
             <button onClick={() => setView('classes_list')} className={`w-full flex items-center transition-all duration-300 rounded-2xl group ${isCollapsed ? 'justify-center p-4' : 'gap-4 px-5 py-3.5'} ${currentView.includes('classes') ? 'bg-blue-600 text-white shadow-xl shadow-blue-200' : 'text-slate-500 hover:bg-white'}`}>
               <BookOpen size={isCollapsed ? 24 : 20} className={`transition-transform duration-300 ${!isCollapsed && 'group-hover:scale-110'}`} />
               {!isCollapsed && <span className="font-bold text-sm tracking-tight">Turmas</span>}
             </button>
           )}
 
-          {perms.classes && (
+          {perms.classes && !isRestrictedRole && (
             <button onClick={() => setView('niveis_list')} className={`w-full flex items-center transition-all duration-300 rounded-2xl group ${isCollapsed ? 'justify-center p-4' : 'gap-4 px-5 py-3.5'} ${currentView === 'niveis_list' ? 'bg-blue-600 text-white shadow-xl shadow-blue-200' : 'text-slate-500 hover:bg-white'}`}>
               <ShieldCheck size={isCollapsed ? 24 : 20} className={`transition-transform duration-300 ${!isCollapsed && 'group-hover:scale-110'}`} />
               {!isCollapsed && <span className="font-bold text-sm tracking-tight">Níveis/Etapas</span>}
@@ -306,7 +308,7 @@ export const Layout: React.FC<LayoutProps> = ({
             </button>
           )}
 
-          {perms.attendance_report && (
+          {perms.attendance_report && !isRestrictedRole && (
              <button
               onClick={() => setView('attendance_report')}
               className={`w-full flex items-center transition-all duration-300 rounded-2xl group ${isCollapsed ? 'justify-center p-4' : 'gap-4 px-5 py-3.5'} ${currentView === 'attendance_report' ? 'bg-blue-600 text-white shadow-xl shadow-blue-200' : 'text-slate-500 hover:bg-white'}`}
@@ -316,7 +318,7 @@ export const Layout: React.FC<LayoutProps> = ({
             </button>
           )}
 
-          {perms.reports && (
+          {perms.reports && !isRestrictedRole && (
             <button
               onClick={() => setView('reports')}
               className={`w-full flex items-center transition-all duration-300 rounded-2xl group ${isCollapsed ? 'justify-center p-4' : 'gap-4 px-5 py-3.5'} ${currentView === 'reports' ? 'bg-blue-600 text-white shadow-xl shadow-blue-200' : 'text-slate-500 hover:bg-white'}`}
