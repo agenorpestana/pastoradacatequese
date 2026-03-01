@@ -1,13 +1,13 @@
 
 import React, { useState } from 'react';
-import { X, Save, UserCheck, GraduationCap, CheckCircle2, Search, Users } from 'lucide-react';
+import { X, Save, UserCheck, GraduationCap, CheckCircle2, Search, Users, Lock } from 'lucide-react';
 import { FormationEvent, Catequista } from '../types';
 
 interface FormationAttendanceModalProps {
   formation: FormationEvent;
   catequistas: Catequista[];
   onClose: () => void;
-  onSave: (id: string, catequistaIds: string[]) => void;
+  onSave: (id: string, catequistaIds: string[], locked?: boolean) => void;
 }
 
 export const FormationAttendanceModal: React.FC<FormationAttendanceModalProps> = ({ 
@@ -20,7 +20,14 @@ export const FormationAttendanceModal: React.FC<FormationAttendanceModalProps> =
   const [searchTerm, setSearchTerm] = useState('');
 
   const toggleAttendance = (id: string) => {
+    if (formation.locked) return;
     setPresentIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+  };
+
+  const handleLock = () => {
+    if (confirm('Tem certeza que deseja trancar as chamadas desta formação? Ninguém mais poderá alterar.')) {
+      onSave(formation.id, presentIds, true);
+    }
   };
 
   const filtered = catequistas.filter(c => c.nome.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -99,13 +106,28 @@ export const FormationAttendanceModal: React.FC<FormationAttendanceModalProps> =
           )}
         </div>
 
-        <div className="p-8 border-t border-slate-100 bg-slate-50 flex justify-end shrink-0">
-          <button 
-            onClick={() => onSave(formation.id, presentIds)}
-            className="flex items-center gap-2 px-12 py-4 bg-slate-900 text-white font-black rounded-2xl hover:bg-slate-800 transition-all shadow-xl shadow-slate-200 uppercase tracking-widest text-xs"
-          >
-            <Save className="w-4 h-4" /> Salvar Presença
-          </button>
+        <div className="p-8 border-t border-slate-100 bg-slate-50 flex justify-between shrink-0">
+          {!formation.locked ? (
+            <button 
+              onClick={handleLock}
+              className="flex items-center gap-2 px-6 py-4 bg-red-50 text-red-600 font-black rounded-2xl hover:bg-red-100 transition-all uppercase tracking-widest text-xs"
+            >
+              <Lock className="w-4 h-4" /> Trancar Chamadas
+            </button>
+          ) : (
+            <div className="flex items-center gap-2 px-6 py-4 bg-slate-200 text-slate-500 font-black rounded-2xl uppercase tracking-widest text-xs">
+              <Lock className="w-4 h-4" /> Chamada Trancada
+            </div>
+          )}
+
+          {!formation.locked && (
+            <button 
+              onClick={() => onSave(formation.id, presentIds)}
+              className="flex items-center gap-2 px-12 py-4 bg-slate-900 text-white font-black rounded-2xl hover:bg-slate-800 transition-all shadow-xl shadow-slate-200 uppercase tracking-widest text-xs"
+            >
+              <Save className="w-4 h-4" /> Salvar Presença
+            </button>
+          )}
         </div>
       </div>
     </div>

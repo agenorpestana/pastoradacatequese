@@ -743,10 +743,10 @@ const App: React.FC = () => {
      }
   };
 
-  const handleSaveFormationAttendance = async (id: string, presentIds: string[]) => {
+  const handleSaveFormationAttendance = async (id: string, presentIds: string[], locked?: boolean) => {
      const formation = formations.find(f => f.id === id);
      if (formation) {
-       const updated = { ...formation, presentes: presentIds };
+       const updated = { ...formation, presentes: presentIds, locked: locked !== undefined ? locked : formation.locked };
        await api.put('formations', id, updated);
        setFormations(prev => prev.map(f => f.id === id ? updated : f));
        setTakingFormationAttendance(null);

@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { X, CheckCircle, XCircle, Calendar, Save, Users, Search, BookOpenText } from 'lucide-react';
+import { X, CheckCircle, XCircle, Calendar, Save, Users, Search, BookOpenText, Lock, Unlock } from 'lucide-react';
 import { Turma, Student, AttendanceSession, AttendanceEntry } from '../types';
 
 interface ClassAttendanceModalProps {
@@ -22,6 +22,7 @@ export const ClassAttendanceModal: React.FC<ClassAttendanceModalProps> = ({
   const [tema, setTema] = useState('');
   const [entries, setEntries] = useState<AttendanceEntry[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isLocked, setIsLocked] = useState(false);
 
   // Carregar dados se já existir uma sessão para esta data
   useEffect(() => {
@@ -29,14 +30,17 @@ export const ClassAttendanceModal: React.FC<ClassAttendanceModalProps> = ({
     if (existing) {
       setEntries(existing.entries);
       setTema(existing.tema || '');
+      setIsLocked(!!existing.locked);
     } else {
       // Inicializar todos como presentes por padrão para facilitar
       setEntries(members.map(m => ({ studentId: m.id, status: 'present' })));
       setTema('');
+      setIsLocked(false);
     }
   }, [selectedDate, members, turma.id, existingSessions]);
 
   const toggleStatus = (studentId: string) => {
+    if (isLocked) return;
     setEntries(prev => prev.map(entry => {
       if (entry.studentId === studentId) {
         return { 
@@ -54,10 +58,23 @@ export const ClassAttendanceModal: React.FC<ClassAttendanceModalProps> = ({
       turmaId: turma.id,
       date: selectedDate,
       tema: tema,
-      entries: entries
+      entries: entries,
+      locked: isLocked
     };
     onSave(session);
-    alert('Frequência salva com sucesso!');
+    alert(isLocked ? 'Chamada trancada e salva com sucesso!' : 'Frequência salva com sucesso!');
+  };
+
+  const handleLock = () => {
+    if (isLocked) {
+      if (confirm('Deseja realmente destravar esta chamada?')) {
+        setIsLocked(false);
+      }
+    } else {
+      if (confirm('Ao trancar a chamada, você não poderá mais alterar as presenças. Deseja continuar?')) {
+        setIsLocked(true);
+      }
+    }
   };
 
   const filteredMembers = members.filter(m => 
@@ -101,7 +118,8 @@ export const ClassAttendanceModal: React.FC<ClassAttendanceModalProps> = ({
                   type="date" 
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-green-500 text-sm font-bold text-slate-700"
+                  disabled={isLocked}
+                  className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-green-500 text-sm font-bold text-slate-700 disabled:opacity-50"
                 />
               </div>
             </div>
@@ -114,7 +132,8 @@ export const ClassAttendanceModal: React.FC<ClassAttendanceModalProps> = ({
                   placeholder="Ex: O Sacramento da Eucaristia..."
                   value={tema}
                   onChange={(e) => setTema(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-green-500 text-sm font-bold text-slate-700 placeholder:font-normal"
+                  disabled={isLocked}
+                  className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-green-500 text-sm font-bold text-slate-700 placeholder:font-normal disabled:opacity-50"
                 />
               </div>
             </div>
@@ -207,13 +226,28 @@ export const ClassAttendanceModal: React.FC<ClassAttendanceModalProps> = ({
           >
             Fechar
           </button>
-          <button 
-            onClick={handleSave}
-            className="flex items-center gap-2 px-10 py-4 bg-green-600 text-white font-bold rounded-2xl hover:bg-green-700 transition-all shadow-xl shadow-green-100"
-          >
-            <Save className="w-5 h-5" />
-            Salvar Diário
-          </button>
+          
+          <div className="flex gap-3">
+            <button 
+              onClick={handleLock}
+              className={`flex items-center gap-2 px-6 py-4 font-bold rounded-2xl transition-all shadow-xl ${
+                isLocked 
+                  ? 'bg-amber-100 text-amber-700 hover:bg-amber-200 shadow-amber-100' 
+                  : 'bg-slate-200 text-slate-700 hover:bg-slate-300 shadow-slate-100'
+              }`}
+            >
+              {isLocked ? <Unlock className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
+              {isLocked ? 'Destrancar' : 'Trancar Chamada'}
+            </button>
+
+            <button 
+              onClick={handleSave}
+              className="flex items-center gap-2 px-10 py-4 bg-green-600 text-white font-bold rounded-2xl hover:bg-green-700 transition-all shadow-xl shadow-green-100"
+            >
+              <Save className="w-5 h-5" />
+              Salvar Diário
+            </button>
+          </div>
         </div>
       </div>
     </div>

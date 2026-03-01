@@ -98,6 +98,7 @@ export interface FormationEvent {
   inicio: string; 
   fim: string;    
   presentes: string[]; 
+  locked?: boolean;
 }
 
 export interface ParishEvent {
