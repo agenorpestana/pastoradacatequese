@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Search, Filter, MoreHorizontal, Eye, Trash2, Calendar, Phone, MapPin, Edit, UserCheck, UserX, GraduationCap, Fingerprint, UserPlus, BookOpen, FileText, Users, Sparkles } from 'lucide-react';
 import { Student, TurmaLevel, Turma, NivelEtapa } from '../types';
+import { Pagination } from './Pagination';
 
 interface StudentTableProps {
   students: Student[];
@@ -18,6 +19,8 @@ export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTurma, setSelectedTurma] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<'all' | 'Ativo' | 'Inativo' | 'Concluido'>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const getStudentLevel = (turmaNome: string) => {
     if (!turmaNome) return '---';
@@ -44,6 +47,17 @@ export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses
     const dateB = b.dataCadastro ? new Date(b.dataCadastro).getTime() : 0;
     return dateB - dateA;
   });
+
+  const totalPages = Math.ceil(filteredStudents.length / itemsPerPage);
+  const paginatedStudents = filteredStudents.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-10">
@@ -133,8 +147,8 @@ export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {filteredStudents.length > 0 ? (
-                filteredStudents.map((student) => (
+              {paginatedStudents.length > 0 ? (
+                paginatedStudents.map((student) => (
                   <tr 
                     key={student.id} 
                     className="hover:bg-slate-50/80 transition-all group cursor-pointer"
@@ -243,6 +257,13 @@ export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses
             </tbody>
           </table>
         </div>
+        <Pagination 
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          totalItems={filteredStudents.length}
+          itemsPerPage={itemsPerPage}
+        />
       </div>
     </div>
   );

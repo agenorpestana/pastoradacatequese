@@ -3,6 +3,7 @@ import React, { useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { BarChart3, Calendar, Printer, School, UserCheck, TrendingUp, Search, ArrowLeft, FileSpreadsheet } from 'lucide-react';
 import { Turma, AttendanceSession, Catequista, ParishConfig, Student } from '../types';
+import { Pagination } from './Pagination';
 
 interface AttendanceReportProps {
   classes: Turma[];
@@ -16,6 +17,9 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedClassForDiary, setSelectedClassForDiary] = useState<string | null>(null);
+  const [currentClassPage, setCurrentClassPage] = useState(1);
+  const [currentCatechistPage, setCurrentCatechistPage] = useState(1);
+  const itemsPerPage = 10;
 
   // Cálculos Estatísticos
   const stats = useMemo(() => {
@@ -77,6 +81,22 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
   const filteredClassStats = stats.classStats.filter(c => 
     c.nome.toLowerCase().includes(searchTerm.toLowerCase()) || 
     c.catequista.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredCatechistStats = stats.catechistStats.filter(c => 
+    c.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const totalClassPages = Math.ceil(filteredClassStats.length / itemsPerPage);
+  const paginatedClassStats = filteredClassStats.slice(
+    (currentClassPage - 1) * itemsPerPage,
+    currentClassPage * itemsPerPage
+  );
+
+  const totalCatechistPages = Math.ceil(filteredCatechistStats.length / itemsPerPage);
+  const paginatedCatechistStats = filteredCatechistStats.slice(
+    (currentCatechistPage - 1) * itemsPerPage,
+    currentCatechistPage * itemsPerPage
   );
 
   const renderDiary = () => {
@@ -462,7 +482,7 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
              </div>
           </div>
           <div className="flex-1 overflow-y-auto max-h-[500px] p-6 space-y-4 custom-scrollbar">
-             {filteredClassStats.map(c => (
+             {paginatedClassStats.map(c => (
                <div key={c.id} className="group p-4 rounded-2xl border border-slate-100 hover:border-emerald-200 hover:bg-emerald-50/30 transition-all">
                  <div className="flex justify-between items-start mb-2">
                    <div>
@@ -489,8 +509,17 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
                  </div>
                  <p className="text-[9px] text-slate-400 text-right mt-1.5 font-medium">{c.sessionsCount} encontros realizados</p>
                </div>
-             ))}
+              ))}
              {filteredClassStats.length === 0 && <p className="text-center text-slate-400 italic py-10">Nenhuma turma encontrada.</p>}
+          </div>
+          <div className="p-4 border-t border-slate-100">
+            <Pagination 
+              currentPage={currentClassPage}
+              totalPages={totalClassPages}
+              onPageChange={setCurrentClassPage}
+              totalItems={filteredClassStats.length}
+              itemsPerPage={itemsPerPage}
+            />
           </div>
         </div>
 
@@ -503,7 +532,7 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
              </div>
           </div>
           <div className="flex-1 overflow-y-auto max-h-[500px] p-6 space-y-4 custom-scrollbar">
-             {stats.catechistStats.filter(c => c.name.toLowerCase().includes(searchTerm.toLowerCase())).map((c, i) => (
+             {paginatedCatechistStats.map((c, i) => (
                <div key={i} className="flex items-center justify-between p-4 rounded-2xl border border-slate-100 hover:shadow-md transition-all">
                  <div className="flex items-center gap-4">
                    <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-black text-xs text-slate-500 uppercase border-2 border-white shadow-sm">
@@ -522,6 +551,15 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
                  </div>
                </div>
              ))}
+          </div>
+          <div className="p-4 border-t border-slate-100">
+            <Pagination 
+              currentPage={currentCatechistPage}
+              totalPages={totalCatechistPages}
+              onPageChange={setCurrentCatechistPage}
+              totalItems={filteredCatechistStats.length}
+              itemsPerPage={itemsPerPage}
+            />
           </div>
         </div>
       </div>

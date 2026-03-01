@@ -1,7 +1,8 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Calendar, Clock, Edit, Trash2, ClipboardCheck, GraduationCap, Users } from 'lucide-react';
 import { FormationEvent } from '../types';
+import { Pagination } from './Pagination';
 
 interface FormationTableProps {
   formations: FormationEvent[];
@@ -11,6 +12,9 @@ interface FormationTableProps {
 }
 
 export const FormationTable: React.FC<FormationTableProps> = ({ formations, onDelete, onEdit, onAttendance }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
   const formatDate = (iso: string) => {
     if (!iso) return '---';
     const d = new Date(iso);
@@ -26,6 +30,17 @@ export const FormationTable: React.FC<FormationTableProps> = ({ formations, onDe
     return { label: 'Em Andamento', class: 'bg-amber-100 text-amber-700 animate-pulse' };
   };
 
+  const totalPages = Math.ceil(formations.length / itemsPerPage);
+  const paginatedItems = formations.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden animate-in fade-in duration-500">
       <div className="overflow-x-auto">
@@ -39,8 +54,8 @@ export const FormationTable: React.FC<FormationTableProps> = ({ formations, onDe
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {formations.length > 0 ? (
-              formations.map((f) => {
+            {paginatedItems.length > 0 ? (
+              paginatedItems.map((f) => {
                 const status = getStatus(f.inicio, f.fim);
                 return (
                   <tr key={f.id} className="hover:bg-slate-50 transition-all group">
@@ -107,6 +122,13 @@ export const FormationTable: React.FC<FormationTableProps> = ({ formations, onDe
           </tbody>
         </table>
       </div>
+      <Pagination 
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+        totalItems={formations.length}
+        itemsPerPage={itemsPerPage}
+      />
     </div>
   );
 };

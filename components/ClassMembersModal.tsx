@@ -1,7 +1,7 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Printer, Users, User, Phone, BookOpen, Calendar } from 'lucide-react';
+import { X, Printer, Users, User, Phone, BookOpen, Calendar, Droplets, Wine } from 'lucide-react';
 import { Turma, Student, ParishConfig } from '../types';
 
 interface ClassMembersModalProps {
@@ -13,12 +13,21 @@ interface ClassMembersModalProps {
 }
 
 export const ClassMembersModal: React.FC<ClassMembersModalProps> = ({ turma, members, onClose, onViewStudent, config }) => {
+  const [filterNoBaptism, setFilterNoBaptism] = useState(false);
+  const [filterNoEucharist, setFilterNoEucharist] = useState(false);
+
   const handlePrint = () => {
     window.print();
   };
 
-  const boys = members.filter(m => m.sexo === 'M').length;
-  const girls = members.filter(m => m.sexo === 'F').length;
+  const filteredMembers = members.filter(m => {
+    if (filterNoBaptism && m.batizado) return false;
+    if (filterNoEucharist && m.fezPrimeiraEucaristia) return false;
+    return true;
+  });
+
+  const boys = filteredMembers.filter(m => m.sexo === 'M').length;
+  const girls = filteredMembers.filter(m => m.sexo === 'F').length;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
@@ -134,7 +143,7 @@ export const ClassMembersModal: React.FC<ClassMembersModalProps> = ({ turma, mem
         <div className="p-6 bg-slate-50 border-b border-slate-100 grid grid-cols-3 gap-4">
           <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 text-center">
             <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Total</p>
-            <p className="text-xl font-black text-slate-900">{members.length}</p>
+            <p className="text-xl font-black text-slate-900">{filteredMembers.length}</p>
           </div>
           <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 text-center">
             <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Masculino</p>
@@ -146,14 +155,39 @@ export const ClassMembersModal: React.FC<ClassMembersModalProps> = ({ turma, mem
           </div>
         </div>
 
+        <div className="px-6 py-4 bg-white border-b border-slate-100 flex gap-4">
+          <button
+            onClick={() => setFilterNoBaptism(!filterNoBaptism)}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-2xl border transition-all font-bold text-[10px] uppercase tracking-widest ${
+              filterNoBaptism 
+                ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-100' 
+                : 'bg-slate-50 text-slate-500 border-slate-100 hover:bg-slate-100'
+            }`}
+          >
+            <Droplets className="w-4 h-4" />
+            Sem Batismo
+          </button>
+          <button
+            onClick={() => setFilterNoEucharist(!filterNoEucharist)}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-2xl border transition-all font-bold text-[10px] uppercase tracking-widest ${
+              filterNoEucharist 
+                ? 'bg-amber-600 text-white border-amber-600 shadow-lg shadow-amber-100' 
+                : 'bg-slate-50 text-slate-500 border-slate-100 hover:bg-slate-100'
+            }`}
+          >
+            <Wine className="w-4 h-4" />
+            Sem Eucaristia
+          </button>
+        </div>
+
         <div className="flex-1 overflow-y-auto p-6 space-y-3">
           <div className="flex items-center gap-2 mb-4 px-2">
             <Users className="w-4 h-4 text-slate-400" />
             <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest">Lista de Membros</h3>
           </div>
           
-          {members.length > 0 ? (
-            members.sort((a,b) => a.nomeCompleto.localeCompare(b.nomeCompleto)).map((student) => (
+          {filteredMembers.length > 0 ? (
+            filteredMembers.sort((a,b) => a.nomeCompleto.localeCompare(b.nomeCompleto)).map((student) => (
               <div 
                 key={student.id} 
                 className="flex items-center justify-between p-4 bg-white hover:bg-slate-50 rounded-2xl border border-slate-100 transition-all cursor-pointer group"

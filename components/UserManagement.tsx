@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Users, UserPlus, Shield, ShieldCheck, Mail, Lock, Edit, Trash2, CheckCircle2, ArrowLeft, Save, ShieldAlert, Key, BookOpen, Check, UserCircle, X, Link } from 'lucide-react';
 import { User, UserPermissions, Turma, UserRole, Catequista } from '../types';
+import { Pagination } from './Pagination';
 
 interface UserListProps {
   users: User[];
@@ -19,6 +20,21 @@ const roleLabels: Record<UserRole, string> = {
 };
 
 export const UserList: React.FC<UserListProps> = ({ users, onEdit, onDelete, onCreateNew, currentUser }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  const filteredUsers = users.filter(u => u.email !== 'suporte@unityautomacoes.com.br');
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+  const paginatedUsers = filteredUsers.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm flex justify-between items-center">
@@ -45,7 +61,7 @@ export const UserList: React.FC<UserListProps> = ({ users, onEdit, onDelete, onC
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {users.filter(u => u.email !== 'suporte@unityautomacoes.com.br').map(u => (
+            {paginatedUsers.map(u => (
               <tr key={u.id} className="hover:bg-slate-50/50 transition-all group">
                 <td className="px-8 py-5">
                   <div className="flex items-center gap-4">
@@ -94,6 +110,13 @@ export const UserList: React.FC<UserListProps> = ({ users, onEdit, onDelete, onC
             ))}
           </tbody>
         </table>
+        <Pagination 
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          totalItems={filteredUsers.length}
+          itemsPerPage={itemsPerPage}
+        />
       </div>
     </div>
   );

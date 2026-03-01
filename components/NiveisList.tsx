@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ShieldCheck, Plus, Trash2, Edit, Save, X, Loader2 } from 'lucide-react';
 import { NivelEtapa } from '../types';
 import { api } from '../services/api';
+import { Pagination } from './Pagination';
 
 interface NiveisListProps {
   niveis: NivelEtapa[];
@@ -13,6 +14,8 @@ export const NiveisList: React.FC<NiveisListProps> = ({ niveis, onUpdate }) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [nome, setNome] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const handleSave = async () => {
     if (!nome.trim()) return;
@@ -57,6 +60,17 @@ export const NiveisList: React.FC<NiveisListProps> = ({ niveis, onUpdate }) => {
     setIsAdding(false);
     setEditingId(null);
     setNome('');
+  };
+
+  const totalPages = Math.ceil(niveis.length / itemsPerPage);
+  const paginatedItems = niveis.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -123,8 +137,8 @@ export const NiveisList: React.FC<NiveisListProps> = ({ niveis, onUpdate }) => {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {niveis.length > 0 ? (
-              niveis.map((nivel) => (
+            {paginatedItems.length > 0 ? (
+              paginatedItems.map((nivel) => (
                 <tr key={nivel.id} className="hover:bg-slate-50 transition-colors group">
                   <td className="px-8 py-5">
                     <p className="font-bold text-slate-800">{nivel.nome}</p>
@@ -156,6 +170,13 @@ export const NiveisList: React.FC<NiveisListProps> = ({ niveis, onUpdate }) => {
             )}
           </tbody>
         </table>
+        <Pagination 
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          totalItems={niveis.length}
+          itemsPerPage={itemsPerPage}
+        />
       </div>
 
       <style>{`

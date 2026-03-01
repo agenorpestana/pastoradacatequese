@@ -1,7 +1,8 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { BookOpen, User, Clock, Trash2, Edit, Users, ClipboardCheck, FileSpreadsheet, Plus, Sparkles } from 'lucide-react';
 import { Turma } from '../types';
+import { Pagination } from './Pagination';
 
 interface ClassTableProps {
   classes: Turma[];
@@ -22,11 +23,25 @@ export const ClassTable: React.FC<ClassTableProps> = ({
   onViewHistory,
   onAddNew
 }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
   const sortedClasses = [...(classes || [])].sort((a, b) => {
     const dateA = a.dataCadastro ? new Date(a.dataCadastro).getTime() : 0;
     const dateB = b.dataCadastro ? new Date(b.dataCadastro).getTime() : 0;
     return dateB - dateA;
   });
+
+  const totalPages = Math.ceil(sortedClasses.length / itemsPerPage);
+  const paginatedClasses = sortedClasses.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-10">
@@ -68,8 +83,8 @@ export const ClassTable: React.FC<ClassTableProps> = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {sortedClasses.length > 0 ? (
-                sortedClasses.map((turma) => (
+              {paginatedClasses.length > 0 ? (
+                paginatedClasses.map((turma) => (
                   <tr key={turma.id} className="hover:bg-slate-50 transition-colors group">
                     <td className="px-8 py-5">
                       <div 
@@ -157,6 +172,13 @@ export const ClassTable: React.FC<ClassTableProps> = ({
             </tbody>
           </table>
         </div>
+        <Pagination 
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          totalItems={sortedClasses.length}
+          itemsPerPage={itemsPerPage}
+        />
       </div>
     </div>
   );

@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Search, Edit, Trash2, Calendar, Phone, Mail, UserCheck, History, MapPin, UserPlus, MessageCircle, UsersRound, Sparkles, FileText } from 'lucide-react';
 import { Catequista } from '../types';
+import { Pagination } from './Pagination';
 
 interface CatequistaTableProps {
   catequistas: Catequista[];
@@ -14,6 +15,8 @@ interface CatequistaTableProps {
 
 export const CatequistaTable: React.FC<CatequistaTableProps> = ({ catequistas, onDelete, onEdit, onViewHistory, onManageDocuments, onAddNew }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const filtered = (catequistas || [])
     .filter(c => 
@@ -26,6 +29,17 @@ export const CatequistaTable: React.FC<CatequistaTableProps> = ({ catequistas, o
       const dateB = b.dataCadastro ? new Date(b.dataCadastro).getTime() : 0;
       return dateB - dateA;
     });
+
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+  const paginatedItems = filtered.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-10">
@@ -80,8 +94,8 @@ export const CatequistaTable: React.FC<CatequistaTableProps> = ({ catequistas, o
               </tr>
             </thead>
             <tbody className="divide-y divide-sky-50">
-              {filtered.length > 0 ? (
-                filtered.map((c) => (
+              {paginatedItems.length > 0 ? (
+                paginatedItems.map((c) => (
                   <tr key={c.id} className="hover:bg-sky-50/30 group transition-all">
                     <td className="px-8 py-5">
                       <div className="flex items-center gap-4">
@@ -162,6 +176,13 @@ export const CatequistaTable: React.FC<CatequistaTableProps> = ({ catequistas, o
             </tbody>
           </table>
         </div>
+        <Pagination 
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          totalItems={filtered.length}
+          itemsPerPage={itemsPerPage}
+        />
       </div>
     </div>
   );

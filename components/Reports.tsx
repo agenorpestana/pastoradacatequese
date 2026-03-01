@@ -2,6 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { FileText, Calendar, TrendingUp, Users, BookOpen, UserCheck, ArrowRight, BarChart3 } from 'lucide-react';
 import { Student, Turma, AttendanceSession } from '../types';
+import { Pagination } from './Pagination';
 
 interface ReportsProps {
   students: Student[];
@@ -11,6 +12,8 @@ interface ReportsProps {
 
 export const Reports: React.FC<ReportsProps> = ({ students, classes, attendanceSessions }) => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const stats = useMemo(() => {
     // Filtro de alunos novos no ano
@@ -52,6 +55,17 @@ export const Reports: React.FC<ReportsProps> = ({ students, classes, attendanceS
       concludedInYear: concludedInYear.length
     };
   }, [students, attendanceSessions, selectedYear]);
+
+  const totalPages = Math.ceil(classes.length / itemsPerPage);
+  const paginatedClasses = classes.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -120,8 +134,8 @@ export const Reports: React.FC<ReportsProps> = ({ students, classes, attendanceS
           <BookOpen className="text-slate-300 w-8 h-8" />
         </div>
         <div className="divide-y divide-slate-100">
-          {classes.length > 0 ? (
-            classes.map(turma => {
+          {paginatedClasses.length > 0 ? (
+            paginatedClasses.map(turma => {
               const sessions = attendanceSessions.filter(s => 
                 s.turmaId === turma.id && 
                 new Date(s.date).getFullYear() === selectedYear
@@ -165,6 +179,13 @@ export const Reports: React.FC<ReportsProps> = ({ students, classes, attendanceS
             </div>
           )}
         </div>
+        <Pagination 
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          totalItems={classes.length}
+          itemsPerPage={itemsPerPage}
+        />
       </div>
     </div>
   );
