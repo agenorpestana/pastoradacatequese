@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { X, CheckCircle, XCircle, Calendar, Save, Users, Search, BookOpenText, Lock, Unlock } from 'lucide-react';
+import { X, CheckCircle, XCircle, Calendar, Save, Users, Search, BookOpenText, Lock, Unlock, ChevronDown, History } from 'lucide-react';
 import { Turma, Student, AttendanceSession, AttendanceEntry } from '../types';
 
 interface ClassAttendanceModalProps {
@@ -66,14 +66,21 @@ export const ClassAttendanceModal: React.FC<ClassAttendanceModalProps> = ({
   };
 
   const handleLock = () => {
-    if (isLocked) {
-      if (confirm('Deseja realmente destravar esta chamada?')) {
-        setIsLocked(false);
-      }
+    if (isLocked) return;
+    if (confirm('Ao trancar a chamada, você não poderá mais alterar as presenças. Deseja continuar?')) {
+      setIsLocked(true);
+    }
+  };
+
+  const classSessions = existingSessions
+    .filter(s => s.turmaId === turma.id)
+    .sort((a, b) => b.date.localeCompare(a.date));
+
+  const handleSelectSession = (date: string) => {
+    if (date === 'new') {
+      setSelectedDate(new Date().toISOString().split('T')[0]);
     } else {
-      if (confirm('Ao trancar a chamada, você não poderá mais alterar as presenças. Deseja continuar?')) {
-        setIsLocked(true);
-      }
+      setSelectedDate(date);
     }
   };
 
@@ -109,6 +116,28 @@ export const ClassAttendanceModal: React.FC<ClassAttendanceModalProps> = ({
 
         {/* Filters and Tema */}
         <div className="p-6 bg-slate-50 border-b border-slate-100 space-y-4">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1">
+              <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block px-1">Histórico de Chamadas</label>
+              <div className="relative">
+                <History className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+                <select 
+                  onChange={(e) => handleSelectSession(e.target.value)}
+                  value={classSessions.find(s => s.date === selectedDate) ? selectedDate : 'new'}
+                  className="w-full pl-10 pr-10 py-2 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-green-500 text-sm font-bold text-slate-700 appearance-none cursor-pointer"
+                >
+                  <option value="new">-- Nova Chamada --</option>
+                  {classSessions.map(s => (
+                    <option key={s.id} value={s.date}>
+                      {new Date(s.date + 'T00:00:00').toLocaleDateString('pt-BR')} {s.tema ? `- ${s.tema}` : ''} {s.locked ? '🔒' : ''}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 pointer-events-none" />
+              </div>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
             <div className="md:col-span-4">
               <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block px-1">Data da Aula</label>
@@ -228,25 +257,29 @@ export const ClassAttendanceModal: React.FC<ClassAttendanceModalProps> = ({
           </button>
           
           <div className="flex gap-3">
-            <button 
-              onClick={handleLock}
-              className={`flex items-center gap-2 px-6 py-4 font-bold rounded-2xl transition-all shadow-xl ${
-                isLocked 
-                  ? 'bg-amber-100 text-amber-700 hover:bg-amber-200 shadow-amber-100' 
-                  : 'bg-slate-200 text-slate-700 hover:bg-slate-300 shadow-slate-100'
-              }`}
-            >
-              {isLocked ? <Unlock className="w-5 h-5" /> : <Lock className="w-5 h-5" />}
-              {isLocked ? 'Destrancar' : 'Trancar Chamada'}
-            </button>
+            {!isLocked ? (
+              <>
+                <button 
+                  onClick={handleLock}
+                  className="flex items-center gap-2 px-6 py-4 bg-slate-200 text-slate-700 font-bold rounded-2xl hover:bg-slate-300 transition-all shadow-xl shadow-slate-100"
+                >
+                  <Lock className="w-5 h-5" />
+                  Trancar Chamada
+                </button>
 
-            <button 
-              onClick={handleSave}
-              className="flex items-center gap-2 px-10 py-4 bg-green-600 text-white font-bold rounded-2xl hover:bg-green-700 transition-all shadow-xl shadow-green-100"
-            >
-              <Save className="w-5 h-5" />
-              Salvar Diário
-            </button>
+                <button 
+                  onClick={handleSave}
+                  className="flex items-center gap-2 px-10 py-4 bg-green-600 text-white font-bold rounded-2xl hover:bg-green-700 transition-all shadow-xl shadow-green-100"
+                >
+                  <Save className="w-5 h-5" />
+                  Salvar Diário
+                </button>
+              </>
+            ) : (
+              <div className="flex items-center gap-2 px-8 py-4 bg-amber-50 text-amber-600 font-black rounded-2xl border border-amber-100 uppercase tracking-widest text-[10px]">
+                <Lock className="w-4 h-4" /> Chamada Trancada
+              </div>
+            )}
           </div>
         </div>
       </div>
