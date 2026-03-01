@@ -68,7 +68,17 @@ export const ClassAttendanceModal: React.FC<ClassAttendanceModalProps> = ({
   const handleLock = () => {
     if (isLocked) return;
     if (confirm('Ao trancar a chamada, você não poderá mais alterar as presenças. Deseja continuar?')) {
+      const session: AttendanceSession = {
+        id: `${turma.id}-${selectedDate}`,
+        turmaId: turma.id,
+        date: selectedDate,
+        tema: tema,
+        entries: entries,
+        locked: true
+      };
+      onSave(session);
       setIsLocked(true);
+      alert('Chamada trancada e salva com sucesso!');
     }
   };
 
@@ -205,9 +215,9 @@ export const ClassAttendanceModal: React.FC<ClassAttendanceModalProps> = ({
             return (
               <div 
                 key={student.id} 
-                className={`flex items-center justify-between p-4 rounded-2xl border transition-all cursor-pointer group ${
+                className={`flex items-center justify-between p-4 rounded-2xl border transition-all group ${
                   isPresent ? 'bg-white border-slate-100 hover:border-green-200' : 'bg-red-50/30 border-red-100'
-                }`}
+                } ${isLocked ? 'cursor-default opacity-80' : 'cursor-pointer'}`}
                 onClick={() => toggleStatus(student.id)}
               >
                 <div className="flex items-center gap-4">
