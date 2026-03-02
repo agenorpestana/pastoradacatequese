@@ -72,12 +72,19 @@ const runMigrations = async () => {
                 CREATE TABLE IF NOT EXISTS niveis_etapas (
                     id VARCHAR(50) PRIMARY KEY,
                     nome VARCHAR(255) NOT NULL,
+                    categoria VARCHAR(50),
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             `);
+            const [columnsNiveis] = await conn.query("SHOW COLUMNS FROM niveis_etapas LIKE 'categoria'");
+            if (columnsNiveis.length === 0) {
+                console.log("⚠️ Migration Required: Adding 'categoria' to 'niveis_etapas' table...");
+                await conn.query("ALTER TABLE niveis_etapas ADD COLUMN categoria VARCHAR(50)");
+                console.log("✅ Migration Successful: Column added to niveis_etapas.");
+            }
             console.log("✅ Database Schema Check: 'niveis_etapas' table is ready.");
         } catch (e) {
-            console.error("❌ Failed to create 'niveis_etapas' table:", e.message);
+            console.error("❌ Failed to create/update 'niveis_etapas' table:", e.message);
         }
         
         // Migration 4: comunidade in turmas
@@ -244,8 +251,8 @@ app.post('/api/:resource', async (req, res) => {
         params = [data.id, data.name, data.category, data.url, data.type, data.upload_date];
         break;
       case 'niveis_etapas':
-        query = 'INSERT INTO niveis_etapas (id, nome) VALUES (?, ?)';
-        params = [data.id, data.nome];
+        query = 'INSERT INTO niveis_etapas (id, nome, categoria) VALUES (?, ?, ?)';
+        params = [data.id, data.nome, data.categoria || 'OUTROS'];
         break;
     }
 
@@ -307,8 +314,8 @@ app.put('/api/:resource/:id', async (req, res) => {
           params = [data.title, data.url, data.date, data.turmaId || null, id];
           break;
         case 'niveis_etapas':
-          query = 'UPDATE niveis_etapas SET nome=? WHERE id=?';
-          params = [data.nome, id];
+          query = 'UPDATE niveis_etapas SET nome=?, categoria=? WHERE id=?';
+          params = [data.nome, data.categoria || 'OUTROS', id];
           break;
     }
 
