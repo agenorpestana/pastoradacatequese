@@ -290,7 +290,6 @@ const DashboardContent = ({ events, students, classes, catequistas, suggestedDat
                </div>
              </div>
              <div className="flex gap-4 pt-4 border-t border-slate-50 text-[9px] font-black uppercase tracking-wide">
-               <span className="text-green-600">Ativos: {activeStudents.length}</span>
                <span className="text-cyan-600">Batizados: {activeBatizadosCount}</span>
                <span className="text-slate-400">Sem Batizar: {activeSemBatismoCount}</span>
              </div>
@@ -308,7 +307,6 @@ const DashboardContent = ({ events, students, classes, catequistas, suggestedDat
                </div>
              </div>
              <div className="flex gap-4 pt-4 border-t border-slate-50 text-[9px] font-black uppercase tracking-wide">
-               <span className="text-green-600">Ativos: {activeStudents.length}</span>
                <span className="text-amber-600">Com Eucaristia: {activeEucaristiaCount}</span>
                <span className="text-slate-400">Sem Eucaristia: {activeSemEucaristiaCount}</span>
              </div>

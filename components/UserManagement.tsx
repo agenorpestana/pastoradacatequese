@@ -172,7 +172,7 @@ export const UserForm: React.FC<UserFormProps> = ({ onSave, onCancel, initialDat
       permissions: formData.role === 'coordenador_paroquial' ? {
         dashboard: true, students_view: true, students_create: true, students_edit: true,
         students_delete: true, students_print: true, students_confirmed_view: true, students_confirmed_manage: true,
-        classes: true, catequistas: true, formations: true, reports: true, certificates: true, 
+        classes: true, catequistas: true, formations: true, niveis_etapas: true, reports: true, certificates: true, 
         attendance: true, users_management: true, attendance_report: true,
         library_view: true, library_upload: true, library_delete: true,
         gallery_view: true, gallery_upload: true, gallery_delete: true,
@@ -217,6 +217,7 @@ export const UserForm: React.FC<UserFormProps> = ({ onSave, onCancel, initialDat
       { k: 'classes', l: 'Gerenciar Turmas (por Turma)' },
       { k: 'catequistas', l: 'Gerenciar Catequistas' },
       { k: 'formations', l: 'Gerenciar Formações' },
+      { k: 'niveis_etapas', l: 'Gerenciar Níveis / Etapas' },
     ]},
     { title: 'Administrativo', perms: [
       { k: 'dashboard', l: 'Ver Painel de Estatísticas' },

@@ -43,6 +43,7 @@ export interface UserPermissions {
   attendance_report: boolean;
   certificates: boolean;
   attendance: boolean;
+  niveis_etapas: boolean;
   users_management: boolean;
   library_view: boolean;
   library_upload: boolean;

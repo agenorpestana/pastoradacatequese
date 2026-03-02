@@ -52,52 +52,57 @@ export const ClassMembersModal: React.FC<ClassMembersModalProps> = ({ turma, mem
               .no-print { display: none !important; }
             }
           `}</style>
-          <div className="border-b-4 border-slate-900 pb-4 mb-8 flex justify-between items-end">
-            <div>
-              <h1 className="text-2xl font-black uppercase tracking-tighter">Lista de Chamada</h1>
-              <p className="text-sm font-bold text-slate-600 uppercase">PARÓQUIA: {config.parishName} - DIOCESE: {config.dioceseName}</p>
-              {(() => {
-                const [comunidadePart, ...nomeParts] = turma.nome.split(' - ');
-                const nomePart = nomeParts.join(' - ') || turma.nome;
-                const finalComunidade = turma.comunidade || (nomeParts.length > 0 ? comunidadePart : '---');
-                const finalNome = nomeParts.length > 0 ? nomePart : turma.nome;
-                return (
-                  <p className="text-sm font-bold text-slate-600">TURMA: {finalNome} - COMUNIDADE: {finalComunidade}</p>
-                );
-              })()}
-              <p className="text-xs text-slate-500">Catequista: {turma.catequista} | Horário: {turma.diaSemana}, {turma.horario}</p>
+          <div className="border border-black mb-4">
+            <div className="bg-slate-100 border-b border-black p-2 text-center font-black uppercase text-sm">
+               DIÁRIO DE CLASSE - LISTA DE CHAMADA
             </div>
-            <div className="text-right">
-              <p className="text-xs font-bold uppercase">Mês: ____________________</p>
-              <p className="text-[10px] text-slate-400 mt-1">Gerado em: {new Date().toLocaleDateString('pt-BR')}</p>
+            <div className="flex text-xs font-bold uppercase">
+              <div className="flex-1 p-2 border-r border-black">
+                PARÓQUIA: {config.parishName} - DIOCESE: {config.dioceseName}
+              </div>
+              <div className="flex-1 p-2">
+                {(() => {
+                  const [comunidadePart, ...nomeParts] = turma.nome.split(' - ');
+                  const nomePart = nomeParts.join(' - ') || turma.nome;
+                  const finalComunidade = turma.comunidade || (nomeParts.length > 0 ? comunidadePart : '---');
+                  const finalNome = nomeParts.length > 0 ? nomePart : turma.nome;
+                  return (
+                    <span>TURMA: {finalNome} - COMUNIDADE: {finalComunidade}</span>
+                  );
+                })()}
+              </div>
             </div>
           </div>
+          <div className="flex justify-between items-center mb-4 text-[10px] font-bold uppercase">
+            <p>Catequista: {turma.catequista} | Horário: {turma.diaSemana}, {turma.horario}</p>
+            <p>Mês: ____________________</p>
+          </div>
 
-          <table className="w-full border-collapse border border-slate-300">
+          <table className="w-full border-collapse border border-black text-[9px]">
             <thead>
               <tr className="bg-slate-50">
-                <th className="border border-slate-300 px-3 py-2 text-left text-xs font-black uppercase w-10">Nº</th>
-                <th className="border border-slate-300 px-3 py-2 text-left text-xs font-black uppercase">Catequizando</th>
+                <th className="border border-black px-3 py-2 text-left font-black uppercase w-10">Nº</th>
+                <th className="border border-black px-3 py-2 text-left font-black uppercase">Catequizando</th>
                 {[1, 2, 3, 4, 5].map(i => (
-                  <th key={i} className="border border-slate-300 px-1 py-2 text-center text-[8px] font-black uppercase w-8">Dia</th>
+                  <th key={i} className="border border-black px-1 py-2 text-center font-black uppercase w-8">Dia</th>
                 ))}
-                <th className="border border-slate-300 px-3 py-2 text-left text-xs font-black uppercase w-24">Obs.</th>
+                <th className="border border-black px-3 py-2 text-left font-black uppercase w-24">Obs.</th>
               </tr>
             </thead>
             <tbody>
               {members.length > 0 ? (
                 members.sort((a,b) => a.nomeCompleto.localeCompare(b.nomeCompleto)).map((m, index) => (
                   <tr key={m.id}>
-                    <td className="border border-slate-300 px-3 py-2 text-xs font-bold text-center">{index + 1}</td>
-                    <td className="border border-slate-300 px-3 py-2 text-xs font-medium">{m.nomeCompleto}</td>
+                    <td className="border border-black px-3 py-2 font-bold text-center">{index + 1}</td>
+                    <td className="border border-black px-3 py-2 font-medium">{m.nomeCompleto}</td>
                     {[1, 2, 3, 4, 5].map(i => (
-                      <td key={i} className="border border-slate-300 px-1 py-2"></td>
+                      <td key={i} className="border border-black px-1 py-2"></td>
                     ))}
-                    <td className="border border-slate-300 px-3 py-2"></td>
+                    <td className="border border-black px-3 py-2"></td>
                   </tr>
                 ))
               ) : (
-                <tr><td colSpan={8} className="border border-slate-300 p-10 text-center italic text-slate-400">Nenhum aluno vinculado.</td></tr>
+                <tr><td colSpan={8} className="border border-black p-10 text-center italic text-slate-400">Nenhum aluno vinculado.</td></tr>
               )}
             </tbody>
           </table>
