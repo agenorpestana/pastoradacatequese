@@ -68,8 +68,8 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
           <style>
             {`
               @media print {
-                @page { margin: 0; }
-                body { margin: 0; }
+                @page { margin: 0; size: auto; }
+                body { -webkit-print-color-adjust: exact; margin: 0; }
                 body > *:not(.print-only) { display: none !important; }
                 .print-only { 
                   display: block !important; 

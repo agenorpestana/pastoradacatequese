@@ -174,7 +174,15 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
                 PARÓQUIA: {config.parishName} - DIOCESE: {config.dioceseName}
               </div>
               <div className="flex-1 p-2">
-                TURMA: {turma.nome} - COMUNIDADE: {turma.comunidade || '---'}
+                {(() => {
+                  const [comunidadePart, ...nomeParts] = turma.nome.split(' - ');
+                  const nomePart = nomeParts.join(' - ') || turma.nome;
+                  const finalComunidade = turma.comunidade || (nomeParts.length > 0 ? comunidadePart : '---');
+                  const finalNome = nomeParts.length > 0 ? nomePart : turma.nome;
+                  return (
+                    <span>TURMA: {finalNome} - COMUNIDADE: {finalComunidade}</span>
+                  );
+                })()}
               </div>
             </div>
           </div>
@@ -300,16 +308,24 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
         <div className="print-only fixed inset-0 z-[200] bg-white p-8">
           <style>{`
             @media print {
-              @page { size: portrait; margin: 10mm; }
-              body { -webkit-print-color-adjust: exact; }
+              @page { margin: 0; size: auto; }
+              body { -webkit-print-color-adjust: exact; margin: 0; }
               body > *:not(.print-only) { display: none !important; }
-              .print-only { display: block !important; }
+              .print-only { 
+                display: block !important; 
+                padding: 15mm; 
+                height: 100vh; 
+                position: absolute !important;
+                top: 0;
+                left: 0;
+                width: 100%;
+                background: white;
+              }
             }
           `}</style>
           <div className="text-center border-b-2 border-slate-900 pb-6 mb-6">
           <h1 className="text-2xl font-black uppercase tracking-widest">PARÓQUIA: {config.parishName}</h1>
           <h2 className="text-lg font-bold text-slate-600">DIOCESE: {config.dioceseName} - Relatório Geral de Frequência - {selectedYear}</h2>
-          <p className="text-sm mt-2">Pastoral da Catequese</p>
         </div>
 
         <div className="grid grid-cols-3 gap-4 mb-8">

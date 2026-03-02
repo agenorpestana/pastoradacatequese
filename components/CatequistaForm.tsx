@@ -114,12 +114,12 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
         <div className="print-only p-10 w-full bg-white text-slate-900 font-sans absolute inset-0 z-[9999] hidden">
           <style>{`
             @media print {
-              @page { margin: 0; }
-              body { margin: 0; }
+              @page { margin: 0; size: auto; }
+              body { -webkit-print-color-adjust: exact; margin: 0; }
               body > *:not(.print-only) { display: none !important; }
               .print-only { 
                 display: block !important; 
-                padding: 10mm; 
+                padding: 15mm; 
                 height: 100vh; 
                 position: absolute !important;
                 top: 0;
@@ -174,7 +174,7 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
                     <p><strong>Telefone/Zap:</strong> {formData.telefone || '---'} {formData.whatsapp && `/ ${formData.whatsapp}`}</p>
                     <p><strong>E-mail:</strong> {formData.email || '---'}</p>
                     <p className="col-span-2"><strong>Endereço:</strong> {formData.endereco || '---'}, {formData.numero || '---'} - {formData.bairro || '---'}, {formData.cidade || '---'}/{formData.ufEndereco || '---'}</p>
-                    <p className="col-span-2"><strong>Comunidade de Atuação:</strong> {formData.comunidade || '---'}</p>
+                    <p className="col-span-2"><strong>TURMA:</strong> {formData.atuacao || '---'} - <strong>COMUNIDADE:</strong> {formData.comunidade || '---'}</p>
                     <p className="col-span-2"><strong>Início na Catequese:</strong> {formData.desde ? new Date(formData.desde + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</p>
                     <p className="col-span-2"><strong>Já tem Crisma?</strong> {formData.temCrisma ? `Sim (${formData.crismaData ? new Date(formData.crismaData + 'T00:00:00').toLocaleDateString('pt-BR') : ''} - ${formData.crismaParoquia || ''})` : 'Não'}</p>
                   </div>
@@ -183,7 +183,6 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
                 <section>
                   <h3 className="bg-slate-100 px-2 py-1 text-[10px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">2. Preferências de Atuação</h3>
                   <div className="grid grid-cols-1 gap-y-1.5 text-[11px]">
-                    <p><strong>Qual Turma/Etapa você atua?</strong> {formData.atuacao || '---'}</p>
                     <p><strong>Qual Turma/Etapa você gosta de atuar?</strong> {formData.atuacaoDesejada || '---'}</p>
                   </div>
                 </section>

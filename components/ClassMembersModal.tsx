@@ -36,12 +36,12 @@ export const ClassMembersModal: React.FC<ClassMembersModalProps> = ({ turma, mem
         <div className="print-only p-10 w-full bg-white text-slate-900 font-sans absolute inset-0 z-[9999] hidden">
           <style>{`
             @media print {
-              @page { margin: 0; }
-              body { margin: 0; }
+              @page { margin: 0; size: auto; }
+              body { -webkit-print-color-adjust: exact; margin: 0; }
               body > *:not(.print-only) { display: none !important; }
               .print-only { 
                 display: block !important; 
-                padding: 10mm; 
+                padding: 15mm; 
                 height: 100vh; 
                 position: absolute !important;
                 top: 0;
@@ -56,7 +56,15 @@ export const ClassMembersModal: React.FC<ClassMembersModalProps> = ({ turma, mem
             <div>
               <h1 className="text-2xl font-black uppercase tracking-tighter">Lista de Chamada</h1>
               <p className="text-sm font-bold text-slate-600 uppercase">PARÓQUIA: {config.parishName} - DIOCESE: {config.dioceseName}</p>
-              <p className="text-sm font-bold text-slate-600">TURMA: {turma.nome} - COMUNIDADE: {turma.comunidade || '---'}</p>
+              {(() => {
+                const [comunidadePart, ...nomeParts] = turma.nome.split(' - ');
+                const nomePart = nomeParts.join(' - ') || turma.nome;
+                const finalComunidade = turma.comunidade || (nomeParts.length > 0 ? comunidadePart : '---');
+                const finalNome = nomeParts.length > 0 ? nomePart : turma.nome;
+                return (
+                  <p className="text-sm font-bold text-slate-600">TURMA: {finalNome} - COMUNIDADE: {finalComunidade}</p>
+                );
+              })()}
               <p className="text-xs text-slate-500">Catequista: {turma.catequista} | Horário: {turma.diaSemana}, {turma.horario}</p>
             </div>
             <div className="text-right">
