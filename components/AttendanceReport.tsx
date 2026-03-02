@@ -18,7 +18,6 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedClassForDiary, setSelectedClassForDiary] = useState<string | null>(null);
   const [currentClassPage, setCurrentClassPage] = useState(1);
-  const [currentCatechistPage, setCurrentCatechistPage] = useState(1);
   const itemsPerPage = 10;
 
   // Cálculos Estatísticos
@@ -83,20 +82,10 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
     c.catequista.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const filteredCatechistStats = stats.catechistStats.filter(c => 
-    c.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   const totalClassPages = Math.ceil(filteredClassStats.length / itemsPerPage);
   const paginatedClassStats = filteredClassStats.slice(
     (currentClassPage - 1) * itemsPerPage,
     currentClassPage * itemsPerPage
-  );
-
-  const totalCatechistPages = Math.ceil(filteredCatechistStats.length / itemsPerPage);
-  const paginatedCatechistStats = filteredCatechistStats.slice(
-    (currentCatechistPage - 1) * itemsPerPage,
-    currentCatechistPage * itemsPerPage
   );
 
   const renderDiary = () => {
@@ -362,28 +351,6 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
           </tbody>
         </table>
 
-        <h3 className="text-sm font-black uppercase border-b border-slate-300 mb-4 pb-1">Desempenho por Catequista</h3>
-        <table className="w-full text-left border-collapse text-xs">
-          <thead>
-             <tr className="bg-slate-100">
-               <th className="p-2 border border-slate-300">Catequista</th>
-               <th className="p-2 border border-slate-300 text-center">Total Encontros</th>
-               <th className="p-2 border border-slate-300 text-center">Média da Turma</th>
-             </tr>
-          </thead>
-          <tbody>
-            {stats.catechistStats.map((c, i) => (
-              <tr key={i}>
-                <td className="p-2 border border-slate-300 font-bold">{c.name}</td>
-                <td className="p-2 border border-slate-300 text-center">{c.totalSessions}</td>
-                <td className="p-2 border border-slate-300 text-center font-bold">
-                  {c.avgRate.toFixed(1)}%
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
         <div className="mt-12 text-center text-[10px] text-slate-400">
            Documento gerado em {new Date().toLocaleDateString('pt-BR')} às {new Date().toLocaleTimeString('pt-BR')}
         </div>
@@ -472,7 +439,7 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 no-print">
+      <div className="grid grid-cols-1 gap-8 no-print">
         {/* LISTA POR TURMA */}
         <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden flex flex-col">
           <div className="p-8 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
@@ -518,46 +485,6 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
               totalPages={totalClassPages}
               onPageChange={setCurrentClassPage}
               totalItems={filteredClassStats.length}
-              itemsPerPage={itemsPerPage}
-            />
-          </div>
-        </div>
-
-        {/* LISTA POR CATEQUISTA */}
-        <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden flex flex-col">
-          <div className="p-8 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
-             <div className="flex items-center gap-3">
-               <UserCheck className="text-blue-600 w-5 h-5" />
-               <h3 className="font-bold text-slate-800">Desempenho por Catequista</h3>
-             </div>
-          </div>
-          <div className="flex-1 overflow-y-auto max-h-[500px] p-6 space-y-4 custom-scrollbar">
-             {paginatedCatechistStats.map((c, i) => (
-               <div key={i} className="flex items-center justify-between p-4 rounded-2xl border border-slate-100 hover:shadow-md transition-all">
-                 <div className="flex items-center gap-4">
-                   <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center font-black text-xs text-slate-500 uppercase border-2 border-white shadow-sm">
-                     {c.name.charAt(0)}
-                   </div>
-                   <div>
-                     <h4 className="font-bold text-slate-800 text-sm">{c.name}</h4>
-                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{c.totalSessions} aulas dadas</p>
-                   </div>
-                 </div>
-                 <div className="text-right">
-                   <p className="text-[9px] font-bold text-slate-400 uppercase">Média Turma</p>
-                   <p className={`text-lg font-black ${c.avgRate >= 75 ? 'text-blue-600' : 'text-slate-600'}`}>
-                     {c.avgRate.toFixed(0)}%
-                   </p>
-                 </div>
-               </div>
-             ))}
-          </div>
-          <div className="p-4 border-t border-slate-100">
-            <Pagination 
-              currentPage={currentCatechistPage}
-              totalPages={totalCatechistPages}
-              onPageChange={setCurrentCatechistPage}
-              totalItems={filteredCatechistStats.length}
               itemsPerPage={itemsPerPage}
             />
           </div>
