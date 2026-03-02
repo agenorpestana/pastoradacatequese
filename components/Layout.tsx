@@ -154,7 +154,7 @@ export const Layout: React.FC<LayoutProps> = ({
                   </button>
                 )}
 
-                {perms.catequistas && !isRestrictedRole && (
+                {perms.catequistas && (
                   <button 
                     onClick={() => handleNavClick('catequista_list')} 
                     className={`flex items-center gap-4 p-4 rounded-2xl transition-all ${currentView === 'catequista_list' ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-slate-600 bg-slate-50 hover:bg-slate-100'}`}
@@ -174,13 +174,23 @@ export const Layout: React.FC<LayoutProps> = ({
                   </button>
                 )}
 
-                {perms.attendance_report && !isRestrictedRole && (
+                {perms.attendance_report && (
                   <button 
                     onClick={() => handleNavClick('attendance_report')} 
                     className={`flex items-center gap-4 p-4 rounded-2xl transition-all ${currentView === 'attendance_report' ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-slate-600 bg-slate-50 hover:bg-slate-100'}`}
                   >
                     <BarChart3 className="w-5 h-5" />
                     <span className="text-sm font-bold uppercase tracking-tight">Relatório Frequência</span>
+                  </button>
+                )}
+
+                {perms.reports && (
+                  <button 
+                    onClick={() => handleNavClick('reports')} 
+                    className={`flex items-center gap-4 p-4 rounded-2xl transition-all ${currentView === 'reports' ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-slate-600 bg-slate-50 hover:bg-slate-100'}`}
+                  >
+                    <FileText className="w-5 h-5" />
+                    <span className="text-sm font-bold uppercase tracking-tight">Relatórios</span>
                   </button>
                 )}
 
@@ -275,7 +285,7 @@ export const Layout: React.FC<LayoutProps> = ({
             </button>
           )}
 
-          {perms.catequistas && !isRestrictedRole && (
+          {perms.catequistas && (
             <button onClick={() => setView('catequista_list')} className={`w-full flex items-center transition-all duration-300 rounded-2xl group ${isCollapsed ? 'justify-center p-4' : 'gap-4 px-5 py-3.5'} ${currentView.includes('catequista') ? 'bg-blue-600 text-white shadow-xl shadow-blue-200' : 'text-slate-500 hover:bg-white'}`}>
               <UsersRound size={isCollapsed ? 24 : 20} className={`transition-transform duration-300 ${!isCollapsed && 'group-hover:scale-110'}`} />
               {!isCollapsed && <span className="font-bold text-sm tracking-tight">Catequistas</span>}
@@ -289,7 +299,7 @@ export const Layout: React.FC<LayoutProps> = ({
             </button>
           )}
 
-          {perms.classes && !isRestrictedRole && (
+          {perms.classes && (
             <button onClick={() => setView('niveis_list')} className={`w-full flex items-center transition-all duration-300 rounded-2xl group ${isCollapsed ? 'justify-center p-4' : 'gap-4 px-5 py-3.5'} ${currentView === 'niveis_list' ? 'bg-blue-600 text-white shadow-xl shadow-blue-200' : 'text-slate-500 hover:bg-white'}`}>
               <ShieldCheck size={isCollapsed ? 24 : 20} className={`transition-transform duration-300 ${!isCollapsed && 'group-hover:scale-110'}`} />
               {!isCollapsed && <span className="font-bold text-sm tracking-tight">Níveis/Etapas</span>}
@@ -308,7 +318,7 @@ export const Layout: React.FC<LayoutProps> = ({
             </button>
           )}
 
-          {perms.attendance_report && !isRestrictedRole && (
+          {perms.attendance_report && (
              <button
               onClick={() => setView('attendance_report')}
               className={`w-full flex items-center transition-all duration-300 rounded-2xl group ${isCollapsed ? 'justify-center p-4' : 'gap-4 px-5 py-3.5'} ${currentView === 'attendance_report' ? 'bg-blue-600 text-white shadow-xl shadow-blue-200' : 'text-slate-500 hover:bg-white'}`}
@@ -318,7 +328,7 @@ export const Layout: React.FC<LayoutProps> = ({
             </button>
           )}
 
-          {perms.reports && !isRestrictedRole && (
+          {perms.reports && (
             <button
               onClick={() => setView('reports')}
               className={`w-full flex items-center transition-all duration-300 rounded-2xl group ${isCollapsed ? 'justify-center p-4' : 'gap-4 px-5 py-3.5'} ${currentView === 'reports' ? 'bg-blue-600 text-white shadow-xl shadow-blue-200' : 'text-slate-500 hover:bg-white'}`}

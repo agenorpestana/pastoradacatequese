@@ -1010,9 +1010,9 @@ const App: React.FC = () => {
                   initialData={editingFormation || undefined}
                />;
       case 'reports':
-        return <Reports students={visibleStudents} classes={visibleClasses} attendanceSessions={attendanceSessions} />;
+        return <Reports students={students} classes={classes} attendanceSessions={attendanceSessions} />;
       case 'attendance_report':
-        return <AttendanceReport classes={visibleClasses} attendanceSessions={attendanceSessions} catequistas={catequistas} config={parishConfig} students={visibleStudents} />;
+        return <AttendanceReport classes={classes} attendanceSessions={attendanceSessions} catequistas={catequistas} config={parishConfig} students={students} />;
       case 'certificates':
         return <CertificateGenerator students={visibleStudents} config={parishConfig} />;
       case 'profile':
