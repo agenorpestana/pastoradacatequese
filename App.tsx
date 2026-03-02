@@ -90,9 +90,11 @@ const DashboardContent = ({ events, students, classes, catequistas, suggestedDat
 
     // Logic for Crisma preparation stats
     const crismaLevels = ['Crisma 1ª Etapa', 'Crisma 2ª Etapa', 'Catecumenato', 'Catequese de Adultos'];
-    const crismaClasses = classes.filter((c:any) => crismaLevels.some((l: string) => (c.nivel || '').includes(l) || c.nivel === l));
-    const crismaClassNames = crismaClasses.map((c:any) => c.nome);
-    const studentsInCrismaPrep = activeStudents.filter((s:any) => crismaClassNames.includes(s.turma)).length;
+    const crismaClasses = classes.filter((c:any) => {
+        const nivel = (c.nivel || '').toString().toLowerCase().trim();
+        return crismaLevels.some(l => nivel.includes(l.toLowerCase().trim()));
+    });
+    const studentsInCrismaPrep = activeStudents.filter((s:any) => !!s.inicioPreparacao).length;
 
     const isLinked = !!user?.linkedCatequistaId;
 
@@ -545,22 +547,8 @@ const App: React.FC = () => {
         api.get('niveis_etapas')
       ]);
 
-      let filteredStudents = s;
-      let filteredClasses = c;
-
-      if (user.role === 'catequista' || user.role === 'catequista_auxiliar') {
-        if (user.linkedCatequistaId) {
-          const linkedCat = cat.find((ct: Catequista) => ct.id === user.linkedCatequistaId);
-          if (linkedCat) {
-            filteredClasses = c.filter((t: Turma) => t.catequista === linkedCat.nome);
-            const classNames = filteredClasses.map((t: Turma) => t.nome);
-            filteredStudents = s.filter((st: Student) => classNames.includes(st.turma || ''));
-          }
-        }
-      }
-
-      setStudents(filteredStudents);
-      setClasses(filteredClasses);
+      setStudents(s);
+      setClasses(c);
       setCatequistas(cat);
       setUsers(u);
       setEvents(e);
