@@ -90,8 +90,8 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
                 <div className="flex items-center gap-3">
                   {config.logo ? <img src={config.logo} className="w-12 h-12 object-contain" /> : <Church className="w-8 h-8" />}
                   <div>
-                    <h1 className="text-lg font-black uppercase tracking-tighter">Ficha de Inscrição Catequética</h1>
-                    <p className="text-[10px] font-bold">{config.parishName} - {config.dioceseName} - {config.city}-{config.state}</p>
+                    <h1 className="text-lg font-black uppercase tracking-tighter">Ficha de Inscrição Catequizando</h1>
+                    <p className="text-[10px] font-bold">PARÓQUIA: {config.parishName} - DIOCESE: {config.dioceseName} - {config.city}-{config.state}</p>
                   </div>
                 </div>
                 <div className="text-right">

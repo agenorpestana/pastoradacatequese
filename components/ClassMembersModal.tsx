@@ -55,7 +55,8 @@ export const ClassMembersModal: React.FC<ClassMembersModalProps> = ({ turma, mem
           <div className="border-b-4 border-slate-900 pb-4 mb-8 flex justify-between items-end">
             <div>
               <h1 className="text-2xl font-black uppercase tracking-tighter">Lista de Chamada</h1>
-              <p className="text-sm font-bold text-slate-600">Turma: {turma.nome}</p>
+              <p className="text-sm font-bold text-slate-600 uppercase">PARÓQUIA: {config.parishName} - DIOCESE: {config.dioceseName}</p>
+              <p className="text-sm font-bold text-slate-600">TURMA: {turma.nome} - COMUNIDADE: {turma.comunidade || '---'}</p>
               <p className="text-xs text-slate-500">Catequista: {turma.catequista} | Horário: {turma.diaSemana}, {turma.horario}</p>
             </div>
             <div className="text-right">

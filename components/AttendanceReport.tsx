@@ -171,10 +171,10 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
             </div>
             <div className="flex text-xs font-bold uppercase">
               <div className="flex-1 p-2 border-r border-black">
-                TURMA: {turma.comunidade ? `${turma.comunidade} - ` : ''}{turma.nome}
+                PARÓQUIA: {config.parishName} - DIOCESE: {config.dioceseName}
               </div>
               <div className="flex-1 p-2">
-                RESUMO: {classStudents.length} CATEQUIZANDOS
+                TURMA: {turma.nome} - COMUNIDADE: {turma.comunidade || '---'}
               </div>
             </div>
           </div>
@@ -307,8 +307,8 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
             }
           `}</style>
           <div className="text-center border-b-2 border-slate-900 pb-6 mb-6">
-          <h1 className="text-2xl font-black uppercase tracking-widest">{config.parishName}</h1>
-          <h2 className="text-lg font-bold text-slate-600">Relatório Geral de Frequência - {selectedYear}</h2>
+          <h1 className="text-2xl font-black uppercase tracking-widest">PARÓQUIA: {config.parishName}</h1>
+          <h2 className="text-lg font-bold text-slate-600">DIOCESE: {config.dioceseName} - Relatório Geral de Frequência - {selectedYear}</h2>
           <p className="text-sm mt-2">Pastoral da Catequese</p>
         </div>
 

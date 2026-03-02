@@ -91,8 +91,8 @@ export const CertificateGenerator: React.FC<CertificateGeneratorProps> = ({ stud
                 </div>
 
                 <div className="text-center space-y-2">
-                  <h1 className="text-xl font-bold uppercase tracking-[0.3em] text-slate-800">{config.dioceseName}</h1>
-                  <h2 className="text-2xl font-black text-slate-900 uppercase font-serif">{config.parishName} - {config.city}-{config.state}</h2>
+                  <h1 className="text-xl font-bold uppercase tracking-[0.3em] text-slate-800">DIOCESE: {config.dioceseName}</h1>
+                  <h2 className="text-2xl font-black text-slate-900 uppercase font-serif">PARÓQUIA: {config.parishName} - {config.city}-{config.state}</h2>
                   <p className="text-xs font-bold text-slate-500 italic mt-2">"Recebei, por este sinal, o Espírito Santo, o Dom de Deus"</p>
                 </div>
 
