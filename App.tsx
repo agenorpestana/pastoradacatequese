@@ -913,8 +913,8 @@ const App: React.FC = () => {
       case 'dashboard':
         return <DashboardContent 
                   events={events} 
-                  students={students} 
-                  classes={classes} 
+                  students={visibleStudents} 
+                  classes={visibleClasses} 
                   catequistas={catequistas}
                   suggestedDate={selectedDate}
                   onDateChange={setSelectedDate}
@@ -1045,8 +1045,8 @@ const App: React.FC = () => {
       default:
         return <DashboardContent 
                   events={events} 
-                  students={students} 
-                  classes={classes} 
+                  students={visibleStudents} 
+                  classes={visibleClasses} 
                   catequistas={catequistas}
                   suggestedDate={selectedDate}
                   onDateChange={setSelectedDate}
