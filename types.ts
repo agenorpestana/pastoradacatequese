@@ -275,6 +275,7 @@ export interface Student {
 export interface NivelEtapa {
   id: string;
   nome: string;
+  categoria?: 'CRISMA' | 'EUCARISTIA' | 'PRÉ-EUCARISTIA' | 'OUTROS';
 }
 
 export type AppView = 'dashboard' | 'register' | 'list' | 'classes_list' | 'classes_create' | 'catequista_list' | 'catequista_create' | 'niveis_list' | 'formation_list' | 'formation_create' | 'reports' | 'attendance_report' | 'certificates' | 'attendance_quick' | 'profile' | 'users_list' | 'users_create' | 'gallery' | 'library' | 'config';

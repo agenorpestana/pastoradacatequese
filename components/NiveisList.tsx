@@ -13,6 +13,7 @@ export const NiveisList: React.FC<NiveisListProps> = ({ niveis, onUpdate }) => {
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [nome, setNome] = useState('');
+  const [categoria, setCategoria] = useState<NivelEtapa['categoria']>('OUTROS');
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -22,14 +23,15 @@ export const NiveisList: React.FC<NiveisListProps> = ({ niveis, onUpdate }) => {
     setIsLoading(true);
     try {
       if (editingId) {
-        await api.put('niveis_etapas', editingId, { nome });
+        await api.put('niveis_etapas', editingId, { nome, categoria });
       } else {
-        await api.post('niveis_etapas', { id: Math.random().toString(36).substr(2, 9), nome });
+        await api.post('niveis_etapas', { id: Math.random().toString(36).substr(2, 9), nome, categoria });
       }
       onUpdate();
       setIsAdding(false);
       setEditingId(null);
       setNome('');
+      setCategoria('OUTROS');
     } catch (e) {
       alert('Erro ao salvar nível/etapa.');
     } finally {
@@ -53,6 +55,7 @@ export const NiveisList: React.FC<NiveisListProps> = ({ niveis, onUpdate }) => {
   const startEdit = (nivel: NivelEtapa) => {
     setEditingId(nivel.id);
     setNome(nivel.nome);
+    setCategoria(nivel.categoria || 'OUTROS');
     setIsAdding(true);
   };
 
@@ -60,6 +63,7 @@ export const NiveisList: React.FC<NiveisListProps> = ({ niveis, onUpdate }) => {
     setIsAdding(false);
     setEditingId(null);
     setNome('');
+    setCategoria('OUTROS');
   };
 
   const totalPages = Math.ceil(niveis.length / itemsPerPage);
@@ -98,8 +102,8 @@ export const NiveisList: React.FC<NiveisListProps> = ({ niveis, onUpdate }) => {
       </div>
 
       {isAdding && (
-        <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex items-end gap-4 animate-in slide-in-from-top-4">
-          <div className="flex-1">
+        <div className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex flex-col md:flex-row items-end gap-4 animate-in slide-in-from-top-4">
+          <div className="flex-[2] w-full">
             <label className="label-style">Nome do Nível / Etapa</label>
             <input 
               type="text" 
@@ -109,6 +113,19 @@ export const NiveisList: React.FC<NiveisListProps> = ({ niveis, onUpdate }) => {
               placeholder="Ex: 1ª Eucaristia"
               autoFocus
             />
+          </div>
+          <div className="flex-1 w-full">
+            <label className="label-style">Categoria</label>
+            <select 
+              value={categoria} 
+              onChange={e => setCategoria(e.target.value as NivelEtapa['categoria'])} 
+              className="input-style"
+            >
+              <option value="CRISMA">CRISMA</option>
+              <option value="EUCARISTIA">EUCARISTIA</option>
+              <option value="PRÉ-EUCARISTIA">PRÉ-EUCARISTIA</option>
+              <option value="OUTROS">OUTROS</option>
+            </select>
           </div>
           <div className="flex gap-2">
             <button 
@@ -133,6 +150,7 @@ export const NiveisList: React.FC<NiveisListProps> = ({ niveis, onUpdate }) => {
           <thead>
             <tr className="bg-slate-50 border-b border-slate-100">
               <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Nome</th>
+              <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Categoria</th>
               <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Ações</th>
             </tr>
           </thead>
@@ -142,6 +160,16 @@ export const NiveisList: React.FC<NiveisListProps> = ({ niveis, onUpdate }) => {
                 <tr key={nivel.id} className="hover:bg-slate-50 transition-colors group">
                   <td className="px-8 py-5">
                     <p className="font-bold text-slate-800">{nivel.nome}</p>
+                  </td>
+                  <td className="px-8 py-5">
+                    <span className={`text-[10px] font-black px-2 py-1 rounded-lg ${
+                      nivel.categoria === 'CRISMA' ? 'bg-blue-100 text-blue-700' :
+                      nivel.categoria === 'EUCARISTIA' ? 'bg-emerald-100 text-emerald-700' :
+                      nivel.categoria === 'PRÉ-EUCARISTIA' ? 'bg-amber-100 text-amber-700' :
+                      'bg-slate-100 text-slate-700'
+                    }`}>
+                      {nivel.categoria || 'OUTROS'}
+                    </span>
                   </td>
                   <td className="px-8 py-5 text-right">
                     <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">

@@ -43,7 +43,7 @@ import {
 } from 'lucide-react';
 
 // DashboardContent Component
-const DashboardContent = ({ events, students, classes, catequistas, suggestedDate, onDateChange, onAddEvent, user, onTakeEventAttendance, onEditEvent, onDeleteEvent }: any) => {
+const DashboardContent = ({ events, students, classes, catequistas, suggestedDate, onDateChange, onAddEvent, user, onTakeEventAttendance, onEditEvent, onDeleteEvent, niveis }: any) => {
     const isRestrictedUser = user?.role === 'catequista' || user?.role === 'catequista_auxiliar';
 
     // Eventos do dia selecionado
@@ -89,10 +89,9 @@ const DashboardContent = ({ events, students, classes, catequistas, suggestedDat
     const activeSemEucaristiaCount = activeStudents.length - activeEucaristiaCount;
 
     // Logic for Crisma preparation stats
-    const crismaLevels = ['Crisma 1ª Etapa', 'Crisma 2ª Etapa', 'Catecumenato', 'Catequese de Adultos'];
-    const crismaClasses = classes.filter((c:any) => {
-        const nivel = (c.nivel || '').toString().toLowerCase().trim();
-        return crismaLevels.some(l => nivel.includes(l.toLowerCase().trim()));
+    const crismaClasses = classes.filter((c: any) => {
+        const nivelObj = niveis.find((n: any) => n.nome === c.nivel);
+        return nivelObj?.categoria === 'CRISMA';
     });
     const studentsInCrismaPrep = activeStudents.filter((s:any) => !!s.inicioPreparacao).length;
 
@@ -923,6 +922,7 @@ const App: React.FC = () => {
                   onTakeEventAttendance={setTakingEventAttendance}
                   onEditEvent={handleEditEvent}
                   onDeleteEvent={handleDeleteEvent}
+                  niveis={niveisEtapas}
                />;
       case 'register':
         return <RegistrationForm 
@@ -1055,6 +1055,7 @@ const App: React.FC = () => {
                   onTakeEventAttendance={setTakingEventAttendance}
                   onEditEvent={handleEditEvent}
                   onDeleteEvent={handleDeleteEvent}
+                  niveis={niveisEtapas}
                />;
     }
   };
