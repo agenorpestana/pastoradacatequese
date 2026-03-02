@@ -401,7 +401,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                   {config.logo ? <img src={config.logo} className="w-12 h-12 object-contain" /> : <Church className="w-8 h-8" />}
                   <div>
                     <h1 className="text-xl font-black uppercase tracking-tighter">Ficha de Inscrição Catequética</h1>
-                    <p className="text-[12px] font-bold">{config.dioceseName} - {config.city}-{config.state}</p>
+                    <p className="text-[12px] font-bold">{config.parishName} - {config.dioceseName} - {config.city}-{config.state}</p>
                   </div>
                 </div>
                 <div className="text-right">
