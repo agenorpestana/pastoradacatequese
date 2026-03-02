@@ -921,7 +921,37 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                     <h4 className="text-sm font-black text-slate-800 uppercase flex items-center gap-2">
                       <ClipboardList size={18} className="text-blue-600" /> PREPARAÇÃO
                     </h4>
-                    <div className="flex items-center gap-3 bg-indigo-50 px-4 py-2 rounded-xl border border-indigo-100">
+                  </div>
+                  
+                  <div className="space-y-6 animate-in slide-in-from-top-4 duration-300">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="label-style">Início da Preparação</label>
+                        <input type="date" value={formData.inicioPreparacao || ''} onChange={e => setFormData({...formData, inicioPreparacao: e.target.value})} className="input-style" />
+                      </div>
+                      <div>
+                        <label className="label-style">Fim da Preparação</label>
+                        <input type="date" value={formData.fimPreparacao || ''} onChange={e => setFormData({...formData, fimPreparacao: e.target.value})} className="input-style" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                      <div className="md:col-span-12">
+                        <label className="label-style">Comunidade</label>
+                        <input type="text" value={formData.comunidade || ''} onChange={e => setFormData({...formData, comunidade: e.target.value})} className="input-style" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="label-style">Catequistas</label>
+                      <input type="text" value={formData.catequistas || ''} onChange={e => setFormData({...formData, catequistas: e.target.value})} className="input-style" placeholder="Nomes dos catequistas responsáveis" />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-10">
+                  {renderPersonFields('padrinhoCrisma', 'Padrinho / Madrinha de Crisma', 'text-slate-700', 'bg-slate-50')}
+
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-3 bg-indigo-50 px-4 py-3 rounded-2xl border border-indigo-100 w-fit">
                       <input 
                         type="checkbox" 
                         checked={formData.temCrisma} 
@@ -931,89 +961,60 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                       />
                       <label htmlFor="checkCrisma" className="font-bold text-indigo-700 cursor-pointer text-xs uppercase tracking-widest">Já tem Crisma?</label>
                     </div>
+
+                    {formData.temCrisma && (
+                      <div className="bg-indigo-50/30 p-6 rounded-3xl border border-indigo-100 shadow-sm space-y-6 animate-in slide-in-from-top-4 duration-300">
+                        <h4 className="text-sm font-black text-indigo-800 uppercase flex items-center gap-2">
+                          <Award size={18} className="text-indigo-600" /> CELEBRAÇÃO DA CRISMA
+                        </h4>
+                        <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                          <div className="md:col-span-4">
+                            <label className="label-style text-indigo-700">Data da Celebração</label>
+                            <input type="date" value={formData.dataCelebracao || ''} onChange={e => setFormData({...formData, dataCelebracao: e.target.value})} className="input-style border-indigo-100 bg-white" />
+                          </div>
+                          <div className="md:col-span-8">
+                            <label className="label-style text-indigo-700">Celebrante (Bispo ou Delegado)</label>
+                            <input type="text" value={formData.celebrante || ''} onChange={e => setFormData({...formData, celebrante: e.target.value})} className="input-style border-indigo-100 bg-white" placeholder="Ex: Dom Jailton de Oliveira Lino" />
+                          </div>
+                          <div className="md:col-span-6">
+                            <label className="label-style text-indigo-700">Local / Cidade</label>
+                            <input type="text" value={formData.localCelebracao || ''} onChange={e => setFormData({...formData, localCelebracao: e.target.value})} className="input-style border-indigo-100 bg-white" placeholder="Ex: Catedral, Ginásio..." />
+                          </div>
+                          <div className="md:col-span-6">
+                            <label className="label-style text-indigo-700">Comunidade</label>
+                            <input type="text" value={formData.comunidadeCelebracao || ''} onChange={e => setFormData({...formData, comunidadeCelebracao: e.target.value})} className="input-style border-indigo-100 bg-white" placeholder="Ex: Matriz, São José..." />
+                          </div>
+
+                          <div className="md:col-span-5">
+                            <label className="label-style text-indigo-700">Paróquia</label>
+                            <input type="text" value={formData.paroquiaCelebracao || ''} onChange={e => setFormData({...formData, paroquiaCelebracao: e.target.value})} className="input-style border-indigo-100 bg-white" />
+                          </div>
+                          <div className="md:col-span-5">
+                            <label className="label-style text-indigo-700">Diocese</label>
+                            <input type="text" value={formData.dioceseCelebracao || ''} onChange={e => setFormData({...formData, dioceseCelebracao: e.target.value})} className="input-style border-indigo-100 bg-white" />
+                          </div>
+                          <div className="md:col-span-2">
+                            <label className="label-style text-indigo-700 text-center">UF</label>
+                            <input type="text" maxLength={2} value={formData.ufCelebracao || ''} onChange={e => setFormData({...formData, ufCelebracao: e.target.value.toUpperCase()})} className="input-style border-indigo-100 bg-white text-center" />
+                          </div>
+                          
+                          <div className="md:col-span-4">
+                            <label className="label-style text-indigo-700">Livro</label>
+                            <input type="text" value={formData.livro || ''} onChange={e => setFormData({...formData, livro: e.target.value})} className="input-style border-indigo-100 bg-white text-center font-bold" />
+                          </div>
+                          <div className="md:col-span-4">
+                            <label className="label-style text-indigo-700">Folha</label>
+                            <input type="text" value={formData.folha || ''} onChange={e => setFormData({...formData, folha: e.target.value})} className="input-style border-indigo-100 bg-white text-center font-bold" />
+                          </div>
+                          <div className="md:col-span-4">
+                            <label className="label-style text-indigo-700">Número / Termo</label>
+                            <input type="text" value={formData.numeroRegistro || ''} onChange={e => setFormData({...formData, numeroRegistro: e.target.value})} className="input-style border-indigo-100 bg-white text-center font-bold" />
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  
-                  {formData.temCrisma && (
-                    <div className="space-y-6 animate-in slide-in-from-top-4 duration-300">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="label-style">Início da Preparação</label>
-                          <input type="date" value={formData.inicioPreparacao || ''} onChange={e => setFormData({...formData, inicioPreparacao: e.target.value})} className="input-style" />
-                        </div>
-                        <div>
-                          <label className="label-style">Fim da Preparação</label>
-                          <input type="date" value={formData.fimPreparacao || ''} onChange={e => setFormData({...formData, fimPreparacao: e.target.value})} className="input-style" />
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-                        <div className="md:col-span-12">
-                          <label className="label-style">Comunidade</label>
-                          <input type="text" value={formData.comunidade || ''} onChange={e => setFormData({...formData, comunidade: e.target.value})} className="input-style" />
-                        </div>
-                      </div>
-                      <div>
-                        <label className="label-style">Catequistas</label>
-                        <input type="text" value={formData.catequistas || ''} onChange={e => setFormData({...formData, catequistas: e.target.value})} className="input-style" placeholder="Nomes dos catequistas responsáveis" />
-                      </div>
-                    </div>
-                  )}
                 </div>
-
-                {formData.temCrisma && (
-                  <div className="space-y-10 animate-in slide-in-from-top-4 duration-300">
-                    {renderPersonFields('padrinhoCrisma', 'Padrinho / Madrinha de Crisma', 'text-slate-700', 'bg-slate-50')}
-
-                    <div className="bg-indigo-50/30 p-6 rounded-3xl border border-indigo-100 shadow-sm space-y-6">
-                      <h4 className="text-sm font-black text-indigo-800 uppercase flex items-center gap-2">
-                        <Award size={18} className="text-indigo-600" /> CELEBRAÇÃO DA CRISMA
-                      </h4>
-                      <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-                        <div className="md:col-span-4">
-                          <label className="label-style text-indigo-700">Data da Celebração</label>
-                          <input type="date" value={formData.dataCelebracao || ''} onChange={e => setFormData({...formData, dataCelebracao: e.target.value})} className="input-style border-indigo-100 bg-white" />
-                        </div>
-                        <div className="md:col-span-8">
-                          <label className="label-style text-indigo-700">Celebrante (Bispo ou Delegado)</label>
-                          <input type="text" value={formData.celebrante || ''} onChange={e => setFormData({...formData, celebrante: e.target.value})} className="input-style border-indigo-100 bg-white" placeholder="Ex: Dom Jailton de Oliveira Lino" />
-                        </div>
-                        <div className="md:col-span-6">
-                          <label className="label-style text-indigo-700">Local / Cidade</label>
-                          <input type="text" value={formData.localCelebracao || ''} onChange={e => setFormData({...formData, localCelebracao: e.target.value})} className="input-style border-indigo-100 bg-white" placeholder="Ex: Catedral, Ginásio..." />
-                        </div>
-                        <div className="md:col-span-6">
-                          <label className="label-style text-indigo-700">Comunidade</label>
-                          <input type="text" value={formData.comunidadeCelebracao || ''} onChange={e => setFormData({...formData, comunidadeCelebracao: e.target.value})} className="input-style border-indigo-100 bg-white" placeholder="Ex: Matriz, São José..." />
-                        </div>
-
-                        <div className="md:col-span-5">
-                          <label className="label-style text-indigo-700">Paróquia</label>
-                          <input type="text" value={formData.paroquiaCelebracao || ''} onChange={e => setFormData({...formData, paroquiaCelebracao: e.target.value})} className="input-style border-indigo-100 bg-white" />
-                        </div>
-                        <div className="md:col-span-5">
-                          <label className="label-style text-indigo-700">Diocese</label>
-                          <input type="text" value={formData.dioceseCelebracao || ''} onChange={e => setFormData({...formData, dioceseCelebracao: e.target.value})} className="input-style border-indigo-100 bg-white" />
-                        </div>
-                        <div className="md:col-span-2">
-                          <label className="label-style text-indigo-700 text-center">UF</label>
-                          <input type="text" maxLength={2} value={formData.ufCelebracao || ''} onChange={e => setFormData({...formData, ufCelebracao: e.target.value.toUpperCase()})} className="input-style border-indigo-100 bg-white text-center" />
-                        </div>
-                        
-                        <div className="md:col-span-4">
-                          <label className="label-style text-indigo-700">Livro</label>
-                          <input type="text" value={formData.livro || ''} onChange={e => setFormData({...formData, livro: e.target.value})} className="input-style border-indigo-100 bg-white text-center font-bold" />
-                        </div>
-                        <div className="md:col-span-4">
-                          <label className="label-style text-indigo-700">Folha</label>
-                          <input type="text" value={formData.folha || ''} onChange={e => setFormData({...formData, folha: e.target.value})} className="input-style border-indigo-100 bg-white text-center font-bold" />
-                        </div>
-                        <div className="md:col-span-4">
-                          <label className="label-style text-indigo-700">Número / Termo</label>
-                          <input type="text" value={formData.numeroRegistro || ''} onChange={e => setFormData({...formData, numeroRegistro: e.target.value})} className="input-style border-indigo-100 bg-white text-center font-bold" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
              </div>
           )}
         </div>
