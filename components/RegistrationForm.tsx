@@ -518,9 +518,9 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
             <div>
               {/* TERMO DE COMPROMISSO (APENAS IMPRESSÃO) */}
               <section className="mt-6 pt-4 border-t border-slate-200">
-                 <h3 className="text-[11px] font-black uppercase mb-2 tracking-widest text-center">Termo de compromisso e Responsabilidade</h3>
+                 <h3 className="text-[11px] font-black uppercase mb-2 tracking-widest text-center">Termo de Responsabilidade</h3>
                  <p className="text-[10px] leading-relaxed text-justify italic text-slate-700">
-                   "Catequese é processo permanente de educação na fé". Ao se inscrever na catequese como Catequista/voluntario, você está se comprometendo a fazer parte deste processo, ou seja, ter um compromisso de participar das atividades da Pastoral e da Paróquia (Missa das crianças, Missas Festivas, Reuniões, Retiros, Encontros de Formação...). É responsabilidade sua a educação religiosa dos Catequizandos a você confiados, com a efetiva participação dos Pais pois, “os pais são os primeiros catequistas dos filhos”. Sem o seu compromisso e apoio, o trabalho catequético não será possível.
+                   "Catequese é processo permanente de educação na fé". Ao inscrever seu(sua) filho(a) na catequese, você está se comprometendo a fazer parte deste processo, ou seja, ter um compromisso de participar com seu(sua) filho(a) das atividades da Paróquia (Missa das crianças e reuniões). E responsabilidade sua a educação religiosa de seu (sua) filho(a) pois, não se deve esquecer que 'os pais são os primeiros catequistas dos filhos'. Sem o seu compromisso e apoio, o trabalho catequético será em vão."
                  </p>
                  <div className="mt-3 text-right">
                    <p className="text-[10px] font-bold">{config.city}-{config.state}, _____ /_____/_________</p>
