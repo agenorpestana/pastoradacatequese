@@ -420,15 +420,17 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                   )}
                   <h3 className="bg-slate-100 px-2 py-1 text-[10px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">1. Dados Pessoais</h3>
                   <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[11px] pr-28">
-                    <p className="col-span-2"><strong>Nome:</strong> {formData.nomeCompleto}</p>
-                    <p><strong>CPF:</strong> {formData.rgCpf || '___________'}</p>
-                    <p><strong>Nascimento:</strong> {formData.dataNascimento ? new Date(formData.dataNascimento + 'T00:00:00').toLocaleDateString('pt-BR') : '___/___/___'}</p>
-                    <p><strong>Estado Civil:</strong> {formData.estadoCivil || 'Solteiro(a)'}</p>
-                    <p><strong>Status:</strong> {formData.status || 'Ativo'}</p>
-                    <p><strong>Naturalidade:</strong> {formData.naturalidade} - {formData.ufNaturalidade}</p>
-                    <p><strong>Telefone/Zap:</strong> {formData.telefone} {formData.whatsapp && `/ ${formData.whatsapp}`}</p>
-                    <p><strong>E-mail:</strong> {formData.email}</p>
-                    <p className="col-span-2"><strong>Endereço:</strong> {formData.endereco}, {formData.numero} - {formData.bairro}, {formData.cidade}/{formData.ufEndereco}</p>
+                    <p className="col-span-2"><strong>Nome:</strong> {formData.nomeCompleto || '---'}</p>
+                    <p><strong>CPF:</strong> {formData.rgCpf || '---'}</p>
+                    <p><strong>Nascimento:</strong> {formData.dataNascimento ? new Date(formData.dataNascimento + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</p>
+                    <p><strong>Estado Civil:</strong> {formData.estadoCivil || '---'}</p>
+                    <p><strong>Status:</strong> {formData.status || '---'}</p>
+                    <p><strong>Naturalidade:</strong> {formData.naturalidade || '---'} - {formData.ufNaturalidade || '---'}</p>
+                    <p><strong>Telefone/Zap:</strong> {formData.telefone || '---'} {formData.whatsapp && `/ ${formData.whatsapp}`}</p>
+                    <p><strong>E-mail:</strong> {formData.email || '---'}</p>
+                    <p><strong>Novo Catequizando?</strong> {formData.novoCatequizando ? 'Sim' : 'Não'}</p>
+                    <p><strong>Moro com:</strong> {formData.moroCom || '---'}</p>
+                    <p className="col-span-2"><strong>Endereço:</strong> {formData.endereco || '---'}, {formData.numero || '---'} - {formData.bairro || '---'}, {formData.cidade || '---'}/{formData.ufEndereco || '---'}</p>
                   </div>
                 </section>
 
@@ -437,13 +439,13 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                   <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[11px]">
                     <div className="border-r border-slate-200 pr-2">
                       <p className="font-bold underline uppercase text-[8px]">Mãe</p>
-                      <p><strong>Nome:</strong> {formData.mae?.nome}</p>
-                      <p><strong>Telefone/Zap:</strong> {formData.mae?.telefone} {formData.mae?.whatsapp && `/ ${formData.mae?.whatsapp}`}</p>
+                      <p><strong>Nome:</strong> {formData.mae?.nome || '---'}</p>
+                      <p><strong>Telefone/Zap:</strong> {formData.mae?.telefone || '---'} {formData.mae?.whatsapp && `/ ${formData.mae?.whatsapp}`}</p>
                     </div>
                     <div>
                       <p className="font-bold underline uppercase text-[8px]">Pai</p>
-                      <p><strong>Nome:</strong> {formData.pai?.nome}</p>
-                      <p><strong>Telefone/Zap:</strong> {formData.pai?.telefone} {formData.pai?.whatsapp && `/ ${formData.pai?.whatsapp}`}</p>
+                      <p><strong>Nome:</strong> {formData.pai?.nome || '---'}</p>
+                      <p><strong>Telefone/Zap:</strong> {formData.pai?.telefone || '---'} {formData.pai?.whatsapp && `/ ${formData.pai?.whatsapp}`}</p>
                     </div>
                   </div>
                 </section>

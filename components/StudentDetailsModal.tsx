@@ -110,15 +110,17 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
                   )}
                   <h3 className="bg-slate-100 px-2 py-0.5 text-[8px] font-black uppercase border-l-4 border-slate-900 mb-1.5 tracking-widest">1. Dados Pessoais</h3>
                   <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[9px] pr-24">
-                    <p className="col-span-2"><strong>Nome:</strong> {student.nomeCompleto}</p>
-                    <p><strong>RG/CPF:</strong> {student.rgCpf || '___________'}</p>
-                    <p><strong>Nascimento:</strong> {student.dataNascimento ? new Date(student.dataNascimento + 'T00:00:00').toLocaleDateString('pt-BR') : '___/___/___'}</p>
-                    <p><strong>Estado Civil:</strong> {student.estadoCivil || 'Solteiro(a)'}</p>
-                    <p><strong>Status:</strong> {student.status || 'Ativo'}</p>
-                    <p><strong>Naturalidade:</strong> {student.naturalidade} - {student.ufNaturalidade}</p>
-                    <p><strong>Telefone/Zap:</strong> {student.telefone} {student.whatsapp && `/ ${student.whatsapp}`}</p>
-                    <p><strong>E-mail:</strong> {student.email}</p>
-                    <p className="col-span-2"><strong>Endereço:</strong> {student.endereco}, {student.numero} - {student.bairro}, {student.cidade}/{student.ufEndereco}</p>
+                    <p className="col-span-2"><strong>Nome:</strong> {student.nomeCompleto || '---'}</p>
+                    <p><strong>RG/CPF:</strong> {student.rgCpf || '---'}</p>
+                    <p><strong>Nascimento:</strong> {student.dataNascimento ? new Date(student.dataNascimento + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</p>
+                    <p><strong>Estado Civil:</strong> {student.estadoCivil || '---'}</p>
+                    <p><strong>Status:</strong> {student.status || '---'}</p>
+                    <p><strong>Naturalidade:</strong> {student.naturalidade || '---'} - {student.ufNaturalidade || '---'}</p>
+                    <p><strong>Telefone/Zap:</strong> {student.telefone || '---'} {student.whatsapp && `/ ${student.whatsapp}`}</p>
+                    <p><strong>E-mail:</strong> {student.email || '---'}</p>
+                    <p><strong>Novo Catequizando?</strong> {student.novoCatequizando ? 'Sim' : 'Não'}</p>
+                    <p><strong>Moro com:</strong> {student.moroCom || '---'}</p>
+                    <p className="col-span-2"><strong>Endereço:</strong> {student.endereco || '---'}, {student.numero || '---'} - {student.bairro || '---'}, {student.cidade || '---'}/{student.ufEndereco || '---'}</p>
                   </div>
                 </section>
 
@@ -127,13 +129,13 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
                   <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[9px]">
                     <div className="border-r border-slate-200 pr-2">
                       <p className="font-bold underline uppercase text-[7px]">Mãe</p>
-                      <p><strong>Nome:</strong> {student.mae?.nome}</p>
-                      <p><strong>Telefone/Zap:</strong> {student.mae?.telefone} {student.mae?.whatsapp && `/ ${student.mae?.whatsapp}`}</p>
+                      <p><strong>Nome:</strong> {student.mae?.nome || '---'}</p>
+                      <p><strong>Telefone/Zap:</strong> {student.mae?.telefone || '---'} {student.mae?.whatsapp && `/ ${student.mae?.whatsapp}`}</p>
                     </div>
                     <div>
                       <p className="font-bold underline uppercase text-[7px]">Pai</p>
-                      <p><strong>Nome:</strong> {student.pai?.nome}</p>
-                      <p><strong>Telefone/Zap:</strong> {student.pai?.telefone} {student.pai?.whatsapp && `/ ${student.pai?.whatsapp}`}</p>
+                      <p><strong>Nome:</strong> {student.pai?.nome || '---'}</p>
+                      <p><strong>Telefone/Zap:</strong> {student.pai?.telefone || '---'} {student.pai?.whatsapp && `/ ${student.pai?.whatsapp}`}</p>
                     </div>
                   </div>
                 </section>

@@ -53,7 +53,7 @@ export const ClassTable: React.FC<ClassTableProps> = ({
             <BookOpen className="w-8 h-8 text-white relative z-10" />
           </div>
           <div>
-            <h2 className="text-2xl font-black text-slate-800 tracking-tight">Turmas Catequéticas</h2>
+            <h2 className="text-2xl font-black text-slate-800 tracking-tight">Turmas de Catequese</h2>
             <p className="text-slate-500 text-sm flex items-center gap-1.5">
               <Sparkles size={12} className="text-indigo-500" /> Organização por níveis e etapas de formação.
             </p>
