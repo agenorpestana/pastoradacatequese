@@ -143,7 +143,11 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
                   )}
                   <div>
                     <h1 className="text-xl font-black uppercase tracking-tighter">Ficha de Inscrição de Catequista</h1>
-                    <p className="text-[12px] font-bold">{config.parishName} - {config.dioceseName} - {config.city}-{config.state}</p>
+                    <div className="text-[12px] font-bold uppercase mt-1">
+                      <p>PARÓQUIA: {config.parishName}</p>
+                      <p>DIOCESE: {config.dioceseName}</p>
+                      <p>CIDADE: {config.city}-{config.state}</p>
+                    </div>
                   </div>
                 </div>
                 <div className="text-right">
@@ -202,6 +206,17 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
 
             {/* Footer */}
             <div>
+              {/* TERMO DE COMPROMISSO (APENAS IMPRESSÃO) */}
+              <section className="mt-6 pt-4 border-t border-slate-200">
+                 <h3 className="text-[11px] font-black uppercase mb-2 tracking-widest text-center">Termo de compromisso e Responsabilidade</h3>
+                 <p className="text-[10px] leading-relaxed text-justify italic text-slate-700">
+                   "Catequese é processo permanente de educação na fé". Ao se inscrever na catequese como Catequista/voluntario, você está se comprometendo a fazer parte deste processo, ou seja, ter um compromisso de participar das atividades da Pastoral e da Paróquia (Missa das crianças, Missas Festivas, Reuniões, Retiros, Encontros de Formação...). É responsabilidade sua a educação religiosa dos Catequizandos a você confiados, com a efetiva participação dos Pais, pois, “os pais são os primeiros catequistas dos filhos”. Sem o seu compromisso e apoio, o trabalho catequético não será possível.
+                 </p>
+                 <div className="mt-3 text-right">
+                   <p className="text-[10px] font-bold">{config.city}-{config.state}, _____ /_____/_________</p>
+                 </div>
+              </section>
+
               <div className="mt-20 grid grid-cols-2 gap-12 pb-4">
                 <div className="text-center">
                   <div className="border-t border-slate-900 pt-1 text-[10px] font-bold uppercase">Assinatura do Catequista</div>

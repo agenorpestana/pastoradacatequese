@@ -36,12 +36,12 @@ export const ClassMembersModal: React.FC<ClassMembersModalProps> = ({ turma, mem
         <div className="print-only p-10 w-full bg-white text-slate-900 font-sans absolute inset-0 z-[9999] hidden">
           <style>{`
             @media print {
-              @page { margin: 0; size: auto; }
+              @page { size: landscape; margin: 10mm; }
               body { -webkit-print-color-adjust: exact; margin: 0; }
               body > *:not(.print-only) { display: none !important; }
               .print-only { 
                 display: block !important; 
-                padding: 15mm; 
+                padding: 10mm; 
                 height: 100vh; 
                 position: absolute !important;
                 top: 0;
@@ -54,7 +54,7 @@ export const ClassMembersModal: React.FC<ClassMembersModalProps> = ({ turma, mem
           `}</style>
           <div className="border border-black mb-4">
             <div className="bg-slate-100 border-b border-black p-2 text-center font-black uppercase text-sm">
-               DIÁRIO DE CLASSE - LISTA DE CHAMADA
+               DIÁRIO CONSOLIDADO DE FREQUÊNCIA
             </div>
             <div className="flex text-xs font-bold uppercase">
               <div className="flex-1 p-2 border-r border-black">
