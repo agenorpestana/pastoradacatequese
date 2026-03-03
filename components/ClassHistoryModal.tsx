@@ -79,21 +79,32 @@ export const ClassHistoryModal: React.FC<ClassHistoryModalProps> = ({ turma, ses
           return (
             <>
               {/* Header */}
-              <div className="mb-6 border-b-4 border-slate-900 pb-2">
-                <div className="flex justify-between items-end mb-2">
-                  <div>
-                    <h1 className="text-3xl font-black uppercase tracking-tighter text-slate-900">LISTA DE CHAMADA</h1>
-                    <p className="text-sm font-bold text-slate-600 uppercase mt-1">
-                      Turma: {turma.comunidade ? `${turma.comunidade} - ` : ''}{turma.nome}
-                    </p>
-                    <p className="text-xs text-slate-500 uppercase mt-0.5">
-                      Catequista: {turma.catequista} | Horário: {turma.horario}
-                    </p>
+              <div className="border border-black mb-4">
+                <div className="bg-slate-100 border-b border-black p-2 text-center font-black uppercase text-sm">
+                   DIÁRIO CONSOLIDADO DE FREQUÊNCIA
+                </div>
+                <div className="flex text-xs font-bold uppercase">
+                  <div className="flex-1 p-2 border-r border-black">
+                    PARÓQUIA: {config.parishName} - DIOCESE: {config.dioceseName}
                   </div>
-                  <div className="text-right">
-                    <p className="text-xl font-black uppercase tracking-tight">ANO: {turma.ano}</p>
-                    <p className="text-[10px] text-slate-400 mt-1 uppercase">Gerado em: {new Date().toLocaleDateString('pt-BR')}</p>
+                  <div className="flex-1 p-2">
+                    {(() => {
+                      const [comunidadePart, ...nomeParts] = turma.nome.split(' - ');
+                      const nomePart = nomeParts.join(' - ') || turma.nome;
+                      const finalComunidade = turma.comunidade || (nomeParts.length > 0 ? comunidadePart : '---');
+                      const finalNome = nomeParts.length > 0 ? nomePart : turma.nome;
+                      return (
+                        <span>TURMA: {finalNome} - COMUNIDADE: {finalComunidade}</span>
+                      );
+                    })()}
                   </div>
+                </div>
+              </div>
+              <div className="flex justify-between items-center mb-4 text-[10px] font-bold uppercase">
+                <p>Catequista: {turma.catequista} | Horário: {turma.diaSemana}, {turma.horario}</p>
+                <div className="text-right">
+                  <p>ANO: {turma.ano}</p>
+                  <p className="text-slate-400 text-[8px]">Gerado em: {new Date().toLocaleDateString('pt-BR')}</p>
                 </div>
               </div>
 
