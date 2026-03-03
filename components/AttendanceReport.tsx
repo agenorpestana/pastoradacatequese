@@ -174,15 +174,7 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
                 PARÓQUIA: {config.parishName} - DIOCESE: {config.dioceseName}
               </div>
               <div className="flex-1 p-2">
-                {(() => {
-                  const [comunidadePart, ...nomeParts] = turma.nome.split(' - ');
-                  const nomePart = nomeParts.join(' - ') || turma.nome;
-                  const finalComunidade = turma.comunidade || (nomeParts.length > 0 ? comunidadePart : '---');
-                  const finalNome = nomeParts.length > 0 ? nomePart : turma.nome;
-                  return (
-                    <span>TURMA: {finalNome} - COMUNIDADE: {finalComunidade}</span>
-                  );
-                })()}
+                <span>TURMA: {turma.nome} - COMUNIDADE: {turma.comunidade || '---'}</span>
               </div>
             </div>
           </div>
