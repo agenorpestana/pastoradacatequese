@@ -455,6 +455,7 @@ const DashboardContent = ({ events, students, classes, catequistas, suggestedDat
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
+  const [isInitialDataLoading, setIsInitialDataLoading] = useState(true);
   const [view, setView] = useState<AppView>('dashboard');
   
   // Data States
@@ -555,8 +556,10 @@ const App: React.FC = () => {
       setLibraryFiles(lib);
       setNiveisEtapas(n);
       if (conf && conf.pastoralName) setParishConfig(conf);
+      setIsInitialDataLoading(false);
     } catch (err) {
       console.error("Error fetching data:", err);
+      setIsInitialDataLoading(false);
     }
   }, [user]);
 
@@ -885,6 +888,17 @@ const App: React.FC = () => {
   }
 
   const renderContent = () => {
+    if (isInitialDataLoading && view === 'dashboard') {
+      return (
+        <div className="flex-1 flex items-center justify-center bg-slate-50 min-h-[60vh]">
+          <div className="flex flex-col items-center gap-4">
+            <div className="animate-spin text-indigo-600"><Loader2 className="w-12 h-12" /></div>
+            <p className="text-slate-400 font-black uppercase tracking-widest text-xs animate-pulse">Carregando Dashboard, aguarde...</p>
+          </div>
+        </div>
+      );
+    }
+
     // Filter classes and students based on user role and linked catequista
     let visibleClasses = classes;
     let visibleStudents = students;
