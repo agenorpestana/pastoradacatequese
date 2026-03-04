@@ -13,14 +13,17 @@ interface ClassFormProps {
 }
 
 export const ClassForm: React.FC<ClassFormProps> = ({ onSave, onCancel, initialData, allStudents, catequistas, niveis }) => {
-  const [formData, setFormData] = useState<Partial<Turma>>(initialData || {
-    nome: '',
-    nivel: niveis.length > 0 ? niveis[0].nome : TurmaLevel.SEMENTINHA,
-    catequista: '',
+  const [formData, setFormData] = useState<Partial<Turma>>({
     diaSemana: 'Sábado',
-    horario: '',
-    ano: new Date().getFullYear().toString(),
-    ativa: true
+    ...(initialData || {
+      nome: '',
+      nivel: niveis.length > 0 ? niveis[0].nome : TurmaLevel.SEMENTINHA,
+      catequista: '',
+      diaSemana: 'Sábado',
+      horario: '',
+      ano: new Date().getFullYear().toString(),
+      ativa: true
+    })
   });
 
   const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
@@ -31,15 +34,31 @@ export const ClassForm: React.FC<ClassFormProps> = ({ onSave, onCancel, initialD
   const [isCatequistaOpen, setIsCatequistaOpen] = useState(false);
   const activeCatequistas = catequistas.filter(c => c.status === 'Ativo');
 
-  // Inicializar alunos selecionados se estiver editando
+  // Sincronizar formData quando initialData mudar
   useEffect(() => {
     if (initialData) {
+      setFormData({
+        diaSemana: 'Sábado',
+        ...initialData
+      });
+      
       const inThisClass = allStudents
         .filter(s => s.turma === initialData.nome)
         .map(s => s.id);
       setSelectedStudentIds(inThisClass);
+    } else {
+      setFormData({
+        nome: '',
+        nivel: niveis.length > 0 ? niveis[0].nome : TurmaLevel.SEMENTINHA,
+        catequista: '',
+        diaSemana: 'Sábado',
+        horario: '',
+        ano: new Date().getFullYear().toString(),
+        ativa: true
+      });
+      setSelectedStudentIds([]);
     }
-  }, [initialData, allStudents]);
+  }, [initialData, allStudents, niveis]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
