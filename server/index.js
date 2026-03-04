@@ -146,6 +146,10 @@ const parseRow = (row) => {
       newRow.turmaId = newRow.turma_id;
       delete newRow.turma_id;
   }
+  if (newRow.dia_semana !== undefined) {
+      newRow.diaSemana = newRow.dia_semana;
+      delete newRow.dia_semana;
+  }
 
   if (newRow.config_json) return newRow.config_json;
 
