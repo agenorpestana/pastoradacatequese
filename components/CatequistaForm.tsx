@@ -178,15 +178,16 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
                     <p><strong>Telefone/Zap:</strong> {formData.telefone || '---'} {formData.whatsapp && `/ ${formData.whatsapp}`}</p>
                     <p><strong>E-mail:</strong> {formData.email || '---'}</p>
                     <p className="col-span-2"><strong>Endereço:</strong> {formData.endereco || '---'}, {formData.numero || '---'} - {formData.bairro || '---'}, {formData.cidade || '---'}/{formData.ufEndereco || '---'}</p>
-                    <p className="col-span-2"><strong>TURMA:</strong> {formData.atuacao || '---'} - <strong>COMUNIDADE:</strong> {formData.comunidade || '---'}</p>
+                    <p className="col-span-2"><strong>TURMA ATUAL:</strong> {formData.atuacao || '---'} - <strong>COMUNIDADE:</strong> {formData.comunidade || '---'}</p>
                     <p className="col-span-2"><strong>Início na Catequese:</strong> {formData.desde ? new Date(formData.desde + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</p>
-                    <p className="col-span-2"><strong>Já tem Crisma?</strong> {formData.temCrisma ? `Sim (${formData.crismaData ? new Date(formData.crismaData + 'T00:00:00').toLocaleDateString('pt-BR') : ''} - ${formData.crismaParoquia || ''})` : 'Não'}</p>
+                    <p className="col-span-2"><strong>Já é Crismado?</strong> {formData.temCrisma ? `Sim (${formData.crismaData ? new Date(formData.crismaData + 'T00:00:00').toLocaleDateString('pt-BR') : ''} - ${formData.crismaParoquia || ''})` : 'Não'}</p>
                   </div>
                 </section>
 
                 <section>
                   <h3 className="bg-slate-100 px-2 py-1 text-[10px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">2. Preferências de Atuação</h3>
                   <div className="grid grid-cols-1 gap-y-1.5 text-[11px]">
+                    <p><strong>Qual Turma/Etapa você atua?</strong> {formData.atuacao || '---'}</p>
                     <p><strong>Qual Turma/Etapa você gosta de atuar?</strong> {formData.atuacaoDesejada || '---'}</p>
                   </div>
                 </section>
@@ -450,7 +451,7 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
                       className="w-5 h-5 rounded cursor-pointer accent-indigo-600" 
                       id="chkCrisma" 
                     />
-                    <label htmlFor="chkCrisma" className="font-bold text-slate-700 cursor-pointer">Já tem Crisma?</label>
+                    <label htmlFor="chkCrisma" className="font-bold text-slate-700 cursor-pointer">Já é Crismado?</label>
                   </div>
                   {formData.temCrisma && (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-in slide-in-from-top-2">

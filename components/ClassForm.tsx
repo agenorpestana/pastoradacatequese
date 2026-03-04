@@ -221,13 +221,13 @@ export const ClassForm: React.FC<ClassFormProps> = ({ onSave, onCancel, initialD
                 onChange={e => setFormData({...formData, diaSemana: e.target.value})} 
                 className="input-style"
               >
-                <option>Segunda-feira</option>
-                <option>Terça-feira</option>
-                <option>Quarta-feira</option>
-                <option>Quinta-feira</option>
-                <option>Sexta-feira</option>
-                <option>Sábado</option>
-                <option>Domingo</option>
+                <option value="Segunda-feira">Segunda-feira</option>
+                <option value="Terça-feira">Terça-feira</option>
+                <option value="Quarta-feira">Quarta-feira</option>
+                <option value="Quinta-feira">Quinta-feira</option>
+                <option value="Sexta-feira">Sexta-feira</option>
+                <option value="Sábado">Sábado</option>
+                <option value="Domingo">Domingo</option>
               </select>
             </div>
 
