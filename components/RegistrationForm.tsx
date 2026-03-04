@@ -101,6 +101,18 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
 
   const [formData, setFormData] = useState<Partial<Student>>(defaultData);
 
+  const formatDate = (dateStr: string | undefined) => {
+    if (!dateStr) return '---';
+    try {
+      // Se a data já tem T, usa como está, senão adiciona T00:00:00 para evitar problemas de fuso horário
+      const dateObj = new Date(dateStr.includes('T') ? dateStr : `${dateStr}T00:00:00`);
+      if (isNaN(dateObj.getTime())) return '---';
+      return dateObj.toLocaleDateString('pt-BR');
+    } catch (e) {
+      return '---';
+    }
+  };
+
   const currentClass = allClasses?.find(c => c.nome === formData.turma);
   const displayCatequistas = currentClass?.catequista || formData.catequistas || '_______________________';
 
@@ -411,7 +423,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                 <div className="text-right">
                   <p className="text-[10px] font-bold uppercase">Matrícula</p>
                   <p className="text-lg font-black">{formData.matricula || '________'}</p>
-                  <p className="text-[9px] uppercase font-bold text-slate-400 mt-0.5">Data: {new Date(formData.dataCadastro || '').toLocaleDateString('pt-BR')}</p>
+                  <p className="text-[9px] uppercase font-bold text-slate-400 mt-0.5">Data: {formatDate(formData.dataCadastro)}</p>
                 </div>
               </div>
 
@@ -426,7 +438,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                   <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[11px] pr-28">
                     <p className="col-span-2"><strong>Nome:</strong> {formData.nomeCompleto || '---'}</p>
                     <p><strong>CPF:</strong> {formData.rgCpf || '---'}</p>
-                    <p><strong>Nascimento:</strong> {formData.dataNascimento ? new Date(formData.dataNascimento + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</p>
+                    <p><strong>Nascimento:</strong> {formatDate(formData.dataNascimento)}</p>
                     <p><strong>Estado Civil:</strong> {formData.estadoCivil || '---'}</p>
                     <p><strong>Status:</strong> {formData.status || '---'}</p>
                     <p><strong>Naturalidade:</strong> {formData.naturalidade || '---'} - {formData.ufNaturalidade || '---'}</p>
@@ -445,11 +457,15 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                       <p className="font-bold underline uppercase text-[8px]">Mãe</p>
                       <p><strong>Nome:</strong> {formData.mae?.nome || '---'}</p>
                       <p><strong>Telefone/Zap:</strong> {formData.mae?.telefone || '---'} {formData.mae?.whatsapp && `/ ${formData.mae?.whatsapp}`}</p>
+                      <p><strong>Endereço:</strong> {formData.mae?.endereco || '---'}{formData.mae?.numero ? `, ${formData.mae.numero}` : ''} {formData.mae?.bairro ? `- ${formData.mae.bairro}` : ''}</p>
+                      <p><strong>Cidade:</strong> {formData.mae?.cidade || '---'}/{formData.mae?.ufEndereco || '---'}</p>
                     </div>
                     <div>
                       <p className="font-bold underline uppercase text-[8px]">Pai</p>
                       <p><strong>Nome:</strong> {formData.pai?.nome || '---'}</p>
                       <p><strong>Telefone/Zap:</strong> {formData.pai?.telefone || '---'} {formData.pai?.whatsapp && `/ ${formData.pai?.whatsapp}`}</p>
+                      <p><strong>Endereço:</strong> {formData.pai?.endereco || '---'}{formData.pai?.numero ? `, ${formData.pai.numero}` : ''} {formData.pai?.bairro ? `- ${formData.pai.bairro}` : ''}</p>
+                      <p><strong>Cidade:</strong> {formData.pai?.cidade || '---'}/{formData.pai?.ufEndereco || '---'}</p>
                     </div>
                   </div>
                 </section>
@@ -461,15 +477,18 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                       <p><strong>Batizado(a):</strong> {formData.batizado ? 'Sim' : 'Não'} {formData.batizado && ` - Paróquia: ${formData.batismoParoquia} / ${formData.batismoUF}`}</p>
                       {formData.batizado && (
                         <>
+                          <p className="pl-2"><strong>Data:</strong> {formatDate(formData.batismoData)} | <strong>Diocese:</strong> {formData.batismoDiocese || '---'}</p>
                           <p className="pl-2"><strong>Comunidade:</strong> {formData.batismoComunidade || '---'} | <strong>Local/Cidade:</strong> {formData.batismoLocal || '---'} | <strong>Celebrante:</strong> {formData.batismoCelebrante || '---'}</p>
                           <div className="grid grid-cols-2 gap-x-4 pl-2 mt-1">
                              <div>
                                 <p className="font-bold underline uppercase text-[8px]">Madrinha de Batismo</p>
                                 <p><strong>Nome:</strong> {formData.madrinhaBatismo?.nome || '---'}</p>
+                                <p><strong>Endereço:</strong> {formData.madrinhaBatismo?.endereco || '---'}</p>
                              </div>
                              <div>
                                 <p className="font-bold underline uppercase text-[8px]">Padrinho de Batismo</p>
                                 <p><strong>Nome:</strong> {formData.padrinhoBatismo?.nome || '---'}</p>
+                                <p><strong>Endereço:</strong> {formData.padrinhoBatismo?.endereco || '---'}</p>
                              </div>
                           </div>
                         </>
@@ -487,24 +506,26 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                 <section>
                   <h3 className="bg-slate-100 px-2 py-1 text-[10px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">4. Crisma / Preparação</h3>
                   <div className="grid grid-cols-2 gap-x-4 text-[11px]">
-                    <p><strong>Turma:</strong> {formData.turma || '___'}</p>
+                    <p><strong>Turma:</strong> {formData.turma || '---'}</p>
                     <p><strong>Catequista:</strong> {displayCatequistas}</p>
-                    <p><strong>Início Prep.:</strong> {formData.inicioPreparacao ? new Date(formData.inicioPreparacao).toLocaleDateString('pt-BR') : '___/___/___'}</p>
-                    <p><strong>Fim Prep.:</strong> {formData.fimPreparacao ? new Date(formData.fimPreparacao).toLocaleDateString('pt-BR') : '___/___/___'}</p>
+                    <p><strong>Início Prep.:</strong> {formatDate(formData.inicioPreparacao)}</p>
+                    <p><strong>Fim Prep.:</strong> {formatDate(formData.fimPreparacao)}</p>
                     
                     <div className="col-span-2 mt-2 border-t border-slate-100 pt-2">
                        <p className="font-bold underline uppercase text-[8px]">Padrinho/Madrinha de Crisma</p>
-                       <p><strong>Nome:</strong> {formData.padrinhoCrisma?.nome || '____________________'}</p>
-                       <p><strong>Telefone:</strong> {formData.padrinhoCrisma?.telefone || '____________________'}</p>
+                       <p><strong>Nome:</strong> {formData.padrinhoCrisma?.nome || '---'}</p>
+                       <p><strong>Telefone:</strong> {formData.padrinhoCrisma?.telefone || '---'}</p>
+                       <p><strong>Endereço:</strong> {formData.padrinhoCrisma?.endereco || '---'}</p>
                     </div>
 
                     {(formData.temCrisma || formData.dataCelebracao || formData.localCelebracao || formData.celebrante) && (
                       <div className="col-span-2 mt-2 border-t border-slate-100 pt-2">
                         <p className="font-bold underline uppercase text-[8px] mb-1">Dados da Celebração</p>
                         <div className="grid grid-cols-2 gap-x-4">
-                          <p><strong>Data:</strong> {formData.dataCelebracao ? new Date(formData.dataCelebracao).toLocaleDateString('pt-BR') : '---'}</p>
+                          <p><strong>Data:</strong> {formatDate(formData.dataCelebracao)}</p>
                           <p><strong>Local:</strong> {formData.localCelebracao || '---'}</p>
                           <p className="col-span-2"><strong>Celebrante:</strong> {formData.celebrante || '---'}</p>
+                          <p className="col-span-2"><strong>Diocese:</strong> {formData.dioceseCelebracao || '---'} | <strong>UF:</strong> {formData.ufCelebracao || '---'}</p>
                           <p><strong>Livro:</strong> {formData.livro || '--'} | <strong>Folha:</strong> {formData.folha || '--'} | <strong>Registro:</strong> {formData.numeroRegistro || '--'}</p>
                         </div>
                       </div>

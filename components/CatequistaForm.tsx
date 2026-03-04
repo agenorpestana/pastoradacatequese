@@ -144,9 +144,9 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
                   <div>
                     <h1 className="text-xl font-black uppercase tracking-tighter">Ficha de Inscrição de Catequista</h1>
                     <div className="text-[12px] font-bold uppercase mt-1">
-                      <p>PARÓQUIA: {config.parishName}</p>
-                      <p>DIOCESE: {config.dioceseName}</p>
-                      <p>CIDADE: {config.city}-{config.state}</p>
+                      <p>{config.parishName}</p>
+                      <p>{config.dioceseName}</p>
+                      <p>{config.city}-{config.state}</p>
                     </div>
                   </div>
                 </div>

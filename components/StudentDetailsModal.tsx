@@ -46,6 +46,18 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
   const presenceRate = totalSessions > 0 ? ((presentSessions / totalSessions) * 100).toFixed(0) : '0';
   const absenceRate = totalSessions > 0 ? ((absentSessions / totalSessions) * 100).toFixed(0) : '0';
 
+  const formatDate = (dateStr: string | undefined) => {
+    if (!dateStr) return '---';
+    try {
+      // Se a data já tem T, usa como está, senão adiciona T00:00:00 para evitar problemas de fuso horário
+      const dateObj = new Date(dateStr.includes('T') ? dateStr : `${dateStr}T00:00:00`);
+      if (isNaN(dateObj.getTime())) return '---';
+      return dateObj.toLocaleDateString('pt-BR');
+    } catch (e) {
+      return '---';
+    }
+  };
+
   useEffect(() => {
     const fetchGoal = async () => {
       setGoal(null);
@@ -101,7 +113,7 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
                 <div className="text-right">
                   <p className="text-[9px] font-bold uppercase">Matrícula</p>
                   <p className="text-sm font-black">{student.matricula || '________'}</p>
-                  <p className="text-[8px] uppercase font-bold text-slate-400 mt-0.5">Data: {new Date(student.dataCadastro || '').toLocaleDateString('pt-BR')}</p>
+                  <p className="text-[8px] uppercase font-bold text-slate-400 mt-0.5">Data: {formatDate(student.dataCadastro)}</p>
                 </div>
               </div>
 
@@ -116,7 +128,7 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
                   <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[9px] pr-24">
                     <p className="col-span-2"><strong>Nome:</strong> {student.nomeCompleto || '---'}</p>
                     <p><strong>RG/CPF:</strong> {student.rgCpf || '---'}</p>
-                    <p><strong>Nascimento:</strong> {student.dataNascimento ? new Date(student.dataNascimento + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</p>
+                    <p><strong>Nascimento:</strong> {formatDate(student.dataNascimento)}</p>
                     <p><strong>Estado Civil:</strong> {student.estadoCivil || '---'}</p>
                     <p><strong>Status:</strong> {student.status || '---'}</p>
                     <p><strong>Naturalidade:</strong> {student.naturalidade || '---'} - {student.ufNaturalidade || '---'}</p>
@@ -135,11 +147,15 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
                       <p className="font-bold underline uppercase text-[7px]">Mãe</p>
                       <p><strong>Nome:</strong> {student.mae?.nome || '---'}</p>
                       <p><strong>Telefone/Zap:</strong> {student.mae?.telefone || '---'} {student.mae?.whatsapp && `/ ${student.mae?.whatsapp}`}</p>
+                      <p><strong>Endereço:</strong> {student.mae?.endereco || '---'}{student.mae?.numero ? `, ${student.mae.numero}` : ''} {student.mae?.bairro ? `- ${student.mae.bairro}` : ''}</p>
+                      <p><strong>Cidade:</strong> {student.mae?.cidade || '---'}/{student.mae?.ufEndereco || '---'}</p>
                     </div>
                     <div>
                       <p className="font-bold underline uppercase text-[7px]">Pai</p>
                       <p><strong>Nome:</strong> {student.pai?.nome || '---'}</p>
                       <p><strong>Telefone/Zap:</strong> {student.pai?.telefone || '---'} {student.pai?.whatsapp && `/ ${student.pai?.whatsapp}`}</p>
+                      <p><strong>Endereço:</strong> {student.pai?.endereco || '---'}{student.pai?.numero ? `, ${student.pai.numero}` : ''} {student.pai?.bairro ? `- ${student.pai.bairro}` : ''}</p>
+                      <p><strong>Cidade:</strong> {student.pai?.cidade || '---'}/{student.pai?.ufEndereco || '---'}</p>
                     </div>
                   </div>
                 </section>
@@ -151,15 +167,18 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
                       <p><strong>Batizado(a):</strong> {student.batizado ? 'Sim' : 'Não'} {student.batizado && ` - Paróquia: ${student.batismoParoquia} / ${student.batismoUF}`}</p>
                       {student.batizado && (
                         <>
+                          <p className="pl-2"><strong>Data:</strong> {formatDate(student.batismoData)} | <strong>Diocese:</strong> {student.batismoDiocese || '---'}</p>
                           <p className="pl-2"><strong>Comunidade:</strong> {student.batismoComunidade || '---'} | <strong>Local/Cidade:</strong> {student.batismoLocal || '---'} | <strong>Celebrante:</strong> {student.batismoCelebrante || '---'}</p>
                           <div className="grid grid-cols-2 gap-x-4 pl-2 mt-0.5">
                              <div>
                                 <p className="font-bold underline uppercase text-[7px]">Madrinha de Batismo</p>
                                 <p><strong>Nome:</strong> {student.madrinhaBatismo?.nome || '---'}</p>
+                                <p><strong>Endereço:</strong> {student.madrinhaBatismo?.endereco || '---'}</p>
                              </div>
                              <div>
                                 <p className="font-bold underline uppercase text-[7px]">Padrinho de Batismo</p>
                                 <p><strong>Nome:</strong> {student.padrinhoBatismo?.nome || '---'}</p>
+                                <p><strong>Endereço:</strong> {student.padrinhoBatismo?.endereco || '---'}</p>
                              </div>
                           </div>
                         </>
@@ -177,24 +196,26 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
                 <section>
                   <h3 className="bg-slate-100 px-2 py-0.5 text-[8px] font-black uppercase border-l-4 border-slate-900 mb-1.5 tracking-widest">4. Crisma / Preparação</h3>
                   <div className="grid grid-cols-2 gap-x-4 text-[9px]">
-                    <p><strong>Turma:</strong> {student.turma || '___'}</p>
+                    <p><strong>Turma:</strong> {student.turma || '---'}</p>
                     <p><strong>Catequista:</strong> {displayCatequistas}</p>
-                    <p><strong>Início Prep.:</strong> {student.inicioPreparacao ? new Date(student.inicioPreparacao).toLocaleDateString('pt-BR') : '___/___/___'}</p>
-                    <p><strong>Fim Prep.:</strong> {student.fimPreparacao ? new Date(student.fimPreparacao).toLocaleDateString('pt-BR') : '___/___/___'}</p>
+                    <p><strong>Início Prep.:</strong> {formatDate(student.inicioPreparacao)}</p>
+                    <p><strong>Fim Prep.:</strong> {formatDate(student.fimPreparacao)}</p>
 
                     <div className="col-span-2 mt-1 border-t border-slate-100 pt-1">
                        <p className="font-bold underline uppercase text-[7px]">Padrinho/Madrinha de Crisma</p>
-                       <p><strong>Nome:</strong> {student.padrinhoCrisma?.nome || '____________________'}</p>
-                       <p><strong>Telefone:</strong> {student.padrinhoCrisma?.telefone || '____________________'}</p>
+                       <p><strong>Nome:</strong> {student.padrinhoCrisma?.nome || '---'}</p>
+                       <p><strong>Telefone:</strong> {student.padrinhoCrisma?.telefone || '---'}</p>
+                       <p><strong>Endereço:</strong> {student.padrinhoCrisma?.endereco || '---'}</p>
                     </div>
 
                     {(student.dataCelebracao || student.localCelebracao || student.celebrante) && (
                       <div className="col-span-2 mt-1 border-t border-slate-100 pt-1">
                         <p className="font-bold underline uppercase text-[7px] mb-0.5">Dados da Celebração</p>
                         <div className="grid grid-cols-2 gap-x-4">
-                          <p><strong>Data:</strong> {student.dataCelebracao ? new Date(student.dataCelebracao).toLocaleDateString('pt-BR') : '---'}</p>
+                          <p><strong>Data:</strong> {formatDate(student.dataCelebracao)}</p>
                           <p><strong>Local:</strong> {student.localCelebracao || '---'}</p>
                           <p className="col-span-2"><strong>Celebrante:</strong> {student.celebrante || '---'}</p>
+                          <p className="col-span-2"><strong>Diocese:</strong> {student.dioceseCelebracao || '---'} | <strong>UF:</strong> {student.ufCelebracao || '---'}</p>
                           <p><strong>Livro:</strong> {student.livro || '--'} | <strong>Folha:</strong> {student.folha || '--'} | <strong>Registro:</strong> {student.numeroRegistro || '--'}</p>
                         </div>
                       </div>
