@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { BookOpen, User, Clock, Trash2, Edit, Users, ClipboardCheck, FileSpreadsheet, Plus, Sparkles } from 'lucide-react';
+import { BookOpen, User, Clock, Trash2, Edit, Users, ClipboardCheck, FileSpreadsheet, Plus, Sparkles, CalendarDays } from 'lucide-react';
 import { Turma, User as UserType } from '../types';
 import { Pagination } from './Pagination';
 
@@ -80,6 +80,7 @@ export const ClassTable: React.FC<ClassTableProps> = ({
                 <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Turma</th>
                 <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Nível / Ano</th>
                 <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Catequista</th>
+                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Dia</th>
                 <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Horário</th>
                 <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Ações</th>
               </tr>
@@ -99,7 +100,6 @@ export const ClassTable: React.FC<ClassTableProps> = ({
                         <div>
                           <p className="font-bold text-slate-800 group-hover/item:text-indigo-600 transition-colors">{turma.nome}</p>
                           {turma.comunidade && <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">{turma.comunidade}</p>}
-                          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">{turma.diaSemana}</p>
                         </div>
                       </div>
                     </td>
@@ -115,6 +115,12 @@ export const ClassTable: React.FC<ClassTableProps> = ({
                       <div className="flex items-center gap-2 text-sm text-slate-700 font-bold">
                         <User className="w-4 h-4 text-indigo-400" />
                         {turma.catequista}
+                      </div>
+                    </td>
+                    <td className="px-8 py-5 text-sm text-slate-600 font-medium">
+                      <div className="flex items-center gap-2">
+                        <CalendarDays className="w-4 h-4 text-indigo-400" />
+                        {turma.diaSemana}
                       </div>
                     </td>
                     <td className="px-8 py-5 text-sm text-slate-600 font-medium">
@@ -171,7 +177,7 @@ export const ClassTable: React.FC<ClassTableProps> = ({
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5} className="px-8 py-20 text-center text-slate-400 italic">
+                  <td colSpan={6} className="px-8 py-20 text-center text-slate-400 italic">
                     Nenhuma turma cadastrada. Comece criando uma nova turma!
                   </td>
                 </tr>

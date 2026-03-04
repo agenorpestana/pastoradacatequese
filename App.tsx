@@ -966,6 +966,7 @@ const App: React.FC = () => {
                />;
       case 'classes_create':
         return <ClassForm 
+                  key={editingClass?.id || 'new'}
                   onSave={handleSaveClass} 
                   onCancel={() => setView('classes_list')} 
                   initialData={editingClass || undefined}
