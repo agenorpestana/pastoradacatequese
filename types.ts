@@ -197,6 +197,7 @@ export interface Catequista {
   dataCadastro?: string;
   atuacao?: string;
   atuacaoDesejada?: string;
+  emergenciaContato?: string;
 }
 
 export interface StudentDocument {

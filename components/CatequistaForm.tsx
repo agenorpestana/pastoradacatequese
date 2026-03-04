@@ -177,6 +177,7 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
                     <p><strong>Naturalidade:</strong> {formData.naturalidade || '---'} - {formData.ufNaturalidade || '---'}</p>
                     <p><strong>Telefone/Zap:</strong> {formData.telefone || '---'} {formData.whatsapp && `/ ${formData.whatsapp}`}</p>
                     <p><strong>E-mail:</strong> {formData.email || '---'}</p>
+                    <p className="col-span-2"><strong>EM CASO DE EMERGÊNCIA LIGAR PARA:</strong> {formData.emergenciaContato || '---'}</p>
                     <p className="col-span-2"><strong>Endereço:</strong> {formData.endereco || '---'}, {formData.numero || '---'} - {formData.bairro || '---'}, {formData.cidade || '---'}/{formData.ufEndereco || '---'}</p>
                     <p className="col-span-2"><strong>TURMA ATUAL:</strong> {formData.atuacao || '---'} - <strong>COMUNIDADE:</strong> {formData.comunidade || '---'}</p>
                     <p className="col-span-2"><strong>Início na Catequese:</strong> {formData.desde ? new Date(formData.desde + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</p>
@@ -529,6 +530,13 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-sky-300 w-4 h-4" />
                   <input type="email" value={formData.email || ''} onChange={e => setFormData({...formData, email: e.target.value})} className="input-style pl-11" placeholder="email@exemplo.com" />
+                </div>
+              </div>
+              <div className="md:col-span-3">
+                <label className="label-style">Em caso de emergência ligar para:</label>
+                <div className="relative">
+                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-red-400 w-4 h-4" />
+                  <input type="text" value={formData.emergenciaContato || ''} onChange={e => setFormData({...formData, emergenciaContato: e.target.value})} className="input-style pl-11 border-red-50 focus:border-red-400" placeholder="Nome e Telefone" />
                 </div>
               </div>
             </div>
