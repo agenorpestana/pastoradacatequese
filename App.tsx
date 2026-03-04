@@ -908,15 +908,12 @@ const App: React.FC = () => {
         const linkedCat = catequistas.find(c => c.id === user.linkedCatequistaId);
         if (linkedCat) {
           visibleClasses = classes.filter(c => c.catequista.includes(linkedCat.nome));
-          const visibleClassNames = visibleClasses.map(c => c.nome);
-          visibleStudents = students.filter(s => visibleClassNames.includes(s.turma));
+          // visibleStudents = students; // Dashboard and Student List should show all
         } else {
           visibleClasses = [];
-          visibleStudents = [];
         }
       } else {
         visibleClasses = [];
-        visibleStudents = [];
       }
     }
 
@@ -948,7 +945,7 @@ const App: React.FC = () => {
       case 'list':
         return <StudentTable 
                   students={visibleStudents}
-                  allClasses={visibleClasses}
+                  allClasses={classes}
                   niveis={niveisEtapas}
                   onDelete={user.permissions.students_delete ? handleDeleteStudent : () => alert('Sem permissão')}
                   onEdit={user.permissions.students_edit ? (s) => { setEditingStudent(s); setView('register'); } : () => alert('Sem permissão')}
@@ -965,6 +962,7 @@ const App: React.FC = () => {
                   onTakeAttendance={(c) => setTakingAttendanceClass(c)}
                   onViewHistory={(c) => setViewingClassHistory(c)}
                   onAddNew={user.permissions.classes ? () => { setEditingClass(null); setView('classes_create'); } : undefined}
+                  currentUser={user}
                />;
       case 'classes_create':
         return <ClassForm 

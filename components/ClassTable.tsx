@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { BookOpen, User, Clock, Trash2, Edit, Users, ClipboardCheck, FileSpreadsheet, Plus, Sparkles } from 'lucide-react';
-import { Turma } from '../types';
+import { Turma, User as UserType } from '../types';
 import { Pagination } from './Pagination';
 
 interface ClassTableProps {
@@ -12,6 +12,7 @@ interface ClassTableProps {
   onTakeAttendance: (turma: Turma) => void;
   onViewHistory: (turma: Turma) => void;
   onAddNew?: () => void;
+  currentUser: UserType;
 }
 
 export const ClassTable: React.FC<ClassTableProps> = ({ 
@@ -21,7 +22,8 @@ export const ClassTable: React.FC<ClassTableProps> = ({
   onViewMembers,
   onTakeAttendance,
   onViewHistory,
-  onAddNew
+  onAddNew,
+  currentUser
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -144,20 +146,25 @@ export const ClassTable: React.FC<ClassTableProps> = ({
                         >
                           <Users className="w-4.5 h-4.5" />
                         </button>
-                        <button 
-                          onClick={() => onEdit(turma)}
-                          className="p-2.5 text-slate-500 hover:text-blue-600 hover:bg-white rounded-xl border border-transparent hover:border-slate-200 transition-all"
-                          title="Editar Turma"
-                        >
-                          <Edit className="w-4.5 h-4.5" />
-                        </button>
-                        <button 
-                          onClick={() => onDelete(turma.id)}
-                          className="p-2.5 text-slate-500 hover:text-red-600 hover:bg-white rounded-xl border border-transparent hover:border-slate-200 transition-all"
-                          title="Excluir Turma"
-                        >
-                          <Trash2 className="w-4.5 h-4.5" />
-                        </button>
+                        
+                        {currentUser.role !== 'catequista' && currentUser.role !== 'catequista_auxiliar' && (
+                          <>
+                            <button 
+                              onClick={() => onEdit(turma)}
+                              className="p-2.5 text-slate-500 hover:text-blue-600 hover:bg-white rounded-xl border border-transparent hover:border-slate-200 transition-all"
+                              title="Editar Turma"
+                            >
+                              <Edit className="w-4.5 h-4.5" />
+                            </button>
+                            <button 
+                              onClick={() => onDelete(turma.id)}
+                              className="p-2.5 text-slate-500 hover:text-red-600 hover:bg-white rounded-xl border border-transparent hover:border-slate-200 transition-all"
+                              title="Excluir Turma"
+                            >
+                              <Trash2 className="w-4.5 h-4.5" />
+                            </button>
+                          </>
+                        )}
                       </div>
                     </td>
                   </tr>

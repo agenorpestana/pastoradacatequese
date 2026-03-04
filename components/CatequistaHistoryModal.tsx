@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { X, Calendar, CheckCircle2, XCircle, GraduationCap, Church, Bookmark, Printer } from 'lucide-react';
 import { Catequista, FormationEvent, ParishEvent } from '../types';
 
@@ -41,7 +42,120 @@ export const CatequistaHistoryModal: React.FC<CatequistaHistoryModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
-      <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[85vh]">
+      {/* FICHA DE IMPRESSÃO OFICIAL */}
+      {createPortal(
+        <div className="print-only bg-white min-h-screen text-slate-900 absolute inset-0 z-[9999] hidden">
+          <style>
+            {`
+              @media print {
+                @page { margin: 15mm; }
+                body { margin: 0; }
+                body > *:not(.print-only) { display: none !important; }
+                .print-only { 
+                  display: block !important; 
+                  width: 100%;
+                  background: white;
+                }
+              }
+            `}
+          </style>
+          
+          <div className="border-[2px] border-slate-900 p-8 flex flex-col h-full">
+            {/* Cabeçalho do Relatório */}
+            <div className="flex justify-between items-center border-b-2 border-slate-900 pb-4 mb-6">
+              <div className="flex items-center gap-4">
+                <div className="bg-slate-900 p-3 rounded-xl">
+                  <GraduationCap className="text-white w-8 h-8" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-black uppercase tracking-tighter">Histórico de Participação</h1>
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Relatório Individual do Catequista</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-[10px] font-black uppercase">Data de Emissão</p>
+                <p className="text-sm font-bold">{new Date().toLocaleDateString('pt-BR')}</p>
+              </div>
+            </div>
+
+            {/* Dados do Catequista */}
+            <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 mb-6 grid grid-cols-2 gap-4">
+              <div className="col-span-2">
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Nome do Catequista</p>
+                <p className="text-xl font-black text-slate-900">{catequista.nome}</p>
+              </div>
+              <div>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Comunidade</p>
+                <p className="text-sm font-bold text-slate-800">{catequista.comunidade || '---'}</p>
+              </div>
+              <div>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Atuação</p>
+                <p className="text-sm font-bold text-slate-800">{catequista.atuacao || '---'}</p>
+              </div>
+            </div>
+
+            {/* Resumo de Assiduidade */}
+            <div className="grid grid-cols-3 gap-4 mb-8">
+              <div className="border-2 border-slate-900 p-4 rounded-2xl text-center">
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Total Atividades</p>
+                <p className="text-2xl font-black text-slate-900">{totalEvents}</p>
+              </div>
+              <div className="border-2 border-slate-900 p-4 rounded-2xl text-center">
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Presenças</p>
+                <p className="text-2xl font-black text-slate-900">{presenceCount}</p>
+              </div>
+              <div className="border-2 border-slate-900 p-4 rounded-2xl text-center">
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Assiduidade</p>
+                <p className="text-2xl font-black text-slate-900">{presenceRate}%</p>
+              </div>
+            </div>
+
+            {/* Tabela de Atividades */}
+            <div className="flex-1">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="bg-slate-900 text-white">
+                    <th className="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest">Data</th>
+                    <th className="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest">Atividade / Tema</th>
+                    <th className="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest">Tipo</th>
+                    <th className="px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200">
+                  {allActivities.map(activity => {
+                    const eventDate = new Date(activity.data + (activity.data.includes('T') ? '' : 'T00:00:00')).toLocaleDateString('pt-BR');
+                    return (
+                      <tr key={activity.id} className="border-b border-slate-100">
+                        <td className="px-4 py-3 text-xs font-bold text-slate-600">{eventDate}</td>
+                        <td className="px-4 py-3 text-xs font-black text-slate-800">{activity.titulo}</td>
+                        <td className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-tighter">{activity.tipo}</td>
+                        <td className="px-4 py-3 text-center">
+                          <span className={`text-[10px] font-black uppercase tracking-widest ${activity.presente ? 'text-green-600' : 'text-red-500'}`}>
+                            {activity.presente ? 'Presente' : 'Ausente'}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Rodapé de Assinaturas */}
+            <div className="mt-20 grid grid-cols-2 gap-12">
+              <div className="text-center">
+                <div className="border-t-2 border-slate-900 pt-2 text-[10px] font-black uppercase tracking-widest">Assinatura do Catequista</div>
+              </div>
+              <div className="text-center">
+                <div className="border-t-2 border-slate-900 pt-2 text-[10px] font-black uppercase tracking-widest">Coordenação de Catequese</div>
+              </div>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[85vh] no-print">
         
         <div className="bg-slate-900 p-8 flex justify-between items-center shrink-0">
           <div className="flex items-center gap-4">

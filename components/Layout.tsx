@@ -299,7 +299,7 @@ export const Layout: React.FC<LayoutProps> = ({
             </button>
           )}
 
-          {perms.classes && (
+          {perms.niveis_etapas && (
             <button onClick={() => setView('niveis_list')} className={`w-full flex items-center transition-all duration-300 rounded-2xl group ${isCollapsed ? 'justify-center p-4' : 'gap-4 px-5 py-3.5'} ${currentView === 'niveis_list' ? 'bg-blue-600 text-white shadow-xl shadow-blue-200' : 'text-slate-500 hover:bg-white'}`}>
               <ShieldCheck size={isCollapsed ? 24 : 20} className={`transition-transform duration-300 ${!isCollapsed && 'group-hover:scale-110'}`} />
               {!isCollapsed && <span className="font-bold text-sm tracking-tight">Níveis/Etapas</span>}

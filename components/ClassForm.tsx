@@ -58,9 +58,8 @@ export const ClassForm: React.FC<ClassFormProps> = ({ onSave, onCancel, initialD
     if (!selectedStudentIds.includes(id)) {
       // Trying to add
       if (student.turma && student.turma !== formData.nome) {
-        if (!confirm(`O catequizando ${student.nomeCompleto} já está vinculado à turma "${student.turma}". Deseja transferi-lo para esta turma?`)) {
-          return;
-        }
+        alert(`O catequizando ${student.nomeCompleto} já está vinculado à turma "${student.turma}". Não é possível transferi-lo por aqui.`);
+        return;
       }
       setSelectedStudentIds(prev => [...prev, id]);
     } else {
@@ -360,15 +359,20 @@ export const ClassForm: React.FC<ClassFormProps> = ({ onSave, onCancel, initialD
             <div className="flex-1 overflow-y-auto p-4 space-y-2">
               {filteredStudents.map(student => {
                 const isSelected = selectedStudentIds.includes(student.id);
+                const isOtherClass = student.turma && student.turma !== formData.nome;
+                
                 return (
                   <button
                     key={student.id}
                     type="button"
                     onClick={() => toggleStudent(student.id)}
+                    disabled={isOtherClass && !isSelected}
                     className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all ${
                       isSelected 
                         ? 'bg-blue-50 border-blue-200 ring-1 ring-blue-200' 
-                        : 'bg-white border-slate-100 hover:border-slate-200'
+                        : isOtherClass 
+                          ? 'bg-slate-50 border-slate-100 opacity-60 cursor-not-allowed'
+                          : 'bg-white border-slate-100 hover:border-slate-200'
                     }`}
                   >
                     <div className="flex items-center gap-4">
@@ -377,8 +381,9 @@ export const ClassForm: React.FC<ClassFormProps> = ({ onSave, onCancel, initialD
                       </div>
                       <div className="text-left">
                         <p className={`font-bold ${isSelected ? 'text-blue-900' : 'text-slate-800'}`}>{student.nomeCompleto}</p>
-                        <p className="text-xs text-slate-500">
+                        <p className={`text-xs ${isOtherClass ? 'text-red-500 font-bold' : 'text-slate-500'}`}>
                           {student.turma ? `Turma atual: ${student.turma}` : 'Sem turma vinculada'}
+                          {isOtherClass && !isSelected && ' (Bloqueado)'}
                         </p>
                       </div>
                     </div>
