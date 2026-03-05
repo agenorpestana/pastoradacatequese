@@ -187,7 +187,10 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
                     <div className="flex flex-col gap-0.5 mt-1">
                       <p><strong>1ª Eucaristia:</strong> {student.fezPrimeiraEucaristia ? 'Sim' : 'Não'} {student.fezPrimeiraEucaristia && ` - Paróquia: ${student.eucaristiaParoquia}`}</p>
                       {student.fezPrimeiraEucaristia && (
-                        <p className="pl-2"><strong>Comunidade:</strong> {student.eucaristiaComunidade || '---'} | <strong>Local/Cidade:</strong> {student.eucaristiaLocal || '---'} | <strong>Celebrante:</strong> {student.eucaristiaCelebrante || '---'} | <strong>Catequistas:</strong> {student.eucaristiaCatequistas || '---'}</p>
+                        <>
+                          <p className="pl-2"><strong>Data:</strong> {formatDate(student.eucaristiaData)} | <strong>Diocese:</strong> {student.eucaristiaDiocese || '---'} / {student.eucaristiaUF || '---'}</p>
+                          <p className="pl-2"><strong>Comunidade:</strong> {student.eucaristiaComunidade || '---'} | <strong>Local/Cidade:</strong> {student.eucaristiaLocal || '---'} | <strong>Celebrante:</strong> {student.eucaristiaCelebrante || '---'} | <strong>Catequistas:</strong> {student.eucaristiaCatequistas || '---'}</p>
+                        </>
                       )}
                     </div>
                   </div>
@@ -208,7 +211,7 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
                        <p><strong>Endereço:</strong> {student.padrinhoCrisma?.endereco || '---'}</p>
                     </div>
 
-                    {(student.dataCelebracao || student.localCelebracao || student.celebrante) && (
+                    {(student.temCrisma || student.dataCelebracao || student.localCelebracao || student.celebrante) && (
                       <div className="col-span-2 mt-1 border-t border-slate-100 pt-1">
                         <p className="font-bold underline uppercase text-[7px] mb-0.5">Dados da Celebração</p>
                         <div className="grid grid-cols-2 gap-x-4">

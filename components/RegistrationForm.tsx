@@ -390,8 +390,8 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
           <style>
             {`
               @media print {
-                @page { margin: 0; }
-                body { margin: 0; }
+                @page { margin: 0; size: auto; }
+                body { -webkit-print-color-adjust: exact; margin: 0; }
                 body > *:not(.print-only) { display: none !important; }
                 .print-only { 
                   display: block !important; 
@@ -412,8 +412,8 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                 <div className="flex items-center gap-3">
                   {config.logo ? <img src={config.logo} className="w-12 h-12 object-contain" /> : <Church className="w-8 h-8" />}
                   <div>
-                    <h1 className="text-xl font-black uppercase tracking-tighter">Ficha de Inscrição Catequética</h1>
-                    <div className="text-[12px] font-bold uppercase mt-1">
+                    <h1 className="text-lg font-black uppercase tracking-tighter">Ficha de Inscrição Catequizando</h1>
+                    <div className="text-[10px] font-bold uppercase mt-1">
                       <p>{config.parishName}</p>
                       <p>{config.dioceseName}</p>
                       <p>{config.city}-{config.state}</p>
@@ -421,23 +421,23 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-[10px] font-bold uppercase">Matrícula</p>
-                  <p className="text-lg font-black">{formData.matricula || '________'}</p>
-                  <p className="text-[9px] uppercase font-bold text-slate-400 mt-0.5">Data: {formatDate(formData.dataCadastro)}</p>
+                  <p className="text-[9px] font-bold uppercase">Matrícula</p>
+                  <p className="text-sm font-black">{formData.matricula || '________'}</p>
+                  <p className="text-[8px] uppercase font-bold text-slate-400 mt-0.5">Data: {formatDate(formData.dataCadastro)}</p>
                 </div>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <section className="relative">
                   {formData.foto && (
-                    <div className="absolute top-0 right-0 w-24 h-28 border border-slate-900 overflow-hidden bg-white">
+                    <div className="absolute top-0 right-0 w-20 h-24 border border-slate-900 overflow-hidden bg-white">
                       <img src={formData.foto} className="w-full h-full object-cover" alt="Foto" />
                     </div>
                   )}
-                  <h3 className="bg-slate-100 px-2 py-1 text-[10px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">1. Dados Pessoais</h3>
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[11px] pr-28">
+                  <h3 className="bg-slate-100 px-2 py-0.5 text-[8px] font-black uppercase border-l-4 border-slate-900 mb-1.5 tracking-widest">1. Dados Pessoais</h3>
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[9px] pr-24">
                     <p className="col-span-2"><strong>Nome:</strong> {formData.nomeCompleto || '---'}</p>
-                    <p><strong>CPF:</strong> {formData.rgCpf || '---'}</p>
+                    <p><strong>RG/CPF:</strong> {formData.rgCpf || '---'}</p>
                     <p><strong>Nascimento:</strong> {formatDate(formData.dataNascimento)}</p>
                     <p><strong>Estado Civil:</strong> {formData.estadoCivil || '---'}</p>
                     <p><strong>Status:</strong> {formData.status || '---'}</p>
@@ -451,17 +451,17 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                 </section>
 
                 <section>
-                  <h3 className="bg-slate-100 px-2 py-1 text-[10px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">2. Filiação</h3>
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[11px]">
+                  <h3 className="bg-slate-100 px-2 py-0.5 text-[8px] font-black uppercase border-l-4 border-slate-900 mb-1.5 tracking-widest">2. Filiação</h3>
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[9px]">
                     <div className="border-r border-slate-200 pr-2">
-                      <p className="font-bold underline uppercase text-[8px]">Mãe</p>
+                      <p className="font-bold underline uppercase text-[7px]">Mãe</p>
                       <p><strong>Nome:</strong> {formData.mae?.nome || '---'}</p>
                       <p><strong>Telefone/Zap:</strong> {formData.mae?.telefone || '---'} {formData.mae?.whatsapp && `/ ${formData.mae?.whatsapp}`}</p>
                       <p><strong>Endereço:</strong> {formData.mae?.endereco || '---'}{formData.mae?.numero ? `, ${formData.mae.numero}` : ''} {formData.mae?.bairro ? `- ${formData.mae.bairro}` : ''}</p>
                       <p><strong>Cidade:</strong> {formData.mae?.cidade || '---'}/{formData.mae?.ufEndereco || '---'}</p>
                     </div>
                     <div>
-                      <p className="font-bold underline uppercase text-[8px]">Pai</p>
+                      <p className="font-bold underline uppercase text-[7px]">Pai</p>
                       <p><strong>Nome:</strong> {formData.pai?.nome || '---'}</p>
                       <p><strong>Telefone/Zap:</strong> {formData.pai?.telefone || '---'} {formData.pai?.whatsapp && `/ ${formData.pai?.whatsapp}`}</p>
                       <p><strong>Endereço:</strong> {formData.pai?.endereco || '---'}{formData.pai?.numero ? `, ${formData.pai.numero}` : ''} {formData.pai?.bairro ? `- ${formData.pai.bairro}` : ''}</p>
@@ -471,22 +471,22 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                 </section>
 
                 <section>
-                  <h3 className="bg-slate-100 px-2 py-1 text-[10px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">3. Sacramentos</h3>
-                  <div className="grid grid-cols-1 gap-y-1.5 text-[11px]">
-                    <div className="flex flex-col gap-1">
+                  <h3 className="bg-slate-100 px-2 py-0.5 text-[8px] font-black uppercase border-l-4 border-slate-900 mb-1.5 tracking-widest">3. Sacramentos</h3>
+                  <div className="grid grid-cols-1 gap-y-1 text-[9px]">
+                    <div className="flex flex-col gap-0.5">
                       <p><strong>Batizado(a):</strong> {formData.batizado ? 'Sim' : 'Não'} {formData.batizado && ` - Paróquia: ${formData.batismoParoquia}`}</p>
                       {formData.batizado && (
                         <>
                           <p className="pl-2"><strong>Data:</strong> {formatDate(formData.batismoData)} | <strong>Diocese:</strong> {formData.batismoDiocese || '---'} / {formData.batismoUF || '---'}</p>
                           <p className="pl-2"><strong>Comunidade:</strong> {formData.batismoComunidade || '---'} | <strong>Local/Cidade:</strong> {formData.batismoLocal || '---'} | <strong>Celebrante:</strong> {formData.batismoCelebrante || '---'}</p>
-                          <div className="grid grid-cols-2 gap-x-4 pl-2 mt-1">
+                          <div className="grid grid-cols-2 gap-x-4 pl-2 mt-0.5">
                              <div>
-                                <p className="font-bold underline uppercase text-[8px]">Madrinha de Batismo</p>
+                                <p className="font-bold underline uppercase text-[7px]">Madrinha de Batismo</p>
                                 <p><strong>Nome:</strong> {formData.madrinhaBatismo?.nome || '---'}</p>
                                 <p><strong>Endereço:</strong> {formData.madrinhaBatismo?.endereco || '---'}</p>
                              </div>
                              <div>
-                                <p className="font-bold underline uppercase text-[8px]">Padrinho de Batismo</p>
+                                <p className="font-bold underline uppercase text-[7px]">Padrinho de Batismo</p>
                                 <p><strong>Nome:</strong> {formData.padrinhoBatismo?.nome || '---'}</p>
                                 <p><strong>Endereço:</strong> {formData.padrinhoBatismo?.endereco || '---'}</p>
                              </div>
@@ -494,33 +494,36 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                         </>
                       )}
                     </div>
-                    <div className="flex flex-col gap-1 mt-1">
+                    <div className="flex flex-col gap-0.5 mt-1">
                       <p><strong>1ª Eucaristia:</strong> {formData.fezPrimeiraEucaristia ? 'Sim' : 'Não'} {formData.fezPrimeiraEucaristia && ` - Paróquia: ${formData.eucaristiaParoquia}`}</p>
                       {formData.fezPrimeiraEucaristia && (
-                        <p className="pl-2"><strong>Comunidade:</strong> {formData.eucaristiaComunidade || '---'} | <strong>Local/Cidade:</strong> {formData.eucaristiaLocal || '---'} | <strong>Celebrante:</strong> {formData.eucaristiaCelebrante || '---'} | <strong>Catequistas:</strong> {formData.eucaristiaCatequistas || '---'}</p>
+                        <>
+                          <p className="pl-2"><strong>Data:</strong> {formatDate(formData.eucaristiaData)} | <strong>Diocese:</strong> {formData.eucaristiaDiocese || '---'} / {formData.eucaristiaUF || '---'}</p>
+                          <p className="pl-2"><strong>Comunidade:</strong> {formData.eucaristiaComunidade || '---'} | <strong>Local/Cidade:</strong> {formData.eucaristiaLocal || '---'} | <strong>Celebrante:</strong> {formData.eucaristiaCelebrante || '---'} | <strong>Catequistas:</strong> {formData.eucaristiaCatequistas || '---'}</p>
+                        </>
                       )}
                     </div>
                   </div>
                 </section>
 
                 <section>
-                  <h3 className="bg-slate-100 px-2 py-1 text-[10px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">4. Crisma / Preparação</h3>
-                  <div className="grid grid-cols-2 gap-x-4 text-[11px]">
+                  <h3 className="bg-slate-100 px-2 py-0.5 text-[8px] font-black uppercase border-l-4 border-slate-900 mb-1.5 tracking-widest">4. Crisma / Preparação</h3>
+                  <div className="grid grid-cols-2 gap-x-4 text-[9px]">
                     <p><strong>Turma:</strong> {formData.turma || '---'}</p>
                     <p><strong>Catequista:</strong> {displayCatequistas}</p>
                     <p><strong>Início Prep.:</strong> {formatDate(formData.inicioPreparacao)}</p>
                     <p><strong>Fim Prep.:</strong> {formatDate(formData.fimPreparacao)}</p>
-                    
-                    <div className="col-span-2 mt-2 border-t border-slate-100 pt-2">
-                       <p className="font-bold underline uppercase text-[8px]">Padrinho/Madrinha de Crisma</p>
+
+                    <div className="col-span-2 mt-1 border-t border-slate-100 pt-1">
+                       <p className="font-bold underline uppercase text-[7px]">Padrinho/Madrinha de Crisma</p>
                        <p><strong>Nome:</strong> {formData.padrinhoCrisma?.nome || '---'}</p>
                        <p><strong>Telefone:</strong> {formData.padrinhoCrisma?.telefone || '---'}</p>
                        <p><strong>Endereço:</strong> {formData.padrinhoCrisma?.endereco || '---'}</p>
                     </div>
 
                     {(formData.temCrisma || formData.dataCelebracao || formData.localCelebracao || formData.celebrante) && (
-                      <div className="col-span-2 mt-2 border-t border-slate-100 pt-2">
-                        <p className="font-bold underline uppercase text-[8px] mb-1">Dados da Celebração</p>
+                      <div className="col-span-2 mt-1 border-t border-slate-100 pt-1">
+                        <p className="font-bold underline uppercase text-[7px] mb-0.5">Dados da Celebração</p>
                         <div className="grid grid-cols-2 gap-x-4">
                           <p><strong>Data:</strong> {formatDate(formData.dataCelebracao)}</p>
                           <p><strong>Local:</strong> {formData.localCelebracao || '---'}</p>
@@ -535,8 +538,8 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
 
                 {formData.observacoes && (
                   <section>
-                    <h3 className="bg-slate-100 px-2 py-1 text-[10px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">5. Observações</h3>
-                    <p className="text-[11px] text-justify leading-snug">{formData.observacoes}</p>
+                    <h3 className="bg-slate-100 px-2 py-0.5 text-[8px] font-black uppercase border-l-4 border-slate-900 mb-1.5 tracking-widest">5. Observações</h3>
+                    <p className="text-[9px] text-justify leading-snug">{formData.observacoes}</p>
                   </section>
                 )}
               </div>
@@ -544,36 +547,36 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
 
             <div>
               {/* TERMO DE COMPROMISSO (APENAS IMPRESSÃO) */}
-              <section className="mt-6 pt-4 border-t border-slate-200">
-                 <h3 className="text-[11px] font-black uppercase mb-2 tracking-widest text-center">Termo de Responsabilidade</h3>
-                 <p className="text-[10px] leading-relaxed text-justify italic text-slate-700">
+              <section className="mt-4 pt-3 border-t border-slate-200">
+                 <h3 className="text-[9px] font-black uppercase mb-1.5 tracking-widest text-center">Termo de Responsabilidade</h3>
+                 <p className="text-[8px] leading-relaxed text-justify italic text-slate-700">
                    "Catequese é processo permanente de educação na fé". Ao inscrever seu(sua) filho(a) na catequese, você está se comprometendo a fazer parte deste processo, ou seja, ter um compromisso de participar com seu(sua) filho(a) das atividades da Paróquia (Missa das crianças e reuniões). E responsabilidade sua a educação religiosa de seu (sua) filho(a) pois, não se deve esquecer que 'os pais são os primeiros catequistas dos filhos'. Sem o seu compromisso e apoio, o trabalho catequético será em vão."
                  </p>
-                 <div className="mt-3 text-right">
-                   <p className="text-[10px] font-bold">{config.city}-{config.state}, _____ /_____/_________</p>
+                 <div className="mt-2 text-right">
+                   <p className="text-[8px] font-bold">{config.city}-{config.state}, _____ /_____/_________</p>
                  </div>
               </section>
 
-              <div className="mt-20 grid grid-cols-2 gap-12 pb-4">
+              <div className="mt-24 grid grid-cols-2 gap-12 pb-4">
                 <div className="text-center">
-                  <div className="border-t border-slate-900 pt-1 text-[10px] font-bold uppercase">Assinatura do Responsável</div>
+                  <div className="border-t border-slate-900 pt-1 text-[8px] font-bold uppercase">Assinatura do Responsável</div>
                 </div>
                 <div className="text-center">
-                  <div className="border-t border-slate-900 pt-1 text-[10px] font-bold uppercase">Assinatura Catequista</div>
+                  <div className="border-t border-slate-900 pt-1 text-[8px] font-bold uppercase">Assinatura Catequista</div>
                 </div>
               </div>
             </div>
 
             <div className="border-t-2 border-slate-900 pt-2 mt-auto text-center">
-              <p className="text-[10px] font-bold uppercase">
+              <p className="text-[8px] font-bold uppercase">
                 {config.address} - {config.city}/{config.state}
               </p>
-              <div className="flex justify-center gap-4 mt-1 text-[10px] font-bold uppercase">
+              <div className="flex justify-center gap-4 mt-1 text-[8px] font-bold uppercase">
                 {config.phone && <span>Tel: {config.phone}</span>}
                 {config.whatsapp && <span>Zap: {config.whatsapp}</span>}
                 {config.email && <span>Email: {config.email}</span>}
               </div>
-              <div className="flex justify-center gap-4 mt-0.5 text-[10px] font-bold uppercase text-slate-600">
+              <div className="flex justify-center gap-4 mt-0.5 text-[8px] font-bold uppercase text-slate-600">
                 {config.instagram && <span>Insta: {config.instagram}</span>}
                 {config.facebook && <span>Face: {config.facebook}</span>}
                 {config.website && <span>Site: {config.website}</span>}
