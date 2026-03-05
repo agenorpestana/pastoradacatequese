@@ -164,7 +164,7 @@ export const Layout: React.FC<LayoutProps> = ({
                   </button>
                 )}
 
-                {perms.classes && (!isRestrictedRole || isLinked) && (
+                {(perms.classes || perms.students_edit) && (!isRestrictedRole || isLinked) && (
                   <button 
                     onClick={() => handleNavClick('classes_list')} 
                     className={`flex items-center gap-4 p-4 rounded-2xl transition-all ${currentView.includes('classes') ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-slate-600 bg-slate-50 hover:bg-slate-100'}`}
@@ -302,7 +302,7 @@ export const Layout: React.FC<LayoutProps> = ({
             </button>
           )}
 
-          {perms.classes && (!isRestrictedRole || isLinked) && (
+          {(perms.classes || perms.students_edit) && (!isRestrictedRole || isLinked) && (
             <button onClick={() => setView('classes_list')} className={`w-full flex items-center transition-all duration-300 rounded-2xl group ${isCollapsed ? 'justify-center p-4' : 'gap-4 px-5 py-3.5'} ${currentView.includes('classes') ? 'bg-blue-600 text-white shadow-xl shadow-blue-200' : 'text-slate-500 hover:bg-white'}`}>
               <BookOpen size={isCollapsed ? 24 : 20} className={`transition-transform duration-300 ${!isCollapsed && 'group-hover:scale-110'}`} />
               {!isCollapsed && <span className="font-bold text-sm tracking-tight">Turmas</span>}

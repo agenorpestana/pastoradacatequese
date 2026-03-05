@@ -162,7 +162,7 @@ export const ClassTable: React.FC<ClassTableProps> = ({
                             <Edit className="w-4.5 h-4.5" />
                           </button>
                         )}
-                        {(currentUser.role === 'coordenador_paroquial' || currentUser.permissions.classes) && (
+                        {currentUser.role === 'coordenador_paroquial' && (
                           <button 
                             onClick={() => onDelete(turma.id)}
                             className="p-2.5 text-slate-500 hover:text-red-600 hover:bg-white rounded-xl border border-transparent hover:border-slate-200 transition-all"
