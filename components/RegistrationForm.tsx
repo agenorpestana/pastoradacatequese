@@ -984,7 +984,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                         className="w-5 h-5 rounded cursor-pointer accent-indigo-600" 
                         id="checkCrisma" 
                       />
-                      <label htmlFor="checkCrisma" className="font-bold text-indigo-700 cursor-pointer text-xs uppercase tracking-widest">Já tem Crisma?</label>
+                      <label htmlFor="checkCrisma" className="font-bold text-indigo-700 cursor-pointer text-xs uppercase tracking-widest">Da Celebração</label>
                     </div>
 
                     {formData.temCrisma && (

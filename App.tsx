@@ -961,7 +961,7 @@ const App: React.FC = () => {
                   onViewMembers={(c) => setViewingClassMembers(c)}
                   onTakeAttendance={(c) => setTakingAttendanceClass(c)}
                   onViewHistory={(c) => setViewingClassHistory(c)}
-                  onAddNew={user.permissions.classes && user.role !== 'catequista' && user.role !== 'catequista_auxiliar' ? () => { setEditingClass(null); setView('classes_create'); } : undefined}
+                  onAddNew={(user.role === 'coordenador_paroquial' || user.permissions.classes) ? () => { setEditingClass(null); setView('classes_create'); } : undefined}
                   currentUser={user}
                />;
       case 'classes_create':

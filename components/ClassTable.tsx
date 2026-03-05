@@ -153,23 +153,23 @@ export const ClassTable: React.FC<ClassTableProps> = ({
                           <Users className="w-4.5 h-4.5" />
                         </button>
                         
-                        {currentUser.role !== 'catequista' && currentUser.role !== 'catequista_auxiliar' && (
-                          <>
-                            <button 
-                              onClick={() => onEdit(turma)}
-                              className="p-2.5 text-slate-500 hover:text-blue-600 hover:bg-white rounded-xl border border-transparent hover:border-slate-200 transition-all"
-                              title="Editar Turma"
-                            >
-                              <Edit className="w-4.5 h-4.5" />
-                            </button>
-                            <button 
-                              onClick={() => onDelete(turma.id)}
-                              className="p-2.5 text-slate-500 hover:text-red-600 hover:bg-white rounded-xl border border-transparent hover:border-slate-200 transition-all"
-                              title="Excluir Turma"
-                            >
-                              <Trash2 className="w-4.5 h-4.5" />
-                            </button>
-                          </>
+                        {(currentUser.role === 'coordenador_paroquial' || currentUser.permissions.students_edit) && (
+                          <button 
+                            onClick={() => onEdit(turma)}
+                            className="p-2.5 text-slate-500 hover:text-blue-600 hover:bg-white rounded-xl border border-transparent hover:border-slate-200 transition-all"
+                            title="Editar Turma"
+                          >
+                            <Edit className="w-4.5 h-4.5" />
+                          </button>
+                        )}
+                        {(currentUser.role === 'coordenador_paroquial' || currentUser.permissions.classes) && (
+                          <button 
+                            onClick={() => onDelete(turma.id)}
+                            className="p-2.5 text-slate-500 hover:text-red-600 hover:bg-white rounded-xl border border-transparent hover:border-slate-200 transition-all"
+                            title="Excluir Turma"
+                          >
+                            <Trash2 className="w-4.5 h-4.5" />
+                          </button>
                         )}
                       </div>
                     </td>
