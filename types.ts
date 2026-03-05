@@ -198,6 +198,21 @@ export interface Catequista {
   atuacao?: string;
   atuacaoDesejada?: string;
   emergenciaContato?: string;
+  batismoDiocese?: string;
+  batismoUF?: string;
+  batismoComunidade?: string;
+  batismoLocal?: string;
+  batismoCelebrante?: string;
+  eucaristiaDiocese?: string;
+  eucaristiaUF?: string;
+  eucaristiaComunidade?: string;
+  eucaristiaLocal?: string;
+  eucaristiaCelebrante?: string;
+  crismaDiocese?: string;
+  crismaUF?: string;
+  crismaComunidade?: string;
+  crismaLocal?: string;
+  crismaCelebrante?: string;
 }
 
 export interface StudentDocument {

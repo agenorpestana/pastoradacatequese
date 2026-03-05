@@ -23,6 +23,16 @@ export const ClassForm: React.FC<ClassFormProps> = ({ onSave, onCancel, initialD
     ativa: true
   });
 
+  // Ensure diaSemana is correctly set when initialData changes
+  useEffect(() => {
+    if (initialData) {
+      setFormData(prev => ({
+        ...prev,
+        ...initialData
+      }));
+    }
+  }, [initialData]);
+
   const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
   const [isSelectorOpen, setIsSelectorOpen] = useState(false);
   const [studentSearch, setStudentSearch] = useState('');

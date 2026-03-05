@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Save, UserCheck, ArrowLeft, Calendar, Phone, Mail, MapPin, ShieldCheck, MessageCircle, Sparkles, X, Camera, Heart, FileText, Printer, Church, Wine, ClipboardList, Award, Users, Home, User } from 'lucide-react';
+import { Save, UserCheck, ArrowLeft, Calendar, Phone, Mail, MapPin, ShieldCheck, MessageCircle, Sparkles, X, Camera, Heart, FileText, Printer, Church, Wine, ClipboardList, Award, Users, Home, User, Droplets } from 'lucide-react';
 import { Catequista, ParishConfig } from '../types';
 import { maskPhone, maskCpfCnpj } from '../utils/masks';
 
@@ -12,7 +12,7 @@ interface CatequistaFormProps {
   config: ParishConfig;
 }
 
-type TabType = 'pessoal' | 'contato' | 'endereco';
+type TabType = 'pessoal' | 'contato' | 'endereco' | 'sacramentos';
 
 export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel, initialData, config }) => {
   const [activeTab, setActiveTab] = useState<TabType>('pessoal');
@@ -23,6 +23,8 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
     whatsapp: '',
     telefone: '',
     email: '',
+    batizado: false,
+    fezPrimeiraEucaristia: false,
     temCrisma: false,
     matricula: Math.floor(100000 + Math.random() * 900000).toString() // Generate random 6-digit matricula
   });
@@ -90,6 +92,7 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
     { id: 'pessoal', label: 'Pessoal', icon: User },
     { id: 'contato', label: 'Contato', icon: Phone },
     { id: 'endereco', label: 'Endereço', icon: MapPin },
+    { id: 'sacramentos', label: 'Sacramentos', icon: Church },
   ];
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -181,12 +184,55 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
                     <p className="col-span-2"><strong>Endereço:</strong> {formData.endereco || '---'}, {formData.numero || '---'} - {formData.bairro || '---'}, {formData.cidade || '---'}/{formData.ufEndereco || '---'}</p>
                     <p className="col-span-2"><strong>TURMA ATUAL:</strong> {formData.atuacao || '---'} - <strong>COMUNIDADE:</strong> {formData.comunidade || '---'}</p>
                     <p className="col-span-2"><strong>Início na Catequese:</strong> {formData.desde ? new Date(formData.desde + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</p>
-                    <p className="col-span-2"><strong>Já é Crismado?</strong> {formData.temCrisma ? `Sim (${formData.crismaData ? new Date(formData.crismaData + 'T00:00:00').toLocaleDateString('pt-BR') : ''} - ${formData.crismaParoquia || ''})` : 'Não'}</p>
                   </div>
                 </section>
 
                 <section>
-                  <h3 className="bg-slate-100 px-2 py-1 text-[10px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">2. Preferências de Atuação</h3>
+                  <h3 className="bg-slate-100 px-2 py-1 text-[10px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">2. Sacramentos</h3>
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-[11px]">
+                    <div className="border border-slate-200 p-2 rounded">
+                      <p className="font-black border-b border-slate-100 mb-1 uppercase text-[9px]">Batismo</p>
+                      <p><strong>Batizado?</strong> {formData.batizado ? 'Sim' : 'Não'}</p>
+                      {formData.batizado && (
+                        <>
+                          <p><strong>Data:</strong> {formData.batismoData ? new Date(formData.batismoData + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</p>
+                          <p><strong>Diocese:</strong> {formData.batismoDiocese || '---'} - {formData.batismoUF || '---'}</p>
+                          <p><strong>Paróquia:</strong> {formData.batismoParoquia || '---'}</p>
+                          <p><strong>Comunidade:</strong> {formData.batismoComunidade || '---'}</p>
+                          <p><strong>Local:</strong> {formData.batismoLocal || '---'}</p>
+                        </>
+                      )}
+                    </div>
+                    <div className="border border-slate-200 p-2 rounded">
+                      <p className="font-black border-b border-slate-100 mb-1 uppercase text-[9px]">Eucaristia</p>
+                      <p><strong>Fez 1ª Eucaristia?</strong> {formData.fezPrimeiraEucaristia ? 'Sim' : 'Não'}</p>
+                      {formData.fezPrimeiraEucaristia && (
+                        <>
+                          <p><strong>Data:</strong> {formData.eucaristiaData ? new Date(formData.eucaristiaData + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</p>
+                          <p><strong>Diocese:</strong> {formData.eucaristiaDiocese || '---'} - {formData.eucaristiaUF || '---'}</p>
+                          <p><strong>Paróquia:</strong> {formData.eucaristiaParoquia || '---'}</p>
+                          <p><strong>Comunidade:</strong> {formData.eucaristiaComunidade || '---'}</p>
+                          <p><strong>Celebrante:</strong> {formData.eucaristiaCelebrante || '---'}</p>
+                        </>
+                      )}
+                    </div>
+                    <div className="border border-slate-200 p-2 rounded col-span-2">
+                      <p className="font-black border-b border-slate-100 mb-1 uppercase text-[9px]">Crisma</p>
+                      <p><strong>Já é Crismado?</strong> {formData.temCrisma ? 'Sim' : 'Não'}</p>
+                      {formData.temCrisma && (
+                        <div className="grid grid-cols-2 gap-x-4">
+                          <p><strong>Data:</strong> {formData.crismaData ? new Date(formData.crismaData + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</p>
+                          <p><strong>Diocese:</strong> {formData.crismaDiocese || '---'} - {formData.crismaUF || '---'}</p>
+                          <p><strong>Paróquia:</strong> {formData.crismaParoquia || '---'}</p>
+                          <p><strong>Comunidade:</strong> {formData.crismaComunidade || '---'}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </section>
+
+                <section>
+                  <h3 className="bg-slate-100 px-2 py-1 text-[10px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">3. Preferências de Atuação</h3>
                   <div className="grid grid-cols-1 gap-y-1.5 text-[11px]">
                     <p><strong>Qual Turma/Etapa você atua?</strong> {formData.atuacao || '---'}</p>
                     <p><strong>Qual Turma/Etapa você gosta de atuar?</strong> {formData.atuacaoDesejada || '---'}</p>
@@ -195,7 +241,7 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
 
                 {formData.estadoCivil === 'Casado(a)' && (
                   <section>
-                    <h3 className="bg-slate-100 px-2 py-1 text-[10px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">3. Dados do Cônjuge</h3>
+                    <h3 className="bg-slate-100 px-2 py-1 text-[10px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">4. Dados do Cônjuge</h3>
                     <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[11px]">
                       <p className="col-span-2"><strong>Nome do Cônjuge:</strong> {formData.conjuge || '---'}</p>
                       <p><strong>CPF do Cônjuge:</strong> {formData.conjugeRgCpf || '---'}</p>
@@ -443,67 +489,184 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
               </div>
 
               <div className="md:col-span-12">
-                <div className="bg-indigo-50/30 p-6 rounded-3xl border border-indigo-100">
-                  <div className="flex items-center gap-3 mb-6">
-                    <input 
-                      type="checkbox" 
-                      checked={formData.temCrisma} 
-                      onChange={e => setFormData({...formData, temCrisma: e.target.checked})} 
-                      className="w-5 h-5 rounded cursor-pointer accent-indigo-600" 
-                      id="chkCrisma" 
-                    />
-                    <label htmlFor="chkCrisma" className="font-bold text-slate-700 cursor-pointer">Já é Crismado?</label>
-                  </div>
-                  {formData.temCrisma && (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-in slide-in-from-top-2">
-                      <div>
-                        <label className="label-style">Data da Crisma</label>
-                        <input type="date" value={formData.crismaData || ''} onChange={e => setFormData({...formData, crismaData: e.target.value})} className="input-style bg-white" />
-                      </div>
-                      <div>
-                        <label className="label-style">Paróquia</label>
-                        <input type="text" value={formData.crismaParoquia || ''} onChange={e => setFormData({...formData, crismaParoquia: e.target.value})} className="input-style bg-white" />
-                      </div>
-                      <div>
-                        <label className="label-style">Cidade</label>
-                        <input type="text" value={formData.crismaCidade || ''} onChange={e => setFormData({...formData, crismaCidade: e.target.value})} className="input-style bg-white" />
-                      </div>
+                <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 space-y-6">
+                  <h4 className="text-sm font-black text-slate-800 uppercase flex items-center gap-2">
+                    <Users size={18} className="text-slate-600" /> Preferências de Atuação
+                  </h4>
+                  <div className="grid grid-cols-1 gap-4">
+                    <div>
+                      <label className="label-style">Qual Turma/Etapa você atua?</label>
+                      <input 
+                        type="text" 
+                        value={formData.atuacao || ''} 
+                        onChange={e => setFormData({...formData, atuacao: e.target.value})} 
+                        className="input-style" 
+                        placeholder="Ex: 1ª Etapa, Crisma..."
+                      />
                     </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 space-y-6">
-              <h4 className="text-sm font-black text-slate-800 uppercase flex items-center gap-2">
-                <Users size={18} className="text-slate-600" /> Preferências de Atuação
-              </h4>
-              <div className="grid grid-cols-1 gap-4">
-                <div>
-                  <label className="label-style">Qual Turma/Etapa você atua?</label>
-                  <input 
-                    type="text" 
-                    value={formData.atuacao || ''} 
-                    onChange={e => setFormData({...formData, atuacao: e.target.value})} 
-                    className="input-style" 
-                    placeholder="Ex: 1ª Etapa, Crisma..."
-                  />
-                </div>
-                <div>
-                  <label className="label-style">Qual Turma/Etapa você gosta de atuar?</label>
-                  <input 
-                    type="text" 
-                    value={formData.atuacaoDesejada || ''} 
-                    onChange={e => setFormData({...formData, atuacaoDesejada: e.target.value})} 
-                    className="input-style" 
-                    placeholder="Ex: Perseverança, Adultos..."
-                  />
+                    <div>
+                      <label className="label-style">Qual Turma/Etapa você gosta de atuar?</label>
+                      <input 
+                        type="text" 
+                        value={formData.atuacaoDesejada || ''} 
+                        onChange={e => setFormData({...formData, atuacaoDesejada: e.target.value})} 
+                        className="input-style" 
+                        placeholder="Ex: Perseverança, Adultos..."
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         )}
 
+        {activeTab === 'sacramentos' && (
+          <div className="space-y-10 animate-in slide-in-from-right-4 duration-300">
+            {/* BATISMO */}
+            <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-50 rounded-2xl text-blue-600"><Droplets className="w-5 h-5" /></div>
+                  <h4 className="font-black text-slate-800 uppercase tracking-widest text-xs">Sacramento do Batismo</h4>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input 
+                    type="checkbox" 
+                    checked={formData.batizado} 
+                    onChange={e => setFormData({...formData, batizado: e.target.checked})} 
+                    className="w-5 h-5 rounded cursor-pointer accent-blue-600" 
+                    id="chkBatismo" 
+                  />
+                  <label htmlFor="chkBatismo" className="text-xs font-bold text-slate-600 cursor-pointer">Já é Batizado?</label>
+                </div>
+              </div>
+
+              {formData.batizado && (
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-6 animate-in slide-in-from-top-2">
+                  <div className="md:col-span-4">
+                    <label className="label-style">Data do Batismo</label>
+                    <input type="date" value={formData.batismoData || ''} onChange={e => setFormData({...formData, batismoData: e.target.value})} className="input-style" />
+                  </div>
+                  <div className="md:col-span-6">
+                    <label className="label-style">Diocese</label>
+                    <input type="text" value={formData.batismoDiocese || ''} onChange={e => setFormData({...formData, batismoDiocese: e.target.value})} className="input-style" placeholder="Diocese do Batismo" />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="label-style">UF</label>
+                    <input type="text" maxLength={2} value={formData.batismoUF || ''} onChange={e => setFormData({...formData, batismoUF: e.target.value.toUpperCase()})} className="input-style text-center font-bold" placeholder="BA" />
+                  </div>
+                  <div className="md:col-span-6">
+                    <label className="label-style">Paróquia</label>
+                    <input type="text" value={formData.batismoParoquia || ''} onChange={e => setFormData({...formData, batismoParoquia: e.target.value})} className="input-style" placeholder="Paróquia do Batismo" />
+                  </div>
+                  <div className="md:col-span-6">
+                    <label className="label-style">Comunidade</label>
+                    <input type="text" value={formData.batismoComunidade || ''} onChange={e => setFormData({...formData, batismoComunidade: e.target.value})} className="input-style" placeholder="Comunidade do Batismo" />
+                  </div>
+                  <div className="md:col-span-12">
+                    <label className="label-style">Local / Igreja</label>
+                    <input type="text" value={formData.batismoLocal || ''} onChange={e => setFormData({...formData, batismoLocal: e.target.value})} className="input-style" placeholder="Nome da Igreja ou Local" />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* EUCARISTIA */}
+            <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-amber-50 rounded-2xl text-amber-600"><Wine className="w-5 h-5" /></div>
+                  <h4 className="font-black text-slate-800 uppercase tracking-widest text-xs">Sacramento da Eucaristia</h4>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input 
+                    type="checkbox" 
+                    checked={formData.fezPrimeiraEucaristia} 
+                    onChange={e => setFormData({...formData, fezPrimeiraEucaristia: e.target.checked})} 
+                    className="w-5 h-5 rounded cursor-pointer accent-amber-600" 
+                    id="chkEucaristia" 
+                  />
+                  <label htmlFor="chkEucaristia" className="text-xs font-bold text-slate-600 cursor-pointer">Fez 1ª Eucaristia?</label>
+                </div>
+              </div>
+
+              {formData.fezPrimeiraEucaristia && (
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-6 animate-in slide-in-from-top-2">
+                  <div className="md:col-span-4">
+                    <label className="label-style">Data da 1ª Eucaristia</label>
+                    <input type="date" value={formData.eucaristiaData || ''} onChange={e => setFormData({...formData, eucaristiaData: e.target.value})} className="input-style" />
+                  </div>
+                  <div className="md:col-span-6">
+                    <label className="label-style">Diocese</label>
+                    <input type="text" value={formData.eucaristiaDiocese || ''} onChange={e => setFormData({...formData, eucaristiaDiocese: e.target.value})} className="input-style" placeholder="Diocese da Celebração" />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="label-style">UF</label>
+                    <input type="text" maxLength={2} value={formData.eucaristiaUF || ''} onChange={e => setFormData({...formData, eucaristiaUF: e.target.value.toUpperCase()})} className="input-style text-center font-bold" placeholder="BA" />
+                  </div>
+                  <div className="md:col-span-6">
+                    <label className="label-style">Paróquia</label>
+                    <input type="text" value={formData.eucaristiaParoquia || ''} onChange={e => setFormData({...formData, eucaristiaParoquia: e.target.value})} className="input-style" placeholder="Paróquia da Celebração" />
+                  </div>
+                  <div className="md:col-span-6">
+                    <label className="label-style">Comunidade</label>
+                    <input type="text" value={formData.eucaristiaComunidade || ''} onChange={e => setFormData({...formData, eucaristiaComunidade: e.target.value})} className="input-style" placeholder="Comunidade da Celebração" />
+                  </div>
+                  <div className="md:col-span-12">
+                    <label className="label-style">Celebrante</label>
+                    <input type="text" value={formData.eucaristiaCelebrante || ''} onChange={e => setFormData({...formData, eucaristiaCelebrante: e.target.value})} className="input-style" placeholder="Nome do Padre / Celebrante" />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* CRISMA */}
+            <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-indigo-50 rounded-2xl text-indigo-600"><ShieldCheck className="w-5 h-5" /></div>
+                  <h4 className="font-black text-slate-800 uppercase tracking-widest text-xs">Sacramento da Crisma</h4>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input 
+                    type="checkbox" 
+                    checked={formData.temCrisma} 
+                    onChange={e => setFormData({...formData, temCrisma: e.target.checked})} 
+                    className="w-5 h-5 rounded cursor-pointer accent-indigo-600" 
+                    id="chkCrismaTab" 
+                  />
+                  <label htmlFor="chkCrismaTab" className="text-xs font-bold text-slate-600 cursor-pointer">Já é Crismado?</label>
+                </div>
+              </div>
+
+              {formData.temCrisma && (
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-6 animate-in slide-in-from-top-2">
+                  <div className="md:col-span-4">
+                    <label className="label-style">Data da Crisma</label>
+                    <input type="date" value={formData.crismaData || ''} onChange={e => setFormData({...formData, crismaData: e.target.value})} className="input-style" />
+                  </div>
+                  <div className="md:col-span-6">
+                    <label className="label-style">Diocese</label>
+                    <input type="text" value={formData.crismaDiocese || ''} onChange={e => setFormData({...formData, crismaDiocese: e.target.value})} className="input-style" placeholder="Diocese da Crisma" />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="label-style">UF</label>
+                    <input type="text" maxLength={2} value={formData.crismaUF || ''} onChange={e => setFormData({...formData, crismaUF: e.target.value.toUpperCase()})} className="input-style text-center font-bold" placeholder="BA" />
+                  </div>
+                  <div className="md:col-span-6">
+                    <label className="label-style">Paróquia</label>
+                    <input type="text" value={formData.crismaParoquia || ''} onChange={e => setFormData({...formData, crismaParoquia: e.target.value})} className="input-style" placeholder="Paróquia da Crisma" />
+                  </div>
+                  <div className="md:col-span-6">
+                    <label className="label-style">Comunidade</label>
+                    <input type="text" value={formData.crismaComunidade || ''} onChange={e => setFormData({...formData, crismaComunidade: e.target.value})} className="input-style" placeholder="Comunidade da Crisma" />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
         {activeTab === 'contato' && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="flex items-center gap-2 mb-2">
@@ -582,8 +745,8 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
           <button type="button" onClick={() => activeTab !== 'pessoal' ? setActiveTab(tabs[tabs.findIndex(t => t.id === activeTab) - 1].id) : onCancel()} className="flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-slate-400 hover:bg-slate-100 transition-all">
             <ArrowLeft className="w-5 h-5" /> {activeTab === 'pessoal' ? 'Cancelar' : 'Anterior'}
           </button>
-          <button type="button" onClick={() => activeTab !== 'endereco' ? setActiveTab(tabs[tabs.findIndex(t => t.id === activeTab) + 1].id) : handleSubmit({ preventDefault: () => {} } as any)} className="flex items-center gap-2 px-12 py-4 rounded-2xl bg-amber-400 text-white font-black hover:bg-amber-500 shadow-xl shadow-amber-100 transition-all transform hover:-translate-y-0.5 uppercase tracking-widest text-xs">
-            {activeTab === 'endereco' ? (initialData ? 'Atualizar Cadastro' : 'Salvar Catequista') : 'Próxima Etapa'} <Save className="w-6 h-6" />
+          <button type="button" onClick={() => activeTab !== 'sacramentos' ? setActiveTab(tabs[tabs.findIndex(t => t.id === activeTab) + 1].id) : handleSubmit({ preventDefault: () => {} } as any)} className="flex items-center gap-2 px-12 py-4 rounded-2xl bg-amber-400 text-white font-black hover:bg-amber-500 shadow-xl shadow-amber-100 transition-all transform hover:-translate-y-0.5 uppercase tracking-widest text-xs">
+            {activeTab === 'sacramentos' ? (initialData ? 'Atualizar Cadastro' : 'Salvar Catequista') : 'Próxima Etapa'} <Save className="w-6 h-6" />
           </button>
         </div>
       </form>

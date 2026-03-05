@@ -174,6 +174,16 @@ export const Layout: React.FC<LayoutProps> = ({
                   </button>
                 )}
 
+                {perms.niveis_etapas && (
+                  <button 
+                    onClick={() => handleNavClick('niveis_list')} 
+                    className={`flex items-center gap-4 p-4 rounded-2xl transition-all ${currentView === 'niveis_list' ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-slate-600 bg-slate-50 hover:bg-slate-100'}`}
+                  >
+                    <ShieldCheck className="w-5 h-5" />
+                    <span className="text-sm font-bold uppercase tracking-tight">Níveis/Etapas</span>
+                  </button>
+                )}
+
                 {perms.attendance_report && (
                   <button 
                     onClick={() => handleNavClick('attendance_report')} 
@@ -299,7 +309,7 @@ export const Layout: React.FC<LayoutProps> = ({
             </button>
           )}
 
-          {perms.niveis_etapas && (
+          {(perms.niveis_etapas || currentUser.role === 'coordenador_paroquial') && (
             <button onClick={() => setView('niveis_list')} className={`w-full flex items-center transition-all duration-300 rounded-2xl group ${isCollapsed ? 'justify-center p-4' : 'gap-4 px-5 py-3.5'} ${currentView === 'niveis_list' ? 'bg-blue-600 text-white shadow-xl shadow-blue-200' : 'text-slate-500 hover:bg-white'}`}>
               <ShieldCheck size={isCollapsed ? 24 : 20} className={`transition-transform duration-300 ${!isCollapsed && 'group-hover:scale-110'}`} />
               {!isCollapsed && <span className="font-bold text-sm tracking-tight">Níveis/Etapas</span>}

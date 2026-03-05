@@ -149,6 +149,7 @@ export const UserForm: React.FC<UserFormProps> = ({ onSave, onCancel, initialDat
       classes: false,
       catequistas: false,
       formations: false,
+      niveis_etapas: false,
       reports: false,
       attendance_report: false,
       certificates: false,
@@ -164,6 +165,13 @@ export const UserForm: React.FC<UserFormProps> = ({ onSave, onCancel, initialDat
     }
   });
 
+  // Ensure formData is updated when initialData changes
+  React.useEffect(() => {
+    if (initialData) {
+      setFormData(initialData);
+    }
+  }, [initialData]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const newUser = {
@@ -177,7 +185,10 @@ export const UserForm: React.FC<UserFormProps> = ({ onSave, onCancel, initialDat
         library_view: true, library_upload: true, library_delete: true,
         gallery_view: true, gallery_upload: true, gallery_delete: true,
         allowedClassIds: []
-      } : formData.permissions
+      } : {
+        ...formData.permissions,
+        niveis_etapas: formData.permissions?.niveis_etapas || false
+      } as UserPermissions
     } as User;
     onSave(newUser);
   };
