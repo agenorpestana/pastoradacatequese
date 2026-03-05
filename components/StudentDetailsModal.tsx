@@ -164,10 +164,10 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
                   <h3 className="bg-slate-100 px-2 py-0.5 text-[8px] font-black uppercase border-l-4 border-slate-900 mb-1.5 tracking-widest">3. Sacramentos</h3>
                   <div className="grid grid-cols-1 gap-y-1 text-[9px]">
                     <div className="flex flex-col gap-0.5">
-                      <p><strong>Batizado(a):</strong> {student.batizado ? 'Sim' : 'Não'} {student.batizado && ` - Paróquia: ${student.batismoParoquia} / ${student.batismoUF}`}</p>
+                      <p><strong>Batizado(a):</strong> {student.batizado ? 'Sim' : 'Não'} {student.batizado && ` - Paróquia: ${student.batismoParoquia}`}</p>
                       {student.batizado && (
                         <>
-                          <p className="pl-2"><strong>Data:</strong> {formatDate(student.batismoData)} | <strong>Diocese:</strong> {student.batismoDiocese || '---'}</p>
+                          <p className="pl-2"><strong>Data:</strong> {formatDate(student.batismoData)} | <strong>Diocese:</strong> {student.batismoDiocese || '---'} / {student.batismoUF || '---'}</p>
                           <p className="pl-2"><strong>Comunidade:</strong> {student.batismoComunidade || '---'} | <strong>Local/Cidade:</strong> {student.batismoLocal || '---'} | <strong>Celebrante:</strong> {student.batismoCelebrante || '---'}</p>
                           <div className="grid grid-cols-2 gap-x-4 pl-2 mt-0.5">
                              <div>
@@ -185,9 +185,9 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
                       )}
                     </div>
                     <div className="flex flex-col gap-0.5 mt-1">
-                      <p><strong>1ª Eucaristia:</strong> {student.fezPrimeiraEucaristia ? 'Sim' : 'Não'} {student.fezPrimeiraEucaristia && ` - Paróquia: ${student.eucaristiaParoquia} / ${student.eucaristiaUF}`}</p>
+                      <p><strong>1ª Eucaristia:</strong> {student.fezPrimeiraEucaristia ? 'Sim' : 'Não'} {student.fezPrimeiraEucaristia && ` - Paróquia: ${student.eucaristiaParoquia}`}</p>
                       {student.fezPrimeiraEucaristia && (
-                        <p className="pl-2"><strong>Comunidade:</strong> {student.eucaristiaComunidade || '---'} | <strong>Local/Cidade:</strong> {student.eucaristiaLocal || '---'} | <strong>Catequistas:</strong> {student.eucaristiaCatequistas || '---'}</p>
+                        <p className="pl-2"><strong>Comunidade:</strong> {student.eucaristiaComunidade || '---'} | <strong>Local/Cidade:</strong> {student.eucaristiaLocal || '---'} | <strong>Celebrante:</strong> {student.eucaristiaCelebrante || '---'} | <strong>Catequistas:</strong> {student.eucaristiaCatequistas || '---'}</p>
                       )}
                     </div>
                   </div>

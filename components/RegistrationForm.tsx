@@ -474,10 +474,10 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                   <h3 className="bg-slate-100 px-2 py-1 text-[10px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">3. Sacramentos</h3>
                   <div className="grid grid-cols-1 gap-y-1.5 text-[11px]">
                     <div className="flex flex-col gap-1">
-                      <p><strong>Batizado(a):</strong> {formData.batizado ? 'Sim' : 'Não'} {formData.batizado && ` - Paróquia: ${formData.batismoParoquia} / ${formData.batismoUF}`}</p>
+                      <p><strong>Batizado(a):</strong> {formData.batizado ? 'Sim' : 'Não'} {formData.batizado && ` - Paróquia: ${formData.batismoParoquia}`}</p>
                       {formData.batizado && (
                         <>
-                          <p className="pl-2"><strong>Data:</strong> {formatDate(formData.batismoData)} | <strong>Diocese:</strong> {formData.batismoDiocese || '---'}</p>
+                          <p className="pl-2"><strong>Data:</strong> {formatDate(formData.batismoData)} | <strong>Diocese:</strong> {formData.batismoDiocese || '---'} / {formData.batismoUF || '---'}</p>
                           <p className="pl-2"><strong>Comunidade:</strong> {formData.batismoComunidade || '---'} | <strong>Local/Cidade:</strong> {formData.batismoLocal || '---'} | <strong>Celebrante:</strong> {formData.batismoCelebrante || '---'}</p>
                           <div className="grid grid-cols-2 gap-x-4 pl-2 mt-1">
                              <div>
@@ -495,9 +495,9 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                       )}
                     </div>
                     <div className="flex flex-col gap-1 mt-1">
-                      <p><strong>1ª Eucaristia:</strong> {formData.fezPrimeiraEucaristia ? 'Sim' : 'Não'} {formData.fezPrimeiraEucaristia && ` - Paróquia: ${formData.eucaristiaParoquia} / ${formData.eucaristiaUF}`}</p>
+                      <p><strong>1ª Eucaristia:</strong> {formData.fezPrimeiraEucaristia ? 'Sim' : 'Não'} {formData.fezPrimeiraEucaristia && ` - Paróquia: ${formData.eucaristiaParoquia}`}</p>
                       {formData.fezPrimeiraEucaristia && (
-                        <p className="pl-2"><strong>Comunidade:</strong> {formData.eucaristiaComunidade || '---'} | <strong>Local/Cidade:</strong> {formData.eucaristiaLocal || '---'} | <strong>Catequistas:</strong> {formData.eucaristiaCatequistas || '---'}</p>
+                        <p className="pl-2"><strong>Comunidade:</strong> {formData.eucaristiaComunidade || '---'} | <strong>Local/Cidade:</strong> {formData.eucaristiaLocal || '---'} | <strong>Celebrante:</strong> {formData.eucaristiaCelebrante || '---'} | <strong>Catequistas:</strong> {formData.eucaristiaCatequistas || '---'}</p>
                       )}
                     </div>
                   </div>
