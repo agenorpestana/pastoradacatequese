@@ -427,7 +427,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                 </div>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <section className="relative">
                   {formData.foto && (
                     <div className="absolute top-0 right-0 w-20 h-24 border border-slate-900 overflow-hidden bg-white">
@@ -547,7 +547,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
 
             <div>
               {/* TERMO DE COMPROMISSO (APENAS IMPRESSÃO) */}
-              <section className="mt-4 pt-3 border-t border-slate-200">
+              <section className="mt-2 pt-2 border-t border-slate-200">
                  <h3 className="text-[9px] font-black uppercase mb-1.5 tracking-widest text-center">Termo de Responsabilidade</h3>
                  <p className="text-[8px] leading-relaxed text-justify italic text-slate-700">
                    "Catequese é processo permanente de educação na fé". Ao inscrever seu(sua) filho(a) na catequese, você está se comprometendo a fazer parte deste processo, ou seja, ter um compromisso de participar com seu(sua) filho(a) das atividades da Paróquia (Missa das crianças e reuniões). E responsabilidade sua a educação religiosa de seu (sua) filho(a) pois, não se deve esquecer que 'os pais são os primeiros catequistas dos filhos'. Sem o seu compromisso e apoio, o trabalho catequético será em vão."
@@ -557,7 +557,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                  </div>
               </section>
 
-              <div className="mt-24 grid grid-cols-2 gap-12 pb-4">
+              <div className="mt-12 grid grid-cols-2 gap-12 pb-4">
                 <div className="text-center">
                   <div className="border-t border-slate-900 pt-1 text-[8px] font-bold uppercase">Assinatura do Responsável</div>
                 </div>
