@@ -95,6 +95,14 @@ const runMigrations = async () => {
             console.log("✅ Migration Successful: Column added to turmas.");
         }
 
+        // Migration 5: locked in attendance_sessions
+        const [columnsAttendance] = await conn.query("SHOW COLUMNS FROM attendance_sessions LIKE 'locked'");
+        if (columnsAttendance.length === 0) {
+            console.log("⚠️ Migration Required: Adding 'locked' to 'attendance_sessions' table...");
+            await conn.query("ALTER TABLE attendance_sessions ADD COLUMN locked BOOLEAN DEFAULT FALSE");
+            console.log("✅ Migration Successful: Column added to attendance_sessions.");
+        }
+
     } catch (err) {
         console.error("❌ Migration Failed:", err.message);
         // Don't crash, purely log the error as it might be a connection issue handled later
@@ -235,8 +243,8 @@ app.post('/api/:resource', async (req, res) => {
         params = [data.id, data.nome, data.status, data.sexo, data.dataNascimento || null, data.rgCpf, data.comunidade, data.telefone, data.whatsapp, data.email, json(data)];
         break;
       case 'attendance_sessions':
-        query = 'INSERT INTO attendance_sessions (id, turma_id, date, tema, entries) VALUES (?, ?, ?, ?, ?)';
-        params = [data.id, data.turmaId, data.date, data.tema, json(data.entries)];
+        query = 'INSERT INTO attendance_sessions (id, turma_id, date, tema, entries, locked) VALUES (?, ?, ?, ?, ?, ?)';
+        params = [data.id, data.turmaId, data.date, data.tema, json(data.entries), data.locked || false];
         break;
       case 'events':
         query = 'INSERT INTO events (id, titulo, data_inicio, data_fim, tipo, full_data) VALUES (?, ?, ?, ?, ?, ?)';
@@ -302,8 +310,8 @@ app.put('/api/:resource/:id', async (req, res) => {
           params = [data.nome, data.status, data.sexo, data.dataNascimento || null, data.rgCpf, data.comunidade, data.telefone, data.whatsapp, data.email, json(data), id];
           break;
         case 'attendance_sessions':
-          query = 'UPDATE attendance_sessions SET date=?, tema=?, entries=? WHERE id=?';
-          params = [data.date, data.tema, json(data.entries), id];
+          query = 'UPDATE attendance_sessions SET date=?, tema=?, entries=?, locked=? WHERE id=?';
+          params = [data.date, data.tema, json(data.entries), data.locked || false, id];
           break;
         case 'events':
           query = 'UPDATE events SET titulo=?, data_inicio=?, data_fim=?, tipo=?, full_data=? WHERE id=?';

@@ -114,7 +114,7 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
     <div className="relative">
       {/* PRINT ONLY SECTION (PORTAL) */}
       {createPortal(
-        <div className="print-only bg-white min-h-screen text-slate-900 absolute inset-0 z-[9999] hidden">
+        <div className="print-only bg-white text-slate-900 absolute inset-0 z-[9999] hidden">
           <style>{`
             @media print {
               @page { margin: 0; size: auto; }
@@ -155,8 +155,8 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
                           <UserCheck className="w-10 h-10" />
                         )}
                         <div>
-                          <h1 className="text-xl font-black uppercase tracking-tighter">Ficha de Inscrição de Catequista</h1>
-                          <div className="text-[12px] font-bold uppercase mt-1">
+                          <h1 className="text-lg font-black uppercase tracking-tighter">Ficha de Inscrição de Catequista</h1>
+                          <div className="text-[10px] font-bold uppercase mt-1">
                             <p>{config.parishName}</p>
                             <p>{config.dioceseName}</p>
                             <p>{config.city}-{config.state}</p>
@@ -164,9 +164,9 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-[10px] font-bold uppercase">Matrícula</p>
-                        <p className="text-lg font-black">{formData.matricula || '________'}</p>
-                        <p className="text-[9px] uppercase font-bold text-slate-400 mt-0.5">
+                        <p className="text-[9px] font-bold uppercase">Matrícula</p>
+                        <p className="text-base font-black">{formData.matricula || '________'}</p>
+                        <p className="text-[8px] uppercase font-bold text-slate-400 mt-0.5">
                           Data: {new Date().toLocaleDateString('pt-BR')}
                         </p>
                       </div>
@@ -187,8 +187,8 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
                             <img src={formData.foto} className="w-full h-full object-cover" alt="Foto" />
                           </div>
                         )}
-                        <h3 className="bg-slate-100 px-2 py-1 text-[10px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">1. Dados Pessoais</h3>
-                        <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[11px] pr-28">
+                        <h3 className="bg-slate-100 px-2 py-1 text-[9px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">1. Dados Pessoais</h3>
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px] pr-28">
                           <p className="col-span-2"><strong>Nome:</strong> {formData.nome || '---'}</p>
                           <p><strong>CPF:</strong> {formData.rgCpf || '---'}</p>
                           <p><strong>Nascimento:</strong> {formData.dataNascimento ? new Date(formData.dataNascimento + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</p>
@@ -205,10 +205,10 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
                       </section>
 
                       <section>
-                        <h3 className="bg-slate-100 px-2 py-1 text-[10px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">2. Sacramentos</h3>
-                        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-[11px]">
-                          <div className="border border-slate-200 p-2 rounded">
-                            <p className="font-black border-b border-slate-100 mb-1 uppercase text-[9px]">Batismo</p>
+                        <h3 className="bg-slate-100 px-2 py-1 text-[9px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">2. Sacramentos</h3>
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[10px]">
+                          <div className="border border-slate-200 p-1.5 rounded">
+                            <p className="font-black border-b border-slate-100 mb-1 uppercase text-[8px]">Batismo</p>
                             <p><strong>Batizado?</strong> {formData.batizado ? 'Sim' : 'Não'}</p>
                             {formData.batizado && (
                               <>
@@ -220,8 +220,8 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
                               </>
                             )}
                           </div>
-                          <div className="border border-slate-200 p-2 rounded">
-                            <p className="font-black border-b border-slate-100 mb-1 uppercase text-[9px]">Eucaristia</p>
+                          <div className="border border-slate-200 p-1.5 rounded">
+                            <p className="font-black border-b border-slate-100 mb-1 uppercase text-[8px]">Eucaristia</p>
                             <p><strong>Fez 1ª Eucaristia?</strong> {formData.fezPrimeiraEucaristia ? 'Sim' : 'Não'}</p>
                             {formData.fezPrimeiraEucaristia && (
                               <>
@@ -233,8 +233,8 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
                               </>
                             )}
                           </div>
-                          <div className="border border-slate-200 p-2 rounded col-span-2">
-                            <p className="font-black border-b border-slate-100 mb-1 uppercase text-[9px]">Crisma</p>
+                          <div className="border border-slate-200 p-1.5 rounded col-span-2">
+                            <p className="font-black border-b border-slate-100 mb-1 uppercase text-[8px]">Crisma</p>
                             <p><strong>Já é Crismado?</strong> {formData.temCrisma ? 'Sim' : 'Não'}</p>
                             {formData.temCrisma && (
                               <div className="grid grid-cols-2 gap-x-4">
@@ -249,8 +249,8 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
                       </section>
 
                       <section>
-                        <h3 className="bg-slate-100 px-2 py-1 text-[10px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">3. Preferências de Atuação</h3>
-                        <div className="grid grid-cols-1 gap-y-1.5 text-[11px]">
+                        <h3 className="bg-slate-100 px-2 py-1 text-[9px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">3. Preferências de Atuação</h3>
+                        <div className="grid grid-cols-1 gap-y-1 text-[10px]">
                           <p><strong>Qual Turma/Etapa você atua?</strong> {formData.atuacao || '---'}</p>
                           <p><strong>Qual Turma/Etapa você gosta de atuar?</strong> {formData.atuacaoDesejada || '---'}</p>
                         </div>
@@ -258,8 +258,8 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
 
                       {formData.estadoCivil === 'Casado(a)' && (
                         <section>
-                          <h3 className="bg-slate-100 px-2 py-1 text-[10px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">4. Dados do Cônjuge</h3>
-                          <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[11px]">
+                          <h3 className="bg-slate-100 px-2 py-1 text-[9px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">4. Dados do Cônjuge</h3>
+                          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px]">
                             <p className="col-span-2"><strong>Nome do Cônjuge:</strong> {formData.conjuge || '---'}</p>
                             <p><strong>CPF do Cônjuge:</strong> {formData.conjugeRgCpf || '---'}</p>
                             <p><strong>Telefone do Cônjuge:</strong> {formData.conjugeTelefone || '---'}</p>
@@ -277,35 +277,35 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
                 <td>
                   <div className="px-5 pb-5">
                     {/* TERMO DE COMPROMISSO (APENAS IMPRESSÃO) */}
-                    <section className="mt-6 pt-4 border-t border-slate-200">
-                      <h3 className="text-[11px] font-black uppercase mb-2 tracking-widest text-center">Termo de compromisso e Responsabilidade</h3>
-                      <p className="text-[10px] leading-relaxed text-justify italic text-slate-700">
+                    <section className="mt-4 pt-3 border-t border-slate-200">
+                      <h3 className="text-[10px] font-black uppercase mb-1.5 tracking-widest text-center">Termo de compromisso e Responsabilidade</h3>
+                      <p className="text-[9px] leading-relaxed text-justify italic text-slate-700">
                         "Catequese é processo permanente de educação na fé". Ao se inscrever na catequese como Catequista/voluntario, você está se comprometendo a fazer parte deste processo, ou seja, ter um compromisso de participar das atividades da Pastoral e da Paróquia (Missa das crianças, Missas Festivas, Reuniões, Retiros, Encontros de Formação...). É responsabilidade sua a educação religiosa dos Catequizandos a você confiados, com a efetiva participação dos Pais, pois, “os pais são os primeiros catequistas dos filhos”. Sem o seu compromisso e apoio, o trabalho catequético não será possível.
                       </p>
-                      <div className="mt-3 text-right">
-                        <p className="text-[10px] font-bold">{config.city}-{config.state}, _____ /_____/_________</p>
+                      <div className="mt-2 text-right">
+                        <p className="text-[9px] font-bold">{config.city}-{config.state}, _____ /_____/_________</p>
                       </div>
                     </section>
 
-                    <div className="mt-12 grid grid-cols-2 gap-12 pb-4">
+                    <div className="mt-8 grid grid-cols-2 gap-12 pb-4">
                       <div className="text-center">
-                        <div className="border-t border-slate-900 pt-1 text-[10px] font-bold uppercase">Assinatura do Catequista</div>
+                        <div className="border-t border-slate-900 pt-1 text-[9px] font-bold uppercase">Assinatura do Catequista</div>
                       </div>
                       <div className="text-center">
-                        <div className="border-t border-slate-900 pt-1 text-[10px] font-bold uppercase">Coordenação de Catequese</div>
+                        <div className="border-t border-slate-900 pt-1 text-[9px] font-bold uppercase">Coordenação de Catequese</div>
                       </div>
                     </div>
 
-                    <div className="border-t-2 border-slate-900 pt-2 mt-auto text-center">
-                      <p className="text-[10px] font-bold uppercase">
+                    <div className="border-t-2 border-slate-900 pt-2 text-center">
+                      <p className="text-[9px] font-bold uppercase">
                         {config.address} - {config.city}/{config.state}
                       </p>
-                      <div className="flex justify-center gap-4 mt-1 text-[10px] font-bold uppercase">
+                      <div className="flex justify-center gap-4 mt-1 text-[9px] font-bold uppercase">
                         {config.phone && <span>Tel: {config.phone}</span>}
                         {config.whatsapp && <span>Zap: {config.whatsapp}</span>}
                         {config.email && <span>Email: {config.email}</span>}
                       </div>
-                      <div className="flex justify-center gap-4 mt-0.5 text-[10px] font-bold uppercase text-slate-600">
+                      <div className="flex justify-center gap-4 mt-0.5 text-[9px] font-bold uppercase text-slate-600">
                         {config.instagram && <span>Insta: {config.instagram}</span>}
                         {config.facebook && <span>Face: {config.facebook}</span>}
                         {config.website && <span>Site: {config.website}</span>}

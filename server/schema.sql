@@ -68,6 +68,7 @@ CREATE TABLE IF NOT EXISTS attendance_sessions (
     date DATE,
     tema VARCHAR(255),
     entries JSON,
+    locked BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
