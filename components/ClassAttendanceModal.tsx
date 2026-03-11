@@ -23,21 +23,28 @@ export const ClassAttendanceModal: React.FC<ClassAttendanceModalProps> = ({
   const [entries, setEntries] = useState<AttendanceEntry[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isLocked, setIsLocked] = useState(false);
+  const [lastLoadedKey, setLastLoadedKey] = useState<string | null>(null);
 
   // Carregar dados se já existir uma sessão para esta data
   useEffect(() => {
-    const existing = existingSessions.find(s => s.turmaId === turma.id && s.date === selectedDate);
-    if (existing) {
-      setEntries(existing.entries);
-      setTema(existing.tema || '');
-      setIsLocked(!!existing.locked);
-    } else {
-      // Inicializar todos como presentes por padrão para facilitar
-      setEntries(members.map(m => ({ studentId: m.id, status: 'present' })));
-      setTema('');
-      setIsLocked(false);
+    const currentKey = `${turma.id}-${selectedDate}`;
+    
+    // Se a chave mudou, ou se ainda não carregamos nada, carregamos os dados
+    if (lastLoadedKey !== currentKey) {
+      const existing = existingSessions.find(s => s.turmaId === turma.id && s.date === selectedDate);
+      if (existing) {
+        setEntries(existing.entries);
+        setTema(existing.tema || '');
+        setIsLocked(!!existing.locked);
+      } else {
+        // Inicializar todos como presentes por padrão para facilitar
+        setEntries(members.map(m => ({ studentId: m.id, status: 'present' })));
+        setTema('');
+        setIsLocked(false);
+      }
+      setLastLoadedKey(currentKey);
     }
-  }, [selectedDate, members, turma.id, existingSessions]);
+  }, [selectedDate, members, turma.id, existingSessions, lastLoadedKey]);
 
   const toggleStatus = (studentId: string) => {
     if (isLocked) return;

@@ -1084,6 +1084,8 @@ const App: React.FC = () => {
             classes={classes} 
             onClose={() => setViewingStudent(null)} 
             config={parishConfig}
+            allStudents={viewingClassMembers ? students.filter(s => s.turma === viewingClassMembers.nome) : undefined}
+            onSelectStudent={(s) => setViewingStudent(s)}
           />
         )}
 
@@ -1108,7 +1110,7 @@ const App: React.FC = () => {
             turma={viewingClassMembers}
             members={students.filter(s => s.turma === viewingClassMembers.nome)}
             onClose={() => setViewingClassMembers(null)}
-            onViewStudent={(s) => { setViewingClassMembers(null); setViewingStudent(s); }}
+            onViewStudent={(s) => { setViewingStudent(s); }}
             config={parishConfig}
           />
         )}

@@ -5,7 +5,7 @@ import {
   X, Printer, Sparkles, Loader2, Quote, User, Phone, 
   MapPin, Church, Users, Wine, BookOpen, Fingerprint, 
   CheckCircle, XCircle, BarChart, Calendar, BookOpenText,
-  Award, FileBadge, Waves
+  Award, FileBadge, Waves, ArrowLeft, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { Student, AttendanceSession, Turma, ParishConfig } from '../types';
 import { generateSpiritualGoal } from '../services/geminiService';
@@ -17,6 +17,8 @@ interface StudentDetailsModalProps {
   onClose: () => void;
   onGenerateCertificate?: (student: Student) => void;
   config: ParishConfig;
+  allStudents?: Student[];
+  onSelectStudent?: (student: Student) => void;
 }
 
 export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({ 
@@ -25,10 +27,30 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
   classes,
   onClose,
   onGenerateCertificate,
-  config
+  config,
+  allStudents,
+  onSelectStudent
 }) => {
   const [goal, setGoal] = useState<string | null>(null);
   const [loadingGoal, setLoadingGoal] = useState(false);
+
+  // Lógica de Navegação
+  const sortedStudents = allStudents ? [...allStudents].sort((a, b) => a.nomeCompleto.localeCompare(b.nomeCompleto)) : [];
+  const currentIndex = sortedStudents.findIndex(s => s.id === student.id);
+  const hasPrevious = currentIndex > 0;
+  const hasNext = currentIndex < sortedStudents.length - 1;
+
+  const handlePrevious = () => {
+    if (hasPrevious && onSelectStudent) {
+      onSelectStudent(sortedStudents[currentIndex - 1]);
+    }
+  };
+
+  const handleNext = () => {
+    if (hasNext && onSelectStudent) {
+      onSelectStudent(sortedStudents[currentIndex + 1]);
+    }
+  };
 
   const currentClass = classes.find(c => c.nome === student.turma);
   const displayCatequistas = currentClass?.catequista || student.catequistas || '_______________________';
@@ -313,12 +335,46 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
         <div className="bg-white w-full max-w-4xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300 flex flex-col max-h-[90vh]">
           {/* Header Gradient */}
           <div className="relative h-32 md:h-40 bg-gradient-to-br from-indigo-600 via-blue-600 to-blue-700 shrink-0">
-            <button 
-              onClick={onClose} 
-              className="absolute top-6 right-6 p-2 bg-white/20 hover:bg-white/40 text-white rounded-full transition-all backdrop-blur-md z-10"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            <div className="absolute top-6 left-6 flex gap-2 z-10">
+              {allStudents && (
+                <button 
+                  onClick={onClose} 
+                  className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/40 text-white rounded-xl transition-all backdrop-blur-md font-bold text-xs uppercase tracking-widest"
+                >
+                  <ArrowLeft className="w-4 h-4" /> Voltar
+                </button>
+              )}
+            </div>
+
+            <div className="absolute top-6 right-6 flex gap-2 z-10">
+              {allStudents && (
+                <div className="flex bg-white/20 rounded-xl backdrop-blur-md overflow-hidden">
+                  <button 
+                    onClick={handlePrevious}
+                    disabled={!hasPrevious}
+                    className="p-2 text-white hover:bg-white/20 disabled:opacity-30 disabled:hover:bg-transparent transition-all"
+                    title="Anterior"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <div className="w-px bg-white/20 my-2"></div>
+                  <button 
+                    onClick={handleNext}
+                    disabled={!hasNext}
+                    className="p-2 text-white hover:bg-white/20 disabled:opacity-30 disabled:hover:bg-transparent transition-all"
+                    title="Próximo"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
+              )}
+              <button 
+                onClick={onClose} 
+                className="p-2 bg-white/20 hover:bg-white/40 text-white rounded-full transition-all backdrop-blur-md"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
             
             {/* Profile Picture / Initial */}
             <div className="absolute -bottom-12 left-6 md:left-10 z-20">
