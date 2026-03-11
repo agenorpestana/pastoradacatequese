@@ -33,13 +33,13 @@ export const ClassMembersModal: React.FC<ClassMembersModalProps> = ({ turma, mem
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
       {/* PRINT ONLY SECTION (PORTAL) */}
       {createPortal(
-        <div className="print-only p-10 w-full bg-white text-slate-900 font-sans absolute inset-0 z-[9999] hidden">
+        <div className="print-class-members p-10 w-full bg-white text-slate-900 font-sans absolute inset-0 z-[9999] hidden">
           <style>{`
             @media print {
               @page { size: landscape; margin: 10mm; }
               body { -webkit-print-color-adjust: exact; margin: 0; }
-              body > *:not(.print-only) { display: none !important; }
-              .print-only { 
+              .no-print { display: none !important; }
+              .print-class-members { 
                 display: block !important; 
                 padding: 10mm; 
                 height: 100vh; 
@@ -49,7 +49,8 @@ export const ClassMembersModal: React.FC<ClassMembersModalProps> = ({ turma, mem
                 width: 100%;
                 background: white;
               }
-              .no-print { display: none !important; }
+              /* Ocultar ficha do aluno se estiver aberta por cima */
+              .print-student-ficha { display: none !important; }
             }
           `}</style>
           <div className="border border-black mb-4">

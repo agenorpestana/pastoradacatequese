@@ -98,31 +98,20 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
   return (
     <>
       {createPortal(
-        <div className="print-only p-0 w-full bg-white text-slate-900 font-sans absolute inset-0 z-[9999] hidden">
+        <div className="print-student-ficha p-0 w-full bg-white text-slate-900 font-sans absolute inset-0 z-[9999] hidden">
           <style>{`
             @media print {
               @page { margin: 10mm; size: auto; }
               body { -webkit-print-color-adjust: exact; margin: 0; }
-              body > *:not(.print-only) { display: none !important; }
-              .print-only { 
+              .no-print { display: none !important; }
+              .print-student-ficha { 
                 display: block !important; 
                 position: relative !important;
                 width: 100%;
                 background: white;
               }
-              .no-print { display: none !important; }
-              
-              table { width: 100%; border-collapse: collapse; }
-              thead { display: table-header-group; }
-              tfoot { display: table-footer-group; }
-              
-              .print-container {
-                display: flex;
-                flex-direction: column;
-              }
-              thead td { border-top: 2px solid #0f172a; border-left: 2px solid #0f172a; border-right: 2px solid #0f172a; }
-              tbody td { border-left: 2px solid #0f172a; border-right: 2px solid #0f172a; }
-              tfoot td { border-bottom: 2px solid #0f172a; border-left: 2px solid #0f172a; border-right: 2px solid #0f172a; }
+              /* Garantir que outros modais de impressão não apareçam */
+              .print-class-members, .print-attendance-report, .print-class-history { display: none !important; }
             }
           `}</style>
           <div className="print-container">
