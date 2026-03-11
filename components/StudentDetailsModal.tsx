@@ -95,11 +95,12 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
               tfoot { display: table-footer-group; }
               
               .print-container {
-                border: 2px solid #0f172a;
-                min-height: calc(100vh - 20mm);
                 display: flex;
                 flex-direction: column;
               }
+              thead td { border-top: 2px solid #0f172a; border-left: 2px solid #0f172a; border-right: 2px solid #0f172a; }
+              tbody td { border-left: 2px solid #0f172a; border-right: 2px solid #0f172a; }
+              tfoot td { border-bottom: 2px solid #0f172a; border-left: 2px solid #0f172a; border-right: 2px solid #0f172a; }
             }
           `}</style>
           <div className="print-container">

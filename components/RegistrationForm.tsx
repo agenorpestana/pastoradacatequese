@@ -396,7 +396,6 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                 .print-only { 
                   display: block !important; 
                   padding: 10mm; 
-                  height: 100vh; 
                   position: absolute !important;
                   top: 0;
                   left: 0;
@@ -407,11 +406,16 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                 table { width: 100%; border-collapse: collapse; }
                 thead { display: table-header-group; }
                 tfoot { display: table-footer-group; }
+                .print-container { display: flex; flex-direction: column; }
+                thead td { border-top: 2px solid #0f172a; border-left: 2px solid #0f172a; border-right: 2px solid #0f172a; }
+                tbody td { border-left: 2px solid #0f172a; border-right: 2px solid #0f172a; }
+                tfoot td { border-bottom: 2px solid #0f172a; border-left: 2px solid #0f172a; border-right: 2px solid #0f172a; }
               }
             `}
           </style>
           
-          <table className="w-full h-full">
+          <div className="print-container">
+            <table className="w-full">
             <thead>
               <tr>
                 <td>
@@ -608,7 +612,8 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
               </tr>
             </tfoot>
           </table>
-        </div>,
+        </div>
+      </div>,
         document.body
       )}
 
