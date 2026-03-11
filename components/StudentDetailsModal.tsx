@@ -331,7 +331,7 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
         document.body
       )}
 
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md no-print">
+      <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md no-print">
         <div className="bg-white w-full max-w-4xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300 flex flex-col max-h-[90vh]">
           {/* Header Gradient */}
           <div className="relative h-32 md:h-40 bg-gradient-to-br from-indigo-600 via-blue-600 to-blue-700 shrink-0">
