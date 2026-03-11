@@ -154,13 +154,23 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
 
         {/* Print Content */}
         {createPortal(
-          <div className="print-only p-8 w-full bg-white text-slate-900 font-sans absolute inset-0 z-[100]">
+          <div className="print-attendance-diary p-8 w-full bg-white text-slate-900 font-sans absolute inset-0 z-[100] hidden">
             <style>{`
               @media print {
                 @page { size: landscape; margin: 10mm; }
-                body { -webkit-print-color-adjust: exact; }
-                body > *:not(.print-only) { display: none !important; }
-                .print-only { display: block !important; }
+                body { -webkit-print-color-adjust: exact; margin: 0; background: white !important; }
+                #root, .no-print { display: none !important; }
+                .print-attendance-diary { 
+                  display: block !important; 
+                  position: absolute !important;
+                  top: 0;
+                  left: 0;
+                  width: 100%;
+                  background: white;
+                  z-index: 99999;
+                }
+                /* Ocultar outros modais de impressão */
+                .print-student-ficha, .print-class-members, .print-attendance-report, .print-class-history { display: none !important; }
               }
             `}</style>
 
@@ -297,13 +307,13 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
       
       {/* SEÇÃO APENAS PARA IMPRESSÃO (RELATÓRIO GERAL) */}
       {createPortal(
-        <div className="print-only fixed inset-0 z-[200] bg-white p-8">
+        <div className="print-attendance-report fixed inset-0 z-[200] bg-white p-8 hidden">
           <style>{`
             @media print {
               @page { margin: 0; size: auto; }
-              body { -webkit-print-color-adjust: exact; margin: 0; }
-              body > *:not(.print-only) { display: none !important; }
-              .print-only { 
+              body { -webkit-print-color-adjust: exact; margin: 0; background: white !important; }
+              #root, .no-print { display: none !important; }
+              .print-attendance-report { 
                 display: block !important; 
                 padding: 15mm; 
                 height: 100vh; 
@@ -312,7 +322,10 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
                 left: 0;
                 width: 100%;
                 background: white;
+                z-index: 99999;
               }
+              /* Ocultar outros modais de impressão */
+              .print-student-ficha, .print-class-members, .print-attendance-diary, .print-class-history { display: none !important; }
             }
           `}</style>
           <div className="text-center border-b-2 border-slate-900 pb-6 mb-6">

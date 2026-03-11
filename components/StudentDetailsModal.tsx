@@ -102,16 +102,19 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
           <style>{`
             @media print {
               @page { margin: 10mm; size: auto; }
-              body { -webkit-print-color-adjust: exact; margin: 0; }
-              .no-print { display: none !important; }
+              body { -webkit-print-color-adjust: exact; margin: 0; background: white !important; }
+              #root, .no-print { display: none !important; }
               .print-student-ficha { 
                 display: block !important; 
-                position: relative !important;
+                position: absolute !important;
+                top: 0;
+                left: 0;
                 width: 100%;
                 background: white;
+                z-index: 99999;
               }
               /* Garantir que outros modais de impressão não apareçam */
-              .print-class-members, .print-attendance-report, .print-class-history { display: none !important; }
+              .print-class-members, .print-attendance-report, .print-attendance-diary, .print-class-history { display: none !important; }
             }
           `}</style>
           <div className="print-container">

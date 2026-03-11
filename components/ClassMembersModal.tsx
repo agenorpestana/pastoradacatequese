@@ -37,8 +37,8 @@ export const ClassMembersModal: React.FC<ClassMembersModalProps> = ({ turma, mem
           <style>{`
             @media print {
               @page { size: landscape; margin: 10mm; }
-              body { -webkit-print-color-adjust: exact; margin: 0; }
-              .no-print { display: none !important; }
+              body { -webkit-print-color-adjust: exact; margin: 0; background: white !important; }
+              #root, .no-print { display: none !important; }
               .print-class-members { 
                 display: block !important; 
                 padding: 10mm; 
@@ -48,9 +48,10 @@ export const ClassMembersModal: React.FC<ClassMembersModalProps> = ({ turma, mem
                 left: 0;
                 width: 100%;
                 background: white;
+                z-index: 99999;
               }
-              /* Ocultar ficha do aluno se estiver aberta por cima */
-              .print-student-ficha { display: none !important; }
+              /* Ocultar outros modais de impressão */
+              .print-student-ficha, .print-attendance-report, .print-attendance-diary, .print-class-history { display: none !important; }
             }
           `}</style>
           <div className="border border-black mb-4">

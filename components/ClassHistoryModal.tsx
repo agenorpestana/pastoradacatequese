@@ -29,13 +29,23 @@ export const ClassHistoryModal: React.FC<ClassHistoryModalProps> = ({ turma, ses
       
       {/* PRINT ONLY SECTION - CONSOLIDADO DO DIÁRIO */}
       {createPortal(
-        <div className="print-only p-8 w-full bg-white text-slate-900 font-sans absolute inset-0 z-[100]">
+        <div className="print-class-history p-8 w-full bg-white text-slate-900 font-sans absolute inset-0 z-[100] hidden">
           <style>{`
               @media print {
                 @page { size: landscape; margin: 10mm; }
-                body { -webkit-print-color-adjust: exact; }
-                body > *:not(.print-only) { display: none !important; }
-                .print-only { display: block !important; }
+                body { -webkit-print-color-adjust: exact; margin: 0; background: white !important; }
+                #root, .no-print { display: none !important; }
+                .print-class-history { 
+                  display: block !important; 
+                  position: absolute !important;
+                  top: 0;
+                  left: 0;
+                  width: 100%;
+                  background: white;
+                  z-index: 99999;
+                }
+                /* Ocultar outros modais de impressão */
+                .print-student-ficha, .print-class-members, .print-attendance-report, .print-attendance-diary { display: none !important; }
               }
           `}</style>
 
