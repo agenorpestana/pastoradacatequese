@@ -167,14 +167,14 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
             {/* Header */}
           <div className="border border-black mb-4">
             <div className="bg-slate-100 border-b border-black p-2 text-center font-black uppercase text-sm">
-               DIÁRIO CONSOLIDADO DE FREQUÊNCIA
+               {config.pastoralName}
             </div>
             <div className="flex text-xs font-bold uppercase">
               <div className="flex-1 p-2 border-r border-black">
-                PARÓQUIA: {config.parishName} - DIOCESE: {config.dioceseName}
+                {config.parishName} - {config.dioceseName}
               </div>
               <div className="flex-1 p-2">
-                <span>TURMA: {turma.nome} - COMUNIDADE: {turma.comunidade || '---'}</span>
+                <span>{turma.nome} - {turma.comunidade || '---'}</span>
               </div>
             </div>
           </div>
