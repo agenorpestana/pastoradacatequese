@@ -76,202 +76,233 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
   return (
     <>
       {createPortal(
-        <div className="print-only bg-white min-h-screen text-slate-900 absolute inset-0 z-[9999] hidden">
-          <style>
-            {`
-              @media print {
-                @page { margin: 0; size: auto; }
-                body { -webkit-print-color-adjust: exact; margin: 0; }
-                body > *:not(.print-only) { display: none !important; }
-                .print-only { 
-                  display: block !important; 
-                  padding: 15mm; 
-                  height: 100vh; 
-                  position: absolute !important;
-                  top: 0;
-                  left: 0;
-                  width: 100%;
-                  background: white;
-                }
+        <div className="print-only p-0 w-full bg-white text-slate-900 font-sans absolute inset-0 z-[9999] hidden">
+          <style>{`
+            @media print {
+              @page { margin: 10mm; size: auto; }
+              body { -webkit-print-color-adjust: exact; margin: 0; }
+              body > *:not(.print-only) { display: none !important; }
+              .print-only { 
+                display: block !important; 
+                position: relative !important;
+                width: 100%;
+                background: white;
               }
-            `}
-          </style>
-          <div className="border-[2px] border-slate-900 p-5 h-full flex flex-col justify-between">
-            <div>
-              <div className="flex justify-between items-center border-b-2 border-slate-900 pb-3 mb-3">
-                <div className="flex items-center gap-3">
-                  {config.logo ? <img src={config.logo} className="w-12 h-12 object-contain" /> : <Church className="w-8 h-8" />}
-                  <div>
-                    <h1 className="text-lg font-black uppercase tracking-tighter">Ficha de Inscrição Catequizando</h1>
-                    <div className="text-[10px] font-bold uppercase mt-1">
-                      <p>{config.parishName}</p>
-                      <p>{config.dioceseName}</p>
-                      <p>{config.city}-{config.state}</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-[9px] font-bold uppercase">Matrícula</p>
-                  <p className="text-sm font-black">{student.matricula || '________'}</p>
-                  <p className="text-[8px] uppercase font-bold text-slate-400 mt-0.5">Data: {formatDate(student.dataCadastro)}</p>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <section className="relative">
-                  {student.foto && (
-                    <div className="absolute top-0 right-0 w-20 h-24 border border-slate-900 overflow-hidden bg-white">
-                      <img src={student.foto} className="w-full h-full object-cover" alt="Foto" />
-                    </div>
-                  )}
-                  <h3 className="bg-slate-100 px-2 py-0.5 text-[8px] font-black uppercase border-l-4 border-slate-900 mb-1.5 tracking-widest">1. Dados Pessoais</h3>
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[9px] pr-24">
-                    <p className="col-span-2"><strong>Nome:</strong> {student.nomeCompleto || '---'}</p>
-                    <p><strong>RG/CPF:</strong> {student.rgCpf || '---'}</p>
-                    <p><strong>Nascimento:</strong> {formatDate(student.dataNascimento)}</p>
-                    <p><strong>Estado Civil:</strong> {student.estadoCivil || '---'}</p>
-                    <p><strong>Status:</strong> {student.status || '---'}</p>
-                    <p><strong>Naturalidade:</strong> {student.naturalidade || '---'} - {student.ufNaturalidade || '---'}</p>
-                    <p><strong>Telefone/Zap:</strong> {student.telefone || '---'} {student.whatsapp && `/ ${student.whatsapp}`}</p>
-                    <p><strong>E-mail:</strong> {student.email || '---'}</p>
-                    <p><strong>Novo Catequizando?</strong> {student.novoCatequizando ? 'Sim' : 'Não'}</p>
-                    <p><strong>Moro com:</strong> {student.moroCom || '---'}</p>
-                    <p className="col-span-2"><strong>Endereço:</strong> {student.endereco || '---'}, {student.numero || '---'} - {student.bairro || '---'}, {student.cidade || '---'}/{student.ufEndereco || '---'}</p>
-                  </div>
-                </section>
-
-                <section>
-                  <h3 className="bg-slate-100 px-2 py-0.5 text-[8px] font-black uppercase border-l-4 border-slate-900 mb-1.5 tracking-widest">2. Filiação</h3>
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[9px]">
-                    <div className="border-r border-slate-200 pr-2">
-                      <p className="font-bold underline uppercase text-[7px]">Mãe</p>
-                      <p><strong>Nome:</strong> {student.mae?.nome || '---'}</p>
-                      <p><strong>Telefone/Zap:</strong> {student.mae?.telefone || '---'} {student.mae?.whatsapp && `/ ${student.mae?.whatsapp}`}</p>
-                      <p><strong>Endereço:</strong> {student.mae?.endereco || '---'}{student.mae?.numero ? `, ${student.mae.numero}` : ''} {student.mae?.bairro ? `- ${student.mae.bairro}` : ''}</p>
-                      <p><strong>Cidade:</strong> {student.mae?.cidade || '---'}/{student.mae?.ufEndereco || '---'}</p>
-                    </div>
-                    <div>
-                      <p className="font-bold underline uppercase text-[7px]">Pai</p>
-                      <p><strong>Nome:</strong> {student.pai?.nome || '---'}</p>
-                      <p><strong>Telefone/Zap:</strong> {student.pai?.telefone || '---'} {student.pai?.whatsapp && `/ ${student.pai?.whatsapp}`}</p>
-                      <p><strong>Endereço:</strong> {student.pai?.endereco || '---'}{student.pai?.numero ? `, ${student.pai.numero}` : ''} {student.pai?.bairro ? `- ${student.pai.bairro}` : ''}</p>
-                      <p><strong>Cidade:</strong> {student.pai?.cidade || '---'}/{student.pai?.ufEndereco || '---'}</p>
-                    </div>
-                  </div>
-                </section>
-
-                <section>
-                  <h3 className="bg-slate-100 px-2 py-0.5 text-[8px] font-black uppercase border-l-4 border-slate-900 mb-1.5 tracking-widest">3. Sacramentos</h3>
-                  <div className="grid grid-cols-1 gap-y-1 text-[9px]">
-                    <div className="flex flex-col gap-0.5">
-                      <p><strong>Batizado(a):</strong> {student.batizado ? 'Sim' : 'Não'} {student.batizado && ` - Paróquia: ${student.batismoParoquia}`}</p>
-                      {student.batizado && (
-                        <>
-                          <p className="pl-2"><strong>Data:</strong> {formatDate(student.batismoData)} | <strong>Diocese:</strong> {student.batismoDiocese || '---'} / {student.batismoUF || '---'}</p>
-                          <p className="pl-2"><strong>Comunidade:</strong> {student.batismoComunidade || '---'} | <strong>Local/Cidade:</strong> {student.batismoLocal || '---'} | <strong>Celebrante:</strong> {student.batismoCelebrante || '---'}</p>
-                          <div className="grid grid-cols-2 gap-x-4 pl-2 mt-0.5">
-                             <div>
-                                <p className="font-bold underline uppercase text-[7px]">Madrinha de Batismo</p>
-                                <p><strong>Nome:</strong> {student.madrinhaBatismo?.nome || '---'}</p>
-                                <p><strong>Endereço:</strong> {student.madrinhaBatismo?.endereco || '---'}</p>
-                             </div>
-                             <div>
-                                <p className="font-bold underline uppercase text-[7px]">Padrinho de Batismo</p>
-                                <p><strong>Nome:</strong> {student.padrinhoBatismo?.nome || '---'}</p>
-                                <p><strong>Endereço:</strong> {student.padrinhoBatismo?.endereco || '---'}</p>
-                             </div>
+              .no-print { display: none !important; }
+              
+              table { width: 100%; border-collapse: collapse; }
+              thead { display: table-header-group; }
+              tfoot { display: table-footer-group; }
+              
+              .print-container {
+                border: 2px solid #0f172a;
+                min-height: calc(100vh - 20mm);
+                display: flex;
+                flex-direction: column;
+              }
+            }
+          `}</style>
+          <div className="print-container">
+            <table>
+              <thead>
+                <tr>
+                  <td>
+                    {/* Header */}
+                    <div className="p-5 border-b-2 border-slate-900 flex justify-between items-center bg-white">
+                      <div className="flex items-center gap-3">
+                        {config.logo ? (
+                          <img src={config.logo} className="w-16 h-16 object-contain" referrerPolicy="no-referrer" />
+                        ) : (
+                          <Church className="w-10 h-10" />
+                        )}
+                        <div>
+                          <h1 className="text-xl font-black uppercase tracking-tighter">Ficha de Inscrição Catequética</h1>
+                          <div className="text-[12px] font-bold uppercase mt-1">
+                            <p>{config.parishName}</p>
+                            <p>{config.dioceseName}</p>
+                            <p>{config.city}-{config.state}</p>
                           </div>
-                        </>
-                      )}
-                    </div>
-                    <div className="flex flex-col gap-0.5 mt-1">
-                      <p><strong>1ª Eucaristia:</strong> {student.fezPrimeiraEucaristia ? 'Sim' : 'Não'} {student.fezPrimeiraEucaristia && ` - Paróquia: ${student.eucaristiaParoquia}`}</p>
-                      {student.fezPrimeiraEucaristia && (
-                        <>
-                          <p className="pl-2"><strong>Data:</strong> {formatDate(student.eucaristiaData)} | <strong>Diocese:</strong> {student.eucaristiaDiocese || '---'} / {student.eucaristiaUF || '---'}</p>
-                          <p className="pl-2"><strong>Comunidade:</strong> {student.eucaristiaComunidade || '---'} | <strong>Local/Cidade:</strong> {student.eucaristiaLocal || '---'} | <strong>Celebrante:</strong> {student.eucaristiaCelebrante || '---'} | <strong>Catequistas:</strong> {student.eucaristiaCatequistas || '---'}</p>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </section>
-
-                <section>
-                  <h3 className="bg-slate-100 px-2 py-0.5 text-[8px] font-black uppercase border-l-4 border-slate-900 mb-1.5 tracking-widest">4. Crisma / Preparação</h3>
-                  <div className="grid grid-cols-2 gap-x-4 text-[9px]">
-                    <p><strong>Turma:</strong> {student.turma || '---'}</p>
-                    <p><strong>Catequista:</strong> {displayCatequistas}</p>
-                    <p><strong>Início Prep.:</strong> {formatDate(student.inicioPreparacao)}</p>
-                    <p><strong>Fim Prep.:</strong> {formatDate(student.fimPreparacao)}</p>
-
-                    <div className="col-span-2 mt-1 border-t border-slate-100 pt-1">
-                       <p className="font-bold underline uppercase text-[7px]">Padrinho/Madrinha de Crisma</p>
-                       <p><strong>Nome:</strong> {student.padrinhoCrisma?.nome || '---'}</p>
-                       <p><strong>Telefone:</strong> {student.padrinhoCrisma?.telefone || '---'}</p>
-                       <p><strong>Endereço:</strong> {student.padrinhoCrisma?.endereco || '---'}</p>
-                    </div>
-
-                    {(student.temCrisma || student.dataCelebracao || student.localCelebracao || student.celebrante) && (
-                      <div className="col-span-2 mt-1 border-t border-slate-100 pt-1">
-                        <p className="font-bold underline uppercase text-[7px] mb-0.5">Dados da Celebração</p>
-                        <div className="grid grid-cols-2 gap-x-4">
-                          <p><strong>Data:</strong> {formatDate(student.dataCelebracao)}</p>
-                          <p><strong>Local:</strong> {student.localCelebracao || '---'}</p>
-                          <p className="col-span-2"><strong>Celebrante:</strong> {student.celebrante || '---'}</p>
-                          <p className="col-span-2"><strong>Diocese:</strong> {student.dioceseCelebracao || '---'} | <strong>UF:</strong> {student.ufCelebracao || '---'}</p>
-                          <p><strong>Livro:</strong> {student.livro || '--'} | <strong>Folha:</strong> {student.folha || '--'} | <strong>Registro:</strong> {student.numeroRegistro || '--'}</p>
                         </div>
                       </div>
-                    )}
-                  </div>
-                </section>
+                      <div className="text-right">
+                        <p className="text-[10px] font-bold uppercase">Matrícula</p>
+                        <p className="text-lg font-black">{student.matricula || '________'}</p>
+                        <p className="text-[9px] uppercase font-bold text-slate-400 mt-0.5">
+                          Data: {formatDate(student.dataCadastro)}
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </thead>
 
-                {student.observacoes && (
-                  <section>
-                    <h3 className="bg-slate-100 px-2 py-0.5 text-[8px] font-black uppercase border-l-4 border-slate-900 mb-1.5 tracking-widest">5. Observações</h3>
-                    <p className="text-[9px] text-justify leading-snug">{student.observacoes}</p>
-                  </section>
-                )}
-              </div>
-            </div>
+              <tbody>
+                <tr>
+                  <td>
+                    {/* Content */}
+                    <div className="p-5 space-y-4">
+                      <section className="relative">
+                        {student.foto && (
+                          <div className="absolute top-0 right-0 w-24 h-28 border border-slate-900 overflow-hidden bg-white">
+                            <img src={student.foto} className="w-full h-full object-cover" alt="Foto" referrerPolicy="no-referrer" />
+                          </div>
+                        )}
+                        <h3 className="bg-slate-100 px-2 py-1 text-[11px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">1. Dados do Catequizando</h3>
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[12px] pr-28">
+                          <p className="col-span-2"><strong>Nome:</strong> {student.nomeCompleto || '---'}</p>
+                          <p><strong>RG/CPF:</strong> {student.rgCpf || '---'}</p>
+                          <p><strong>Nascimento:</strong> {formatDate(student.dataNascimento)}</p>
+                          <p><strong>Estado Civil:</strong> {student.estadoCivil || '---'}</p>
+                          <p><strong>Status:</strong> {student.status || '---'}</p>
+                          <p><strong>Naturalidade:</strong> {student.naturalidade || '---'} - {student.ufNaturalidade || '---'}</p>
+                          <p><strong>Telefone/Zap:</strong> {student.telefone || '---'} {student.whatsapp && `/ ${student.whatsapp}`}</p>
+                          <p><strong>E-mail:</strong> {student.email || '---'}</p>
+                          <p><strong>Novo Catequizando?</strong> {student.novoCatequizando ? 'Sim' : 'Não'}</p>
+                          <p><strong>Moro com:</strong> {student.moroCom || '---'}</p>
+                          <p className="col-span-2"><strong>Endereço:</strong> {student.endereco || '---'}, {student.numero || '---'} - {student.bairro || '---'}, {student.cidade || '---'}/{student.ufEndereco || '---'}</p>
+                        </div>
+                      </section>
 
-            <div>
-              {/* TERMO DE COMPROMISSO (APENAS IMPRESSÃO) */}
-              <section className="mt-2 pt-2 border-t border-slate-200">
-                 <h3 className="text-[9px] font-black uppercase mb-1.5 tracking-widest text-center">Termo de Responsabilidade</h3>
-                 <p className="text-[8px] leading-relaxed text-justify italic text-slate-700">
-                   "Catequese é processo permanente de educação na fé". Ao inscrever seu(sua) filho(a) na catequese, você está se comprometendo a fazer parte deste processo, ou seja, ter um compromisso de participar com seu(sua) filho(a) das atividades da Paróquia (Missa das crianças e reuniões). E responsabilidade sua a educação religiosa de seu (sua) filho(a) pois, não se deve esquecer que 'os pais são os primeiros catequistas dos filhos'. Sem o seu compromisso e apoio, o trabalho catequético será em vão."
-                 </p>
-                 <div className="mt-2 text-right">
-                   <p className="text-[8px] font-bold">{config.city}-{config.state}, _____ /_____/_________</p>
-                 </div>
-              </section>
+                      <section>
+                        <h3 className="bg-slate-100 px-2 py-1 text-[11px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">2. Filiação</h3>
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-[11px]">
+                          <div className="border-r border-slate-200 pr-2">
+                            <p className="font-bold underline uppercase text-[9px]">Mãe</p>
+                            <p><strong>Nome:</strong> {student.mae?.nome || '---'}</p>
+                            <p><strong>Telefone/Zap:</strong> {student.mae?.telefone || '---'} {student.mae?.whatsapp && `/ ${student.mae?.whatsapp}`}</p>
+                            <p><strong>Endereço:</strong> {student.mae?.endereco || '---'}{student.mae?.numero ? `, ${student.mae.numero}` : ''} {student.mae?.bairro ? `- ${student.mae.bairro}` : ''}</p>
+                            <p><strong>Cidade:</strong> {student.mae?.cidade || '---'}/{student.mae?.ufEndereco || '---'}</p>
+                          </div>
+                          <div>
+                            <p className="font-bold underline uppercase text-[9px]">Pai</p>
+                            <p><strong>Nome:</strong> {student.pai?.nome || '---'}</p>
+                            <p><strong>Telefone/Zap:</strong> {student.pai?.telefone || '---'} {student.pai?.whatsapp && `/ ${student.pai?.whatsapp}`}</p>
+                            <p><strong>Endereço:</strong> {student.pai?.endereco || '---'}{student.pai?.numero ? `, ${student.pai.numero}` : ''} {student.pai?.bairro ? `- ${student.pai.bairro}` : ''}</p>
+                            <p><strong>Cidade:</strong> {student.pai?.cidade || '---'}/{student.pai?.ufEndereco || '---'}</p>
+                          </div>
+                        </div>
+                      </section>
 
-              <div className="mt-12 grid grid-cols-2 gap-12 pb-4">
-                <div className="text-center">
-                  <div className="border-t border-slate-900 pt-1 text-[8px] font-bold uppercase">Assinatura do Responsável</div>
-                </div>
-                <div className="text-center">
-                  <div className="border-t border-slate-900 pt-1 text-[8px] font-bold uppercase">Assinatura Catequista</div>
-                </div>
-              </div>
-            </div>
+                      <section>
+                        <h3 className="bg-slate-100 px-2 py-1 text-[11px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">3. Sacramentos</h3>
+                        <div className="grid grid-cols-1 gap-y-2 text-[11px]">
+                          <div className="flex flex-col gap-0.5">
+                            <p><strong>Batizado(a):</strong> {student.batizado ? 'Sim' : 'Não'} {student.batizado && ` - Paróquia: ${student.batismoParoquia}`}</p>
+                            {student.batizado && (
+                              <>
+                                <p className="pl-2"><strong>Data:</strong> {formatDate(student.batismoData)} | <strong>Diocese:</strong> {student.batismoDiocese || '---'} / {student.batismoUF || '---'}</p>
+                                <p className="pl-2"><strong>Comunidade:</strong> {student.batismoComunidade || '---'} | <strong>Local/Cidade:</strong> {student.batismoLocal || '---'} | <strong>Celebrante:</strong> {student.batismoCelebrante || '---'}</p>
+                                <div className="grid grid-cols-2 gap-x-4 pl-2 mt-1">
+                                   <div>
+                                      <p className="font-bold underline uppercase text-[9px]">Madrinha de Batismo</p>
+                                      <p><strong>Nome:</strong> {student.madrinhaBatismo?.nome || '---'}</p>
+                                      <p><strong>Endereço:</strong> {student.madrinhaBatismo?.endereco || '---'}</p>
+                                   </div>
+                                   <div>
+                                      <p className="font-bold underline uppercase text-[9px]">Padrinho de Batismo</p>
+                                      <p><strong>Nome:</strong> {student.padrinhoBatismo?.nome || '---'}</p>
+                                      <p><strong>Endereço:</strong> {student.padrinhoBatismo?.endereco || '---'}</p>
+                                   </div>
+                                </div>
+                              </>
+                            )}
+                          </div>
+                          <div className="flex flex-col gap-0.5 mt-1">
+                            <p><strong>1ª Eucaristia:</strong> {student.fezPrimeiraEucaristia ? 'Sim' : 'Não'} {student.fezPrimeiraEucaristia && ` - Paróquia: ${student.eucaristiaParoquia}`}</p>
+                            {student.fezPrimeiraEucaristia && (
+                              <>
+                                <p className="pl-2"><strong>Data:</strong> {formatDate(student.eucaristiaData)} | <strong>Diocese:</strong> {student.eucaristiaDiocese || '---'} / {student.eucaristiaUF || '---'}</p>
+                                <p className="pl-2"><strong>Comunidade:</strong> {student.eucaristiaComunidade || '---'} | <strong>Local/Cidade:</strong> {student.eucaristiaLocal || '---'} | <strong>Celebrante:</strong> {student.eucaristiaCelebrante || '---'} | <strong>Catequistas:</strong> {student.eucaristiaCatequistas || '---'}</p>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </section>
 
-            <div className="border-t-2 border-slate-900 pt-2 mt-auto text-center">
-              <p className="text-[8px] font-bold uppercase">
-                {config.address} - {config.city}/{config.state}
-              </p>
-              <div className="flex justify-center gap-4 mt-1 text-[8px] font-bold uppercase">
-                {config.phone && <span>Tel: {config.phone}</span>}
-                {config.whatsapp && <span>Zap: {config.whatsapp}</span>}
-                {config.email && <span>Email: {config.email}</span>}
-              </div>
-              <div className="flex justify-center gap-4 mt-0.5 text-[8px] font-bold uppercase text-slate-600">
-                {config.instagram && <span>Insta: {config.instagram}</span>}
-                {config.facebook && <span>Face: {config.facebook}</span>}
-                {config.website && <span>Site: {config.website}</span>}
-              </div>
-            </div>
+                      <section>
+                        <h3 className="bg-slate-100 px-2 py-1 text-[11px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">4. Crisma / Preparação</h3>
+                        <div className="grid grid-cols-2 gap-x-4 text-[11px]">
+                          <p><strong>Turma:</strong> {student.turma || '---'}</p>
+                          <p><strong>Catequista:</strong> {displayCatequistas}</p>
+                          <p><strong>Início Prep.:</strong> {formatDate(student.inicioPreparacao)}</p>
+                          <p><strong>Fim Prep.:</strong> {formatDate(student.fimPreparacao)}</p>
+
+                          <div className="col-span-2 mt-1 border-t border-slate-100 pt-1">
+                             <p className="font-bold underline uppercase text-[9px]">Padrinho/Madrinha de Crisma</p>
+                             <p><strong>Nome:</strong> {student.padrinhoCrisma?.nome || '---'}</p>
+                             <p><strong>Telefone:</strong> {student.padrinhoCrisma?.telefone || '---'}</p>
+                             <p><strong>Endereço:</strong> {student.padrinhoCrisma?.endereco || '---'}</p>
+                          </div>
+
+                          {(student.temCrisma || student.dataCelebracao || student.localCelebracao || student.celebrante) && (
+                            <div className="col-span-2 mt-1 border-t border-slate-100 pt-1">
+                              <p className="font-bold underline uppercase text-[9px] mb-0.5">Dados da Celebração</p>
+                              <div className="grid grid-cols-2 gap-x-4">
+                                <p><strong>Data:</strong> {formatDate(student.dataCelebracao)}</p>
+                                <p><strong>Local:</strong> {student.localCelebracao || '---'}</p>
+                                <p className="col-span-2"><strong>Celebrante:</strong> {student.celebrante || '---'}</p>
+                                <p className="col-span-2"><strong>Diocese:</strong> {student.dioceseCelebracao || '---'} | <strong>UF:</strong> {student.ufCelebracao || '---'}</p>
+                                <p><strong>Livro:</strong> {student.livro || '--'} | <strong>Folha:</strong> {student.folha || '--'} | <strong>Registro:</strong> {student.numeroRegistro || '--'}</p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </section>
+
+                      {student.observacoes && (
+                        <section>
+                          <h3 className="bg-slate-100 px-2 py-1 text-[11px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">5. Observações</h3>
+                          <p className="text-[11px] text-justify leading-snug">{student.observacoes}</p>
+                        </section>
+                      )}
+
+                      {/* TERMO DE RESPONSABILIDADE */}
+                      <section className="mt-4 pt-4 border-t border-slate-200">
+                        <h3 className="text-[11px] font-black uppercase mb-2 tracking-widest text-center">Termo de Responsabilidade</h3>
+                        <p className="text-[10px] leading-relaxed text-justify italic text-slate-700">
+                          "Catequese é processo permanente de educação na fé". Ao inscrever seu(sua) filho(a) na catequese, você está se comprometendo a fazer parte deste processo, ou seja, ter um compromisso de participar com seu(sua) filho(a) das atividades da Paróquia (Missa das crianças e reuniões). E responsabilidade sua a educação religiosa de seu (sua) filho(a) pois, não se deve esquecer que 'os pais são os primeiros catequistas dos filhos'. Sem o seu compromisso e apoio, o trabalho catequético será em vão."
+                        </p>
+                        <div className="mt-3 text-right">
+                          <p className="text-[11px] font-bold">{config.city}-{config.state}, _____ /_____/_________</p>
+                        </div>
+                      </section>
+
+                      <div className="mt-12 grid grid-cols-2 gap-12">
+                        <div className="text-center">
+                          <div className="border-t border-slate-900 pt-1 text-[11px] font-bold uppercase">Assinatura do Responsável</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="border-t border-slate-900 pt-1 text-[11px] font-bold uppercase">Assinatura Catequista</div>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+
+              <tfoot>
+                <tr>
+                  <td>
+                    {/* Footer */}
+                    <div className="p-5 border-t-2 border-slate-900 text-center bg-white">
+                      <p className="text-[10px] font-bold uppercase">
+                        {config.address} - {config.city}/{config.state}
+                      </p>
+                      <div className="flex justify-center gap-4 mt-1 text-[10px] font-bold uppercase">
+                        {config.phone && <span>Tel: {config.phone}</span>}
+                        {config.whatsapp && <span>Zap: {config.whatsapp}</span>}
+                        {config.email && <span>Email: {config.email}</span>}
+                      </div>
+                      <div className="flex justify-center gap-4 mt-0.5 text-[10px] font-bold uppercase text-slate-600">
+                        {config.instagram && <span>Insta: {config.instagram}</span>}
+                        {config.facebook && <span>Face: {config.facebook}</span>}
+                        {config.website && <span>Site: {config.website}</span>}
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
           </div>
         </div>,
         document.body

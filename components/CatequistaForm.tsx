@@ -114,7 +114,7 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
     <div className="relative">
       {/* PRINT ONLY SECTION (PORTAL) */}
       {createPortal(
-        <div className="print-only p-10 w-full bg-white text-slate-900 font-sans absolute inset-0 z-[9999] hidden">
+        <div className="print-only bg-white min-h-screen text-slate-900 absolute inset-0 z-[9999] hidden">
           <style>{`
             @media print {
               @page { margin: 0; size: auto; }
@@ -122,175 +122,197 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
               body > *:not(.print-only) { display: none !important; }
               .print-only { 
                 display: block !important; 
-                padding: 15mm; 
+                padding: 10mm; 
                 height: 100vh; 
                 position: absolute !important;
                 top: 0;
                 left: 0;
                 width: 100%;
                 background: white;
+                font-size: 11pt;
               }
               .no-print { display: none !important; }
+              table { width: 100%; border-collapse: collapse; }
+              thead { display: table-header-group; }
+              tfoot { display: table-footer-group; }
+              .print-container { border: 2px solid #0f172a; min-height: calc(100vh - 20mm); display: flex; flex-col: column; }
             }
           `}</style>
 
-          <div className="border-[2px] border-slate-900 p-5 h-full flex flex-col justify-between">
-            <div>
-              {/* Header */}
-              <div className="flex justify-between items-center border-b-2 border-slate-900 pb-3 mb-3">
-                <div className="flex items-center gap-3">
-                  {config.logo ? (
-                    <img src={config.logo} className="w-16 h-16 object-contain" />
-                  ) : (
-                    <UserCheck className="w-10 h-10" />
-                  )}
-                  <div>
-                    <h1 className="text-xl font-black uppercase tracking-tighter">Ficha de Inscrição de Catequista</h1>
-                    <div className="text-[12px] font-bold uppercase mt-1">
-                      <p>{config.parishName}</p>
-                      <p>{config.dioceseName}</p>
-                      <p>{config.city}-{config.state}</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-[10px] font-bold uppercase">Matrícula</p>
-                  <p className="text-lg font-black">{formData.matricula || '________'}</p>
-                  <p className="text-[9px] uppercase font-bold text-slate-400 mt-0.5">
-                    Data: {new Date().toLocaleDateString('pt-BR')}
-                  </p>
-                </div>
-              </div>
-
-              {/* Content */}
-              <div className="space-y-4">
-                <section className="relative">
-                  {formData.foto && (
-                    <div className="absolute top-0 right-0 w-24 h-28 border border-slate-900 overflow-hidden bg-white">
-                      <img src={formData.foto} className="w-full h-full object-cover" alt="Foto" />
-                    </div>
-                  )}
-                  <h3 className="bg-slate-100 px-2 py-1 text-[10px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">1. Dados Pessoais</h3>
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[11px] pr-28">
-                    <p className="col-span-2"><strong>Nome:</strong> {formData.nome || '---'}</p>
-                    <p><strong>CPF:</strong> {formData.rgCpf || '---'}</p>
-                    <p><strong>Nascimento:</strong> {formData.dataNascimento ? new Date(formData.dataNascimento + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</p>
-                    <p><strong>Estado Civil:</strong> {formData.estadoCivil || '---'}</p>
-                    <p><strong>Status:</strong> {formData.status || '---'}</p>
-                    <p><strong>Naturalidade:</strong> {formData.naturalidade || '---'} - {formData.ufNaturalidade || '---'}</p>
-                    <p><strong>Telefone/Zap:</strong> {formData.telefone || '---'} {formData.whatsapp && `/ ${formData.whatsapp}`}</p>
-                    <p><strong>E-mail:</strong> {formData.email || '---'}</p>
-                    <p className="col-span-2"><strong>EM CASO DE EMERGÊNCIA LIGAR PARA:</strong> {formData.emergenciaContato || '---'}</p>
-                    <p className="col-span-2"><strong>Endereço:</strong> {formData.endereco || '---'}, {formData.numero || '---'} - {formData.bairro || '---'}, {formData.cidade || '---'}/{formData.ufEndereco || '---'}</p>
-                    <p className="col-span-2"><strong>TURMA ATUAL:</strong> {formData.atuacao || '---'} - <strong>COMUNIDADE:</strong> {formData.comunidade || '---'}</p>
-                    <p className="col-span-2"><strong>Início na Catequese:</strong> {formData.desde ? new Date(formData.desde + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</p>
-                  </div>
-                </section>
-
-                <section>
-                  <h3 className="bg-slate-100 px-2 py-1 text-[10px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">2. Sacramentos</h3>
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-[11px]">
-                    <div className="border border-slate-200 p-2 rounded">
-                      <p className="font-black border-b border-slate-100 mb-1 uppercase text-[9px]">Batismo</p>
-                      <p><strong>Batizado?</strong> {formData.batizado ? 'Sim' : 'Não'}</p>
-                      {formData.batizado && (
-                        <>
-                          <p><strong>Data:</strong> {formData.batismoData ? new Date(formData.batismoData + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</p>
-                          <p><strong>Diocese:</strong> {formData.batismoDiocese || '---'} - {formData.batismoUF || '---'}</p>
-                          <p><strong>Paróquia:</strong> {formData.batismoParoquia || '---'}</p>
-                          <p><strong>Comunidade:</strong> {formData.batismoComunidade || '---'}</p>
-                          <p><strong>Local:</strong> {formData.batismoLocal || '---'}</p>
-                        </>
-                      )}
-                    </div>
-                    <div className="border border-slate-200 p-2 rounded">
-                      <p className="font-black border-b border-slate-100 mb-1 uppercase text-[9px]">Eucaristia</p>
-                      <p><strong>Fez 1ª Eucaristia?</strong> {formData.fezPrimeiraEucaristia ? 'Sim' : 'Não'}</p>
-                      {formData.fezPrimeiraEucaristia && (
-                        <>
-                          <p><strong>Data:</strong> {formData.eucaristiaData ? new Date(formData.eucaristiaData + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</p>
-                          <p><strong>Diocese:</strong> {formData.eucaristiaDiocese || '---'} - {formData.eucaristiaUF || '---'}</p>
-                          <p><strong>Paróquia:</strong> {formData.eucaristiaParoquia || '---'}</p>
-                          <p><strong>Comunidade:</strong> {formData.eucaristiaComunidade || '---'}</p>
-                          <p><strong>Celebrante:</strong> {formData.eucaristiaCelebrante || '---'}</p>
-                        </>
-                      )}
-                    </div>
-                    <div className="border border-slate-200 p-2 rounded col-span-2">
-                      <p className="font-black border-b border-slate-100 mb-1 uppercase text-[9px]">Crisma</p>
-                      <p><strong>Já é Crismado?</strong> {formData.temCrisma ? 'Sim' : 'Não'}</p>
-                      {formData.temCrisma && (
-                        <div className="grid grid-cols-2 gap-x-4">
-                          <p><strong>Data:</strong> {formData.crismaData ? new Date(formData.crismaData + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</p>
-                          <p><strong>Diocese:</strong> {formData.crismaDiocese || '---'} - {formData.crismaUF || '---'}</p>
-                          <p><strong>Paróquia:</strong> {formData.crismaParoquia || '---'}</p>
-                          <p><strong>Comunidade:</strong> {formData.crismaComunidade || '---'}</p>
+          <table className="w-full h-full">
+            <thead>
+              <tr>
+                <td>
+                  <div className="px-5 pt-5">
+                    <div className="flex justify-between items-center border-b-2 border-slate-900 pb-3 mb-3">
+                      <div className="flex items-center gap-3">
+                        {config.logo ? (
+                          <img src={config.logo} className="w-16 h-16 object-contain" />
+                        ) : (
+                          <UserCheck className="w-10 h-10" />
+                        )}
+                        <div>
+                          <h1 className="text-xl font-black uppercase tracking-tighter">Ficha de Inscrição de Catequista</h1>
+                          <div className="text-[12px] font-bold uppercase mt-1">
+                            <p>{config.parishName}</p>
+                            <p>{config.dioceseName}</p>
+                            <p>{config.city}-{config.state}</p>
+                          </div>
                         </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-[10px] font-bold uppercase">Matrícula</p>
+                        <p className="text-lg font-black">{formData.matricula || '________'}</p>
+                        <p className="text-[9px] uppercase font-bold text-slate-400 mt-0.5">
+                          Data: {new Date().toLocaleDateString('pt-BR')}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <td>
+                  <div className="px-5 py-2">
+                    <div className="space-y-4">
+                      <section className="relative">
+                        {formData.foto && (
+                          <div className="absolute top-0 right-0 w-24 h-28 border border-slate-900 overflow-hidden bg-white">
+                            <img src={formData.foto} className="w-full h-full object-cover" alt="Foto" />
+                          </div>
+                        )}
+                        <h3 className="bg-slate-100 px-2 py-1 text-[10px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">1. Dados Pessoais</h3>
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[11px] pr-28">
+                          <p className="col-span-2"><strong>Nome:</strong> {formData.nome || '---'}</p>
+                          <p><strong>CPF:</strong> {formData.rgCpf || '---'}</p>
+                          <p><strong>Nascimento:</strong> {formData.dataNascimento ? new Date(formData.dataNascimento + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</p>
+                          <p><strong>Estado Civil:</strong> {formData.estadoCivil || '---'}</p>
+                          <p><strong>Status:</strong> {formData.status || '---'}</p>
+                          <p><strong>Naturalidade:</strong> {formData.naturalidade || '---'} - {formData.ufNaturalidade || '---'}</p>
+                          <p><strong>Telefone/Zap:</strong> {formData.telefone || '---'} {formData.whatsapp && `/ ${formData.whatsapp}`}</p>
+                          <p><strong>E-mail:</strong> {formData.email || '---'}</p>
+                          <p className="col-span-2"><strong>EM CASO DE EMERGÊNCIA LIGAR PARA:</strong> {formData.emergenciaContato || '---'}</p>
+                          <p className="col-span-2"><strong>Endereço:</strong> {formData.endereco || '---'}, {formData.numero || '---'} - {formData.bairro || '---'}, {formData.cidade || '---'}/{formData.ufEndereco || '---'}</p>
+                          <p className="col-span-2"><strong>TURMA ATUAL:</strong> {formData.atuacao || '---'} - <strong>COMUNIDADE:</strong> {formData.comunidade || '---'}</p>
+                          <p className="col-span-2"><strong>Início na Catequese:</strong> {formData.desde ? new Date(formData.desde + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</p>
+                        </div>
+                      </section>
+
+                      <section>
+                        <h3 className="bg-slate-100 px-2 py-1 text-[10px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">2. Sacramentos</h3>
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-[11px]">
+                          <div className="border border-slate-200 p-2 rounded">
+                            <p className="font-black border-b border-slate-100 mb-1 uppercase text-[9px]">Batismo</p>
+                            <p><strong>Batizado?</strong> {formData.batizado ? 'Sim' : 'Não'}</p>
+                            {formData.batizado && (
+                              <>
+                                <p><strong>Data:</strong> {formData.batismoData ? new Date(formData.batismoData + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</p>
+                                <p><strong>Diocese:</strong> {formData.batismoDiocese || '---'} - {formData.batismoUF || '---'}</p>
+                                <p><strong>Paróquia:</strong> {formData.batismoParoquia || '---'}</p>
+                                <p><strong>Comunidade:</strong> {formData.batismoComunidade || '---'}</p>
+                                <p><strong>Local:</strong> {formData.batismoLocal || '---'}</p>
+                              </>
+                            )}
+                          </div>
+                          <div className="border border-slate-200 p-2 rounded">
+                            <p className="font-black border-b border-slate-100 mb-1 uppercase text-[9px]">Eucaristia</p>
+                            <p><strong>Fez 1ª Eucaristia?</strong> {formData.fezPrimeiraEucaristia ? 'Sim' : 'Não'}</p>
+                            {formData.fezPrimeiraEucaristia && (
+                              <>
+                                <p><strong>Data:</strong> {formData.eucaristiaData ? new Date(formData.eucaristiaData + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</p>
+                                <p><strong>Diocese:</strong> {formData.eucaristiaDiocese || '---'} - {formData.eucaristiaUF || '---'}</p>
+                                <p><strong>Paróquia:</strong> {formData.eucaristiaParoquia || '---'}</p>
+                                <p><strong>Comunidade:</strong> {formData.eucaristiaComunidade || '---'}</p>
+                                <p><strong>Celebrante:</strong> {formData.eucaristiaCelebrante || '---'}</p>
+                              </>
+                            )}
+                          </div>
+                          <div className="border border-slate-200 p-2 rounded col-span-2">
+                            <p className="font-black border-b border-slate-100 mb-1 uppercase text-[9px]">Crisma</p>
+                            <p><strong>Já é Crismado?</strong> {formData.temCrisma ? 'Sim' : 'Não'}</p>
+                            {formData.temCrisma && (
+                              <div className="grid grid-cols-2 gap-x-4">
+                                <p><strong>Data:</strong> {formData.crismaData ? new Date(formData.crismaData + 'T00:00:00').toLocaleDateString('pt-BR') : '---'}</p>
+                                <p><strong>Diocese:</strong> {formData.crismaDiocese || '---'} - {formData.crismaUF || '---'}</p>
+                                <p><strong>Paróquia:</strong> {formData.crismaParoquia || '---'}</p>
+                                <p><strong>Comunidade:</strong> {formData.crismaComunidade || '---'}</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </section>
+
+                      <section>
+                        <h3 className="bg-slate-100 px-2 py-1 text-[10px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">3. Preferências de Atuação</h3>
+                        <div className="grid grid-cols-1 gap-y-1.5 text-[11px]">
+                          <p><strong>Qual Turma/Etapa você atua?</strong> {formData.atuacao || '---'}</p>
+                          <p><strong>Qual Turma/Etapa você gosta de atuar?</strong> {formData.atuacaoDesejada || '---'}</p>
+                        </div>
+                      </section>
+
+                      {formData.estadoCivil === 'Casado(a)' && (
+                        <section>
+                          <h3 className="bg-slate-100 px-2 py-1 text-[10px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">4. Dados do Cônjuge</h3>
+                          <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[11px]">
+                            <p className="col-span-2"><strong>Nome do Cônjuge:</strong> {formData.conjuge || '---'}</p>
+                            <p><strong>CPF do Cônjuge:</strong> {formData.conjugeRgCpf || '---'}</p>
+                            <p><strong>Telefone do Cônjuge:</strong> {formData.conjugeTelefone || '---'}</p>
+                          </div>
+                        </section>
                       )}
                     </div>
                   </div>
-                </section>
+                </td>
+              </tr>
+            </tbody>
 
-                <section>
-                  <h3 className="bg-slate-100 px-2 py-1 text-[10px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">3. Preferências de Atuação</h3>
-                  <div className="grid grid-cols-1 gap-y-1.5 text-[11px]">
-                    <p><strong>Qual Turma/Etapa você atua?</strong> {formData.atuacao || '---'}</p>
-                    <p><strong>Qual Turma/Etapa você gosta de atuar?</strong> {formData.atuacaoDesejada || '---'}</p>
-                  </div>
-                </section>
+            <tfoot>
+              <tr>
+                <td>
+                  <div className="px-5 pb-5">
+                    {/* TERMO DE COMPROMISSO (APENAS IMPRESSÃO) */}
+                    <section className="mt-6 pt-4 border-t border-slate-200">
+                      <h3 className="text-[11px] font-black uppercase mb-2 tracking-widest text-center">Termo de compromisso e Responsabilidade</h3>
+                      <p className="text-[10px] leading-relaxed text-justify italic text-slate-700">
+                        "Catequese é processo permanente de educação na fé". Ao se inscrever na catequese como Catequista/voluntario, você está se comprometendo a fazer parte deste processo, ou seja, ter um compromisso de participar das atividades da Pastoral e da Paróquia (Missa das crianças, Missas Festivas, Reuniões, Retiros, Encontros de Formação...). É responsabilidade sua a educação religiosa dos Catequizandos a você confiados, com a efetiva participação dos Pais, pois, “os pais são os primeiros catequistas dos filhos”. Sem o seu compromisso e apoio, o trabalho catequético não será possível.
+                      </p>
+                      <div className="mt-3 text-right">
+                        <p className="text-[10px] font-bold">{config.city}-{config.state}, _____ /_____/_________</p>
+                      </div>
+                    </section>
 
-                {formData.estadoCivil === 'Casado(a)' && (
-                  <section>
-                    <h3 className="bg-slate-100 px-2 py-1 text-[10px] font-black uppercase border-l-4 border-slate-900 mb-2 tracking-widest">4. Dados do Cônjuge</h3>
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[11px]">
-                      <p className="col-span-2"><strong>Nome do Cônjuge:</strong> {formData.conjuge || '---'}</p>
-                      <p><strong>CPF do Cônjuge:</strong> {formData.conjugeRgCpf || '---'}</p>
-                      <p><strong>Telefone do Cônjuge:</strong> {formData.conjugeTelefone || '---'}</p>
+                    <div className="mt-12 grid grid-cols-2 gap-12 pb-4">
+                      <div className="text-center">
+                        <div className="border-t border-slate-900 pt-1 text-[10px] font-bold uppercase">Assinatura do Catequista</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="border-t border-slate-900 pt-1 text-[10px] font-bold uppercase">Coordenação de Catequese</div>
+                      </div>
                     </div>
-                  </section>
-                )}
-              </div>
-            </div>
 
-            {/* Footer */}
-            <div>
-              {/* TERMO DE COMPROMISSO (APENAS IMPRESSÃO) */}
-              <section className="mt-6 pt-4 border-t border-slate-200">
-                 <h3 className="text-[11px] font-black uppercase mb-2 tracking-widest text-center">Termo de compromisso e Responsabilidade</h3>
-                 <p className="text-[10px] leading-relaxed text-justify italic text-slate-700">
-                   "Catequese é processo permanente de educação na fé". Ao se inscrever na catequese como Catequista/voluntario, você está se comprometendo a fazer parte deste processo, ou seja, ter um compromisso de participar das atividades da Pastoral e da Paróquia (Missa das crianças, Missas Festivas, Reuniões, Retiros, Encontros de Formação...). É responsabilidade sua a educação religiosa dos Catequizandos a você confiados, com a efetiva participação dos Pais, pois, “os pais são os primeiros catequistas dos filhos”. Sem o seu compromisso e apoio, o trabalho catequético não será possível.
-                 </p>
-                 <div className="mt-3 text-right">
-                   <p className="text-[10px] font-bold">{config.city}-{config.state}, _____ /_____/_________</p>
-                 </div>
-              </section>
-
-              <div className="mt-20 grid grid-cols-2 gap-12 pb-4">
-                <div className="text-center">
-                  <div className="border-t border-slate-900 pt-1 text-[10px] font-bold uppercase">Assinatura do Catequista</div>
-                </div>
-                <div className="text-center">
-                  <div className="border-t border-slate-900 pt-1 text-[10px] font-bold uppercase">Coordenação de Catequese</div>
-                </div>
-              </div>
-
-              <div className="border-t-2 border-slate-900 pt-2 mt-auto text-center">
-                <p className="text-[10px] font-bold uppercase">
-                  {config.address} - {config.city}/{config.state}
-                </p>
-                <div className="flex justify-center gap-4 mt-1 text-[10px] font-bold uppercase">
-                  {config.phone && <span>Tel: {config.phone}</span>}
-                  {config.whatsapp && <span>Zap: {config.whatsapp}</span>}
-                  {config.email && <span>Email: {config.email}</span>}
-                </div>
-                <div className="flex justify-center gap-4 mt-0.5 text-[10px] font-bold uppercase text-slate-600">
-                  {config.instagram && <span>Insta: {config.instagram}</span>}
-                  {config.facebook && <span>Face: {config.facebook}</span>}
-                  {config.website && <span>Site: {config.website}</span>}
-                </div>
-              </div>
-            </div>
-          </div>
+                    <div className="border-t-2 border-slate-900 pt-2 mt-auto text-center">
+                      <p className="text-[10px] font-bold uppercase">
+                        {config.address} - {config.city}/{config.state}
+                      </p>
+                      <div className="flex justify-center gap-4 mt-1 text-[10px] font-bold uppercase">
+                        {config.phone && <span>Tel: {config.phone}</span>}
+                        {config.whatsapp && <span>Zap: {config.whatsapp}</span>}
+                        {config.email && <span>Email: {config.email}</span>}
+                      </div>
+                      <div className="flex justify-center gap-4 mt-0.5 text-[10px] font-bold uppercase text-slate-600">
+                        {config.instagram && <span>Insta: {config.instagram}</span>}
+                        {config.facebook && <span>Face: {config.facebook}</span>}
+                        {config.website && <span>Site: {config.website}</span>}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
         </div>,
         document.body
       )}

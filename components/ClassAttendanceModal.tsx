@@ -102,33 +102,33 @@ export const ClassAttendanceModal: React.FC<ClassAttendanceModalProps> = ({
   const absentCount = entries.filter(e => e.status === 'absent').length;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
-      <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300 flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-2 md:p-4 bg-slate-900/60 backdrop-blur-md">
+      <div className="bg-white w-full max-w-2xl rounded-[1.5rem] md:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300 flex flex-col max-h-[95vh] md:max-h-[90vh]">
         
         {/* Header */}
-        <div className="bg-slate-900 p-8 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <div className="bg-green-600 p-3 rounded-2xl">
-              <CheckCircle className="text-white w-6 h-6" />
+        <div className="bg-slate-900 p-4 md:p-8 flex justify-between items-center">
+          <div className="flex items-center gap-3 md:gap-4">
+            <div className="bg-green-600 p-2 md:p-3 rounded-xl md:rounded-2xl">
+              <CheckCircle className="text-white w-5 h-5 md:w-6 md:h-6" />
             </div>
             <div>
-              <h2 className="text-xl font-black text-white">Diário de Frequência</h2>
-              <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">{turma.nome}</p>
+              <h2 className="text-lg md:text-xl font-black text-white">Diário de Frequência</h2>
+              <p className="text-[10px] md:text-xs text-slate-400 font-bold uppercase tracking-wider">{turma.nome}</p>
             </div>
           </div>
           <button 
             onClick={onClose}
             className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5 md:w-6 md:h-6" />
           </button>
         </div>
 
         {/* Filters and Tema */}
-        <div className="p-6 bg-slate-50 border-b border-slate-100 space-y-4">
-          <div className="flex flex-col md:flex-row gap-4">
+        <div className="p-4 md:p-6 bg-slate-50 border-b border-slate-100 space-y-3 md:space-y-4">
+          <div className="flex flex-col md:flex-row gap-3 md:gap-4">
             <div className="flex-1">
-              <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block px-1">Histórico de Chamadas</label>
+              <label className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase mb-1 block px-1">Histórico de Chamadas</label>
               <div className="relative">
                 <History className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
                 <select 
@@ -148,9 +148,9 @@ export const ClassAttendanceModal: React.FC<ClassAttendanceModalProps> = ({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4">
             <div className="md:col-span-4">
-              <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block px-1">Data da Aula</label>
+              <label className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase mb-1 block px-1">Data da Aula</label>
               <div className="relative">
                 <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
                 <input 
@@ -163,7 +163,7 @@ export const ClassAttendanceModal: React.FC<ClassAttendanceModalProps> = ({
               </div>
             </div>
             <div className="md:col-span-8">
-              <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block px-1">Tema do Encontro</label>
+              <label className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase mb-1 block px-1">Tema do Encontro</label>
               <div className="relative">
                 <BookOpenText className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
                 <input 
@@ -178,9 +178,9 @@ export const ClassAttendanceModal: React.FC<ClassAttendanceModalProps> = ({
             </div>
           </div>
 
-          <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex flex-col md:flex-row gap-3 md:gap-4">
             <div className="flex-1">
-              <label className="text-[10px] font-black text-slate-400 uppercase mb-1 block px-1">Filtrar por Nome</label>
+              <label className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase mb-1 block px-1">Filtrar por Nome</label>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
                 <input 
@@ -194,20 +194,20 @@ export const ClassAttendanceModal: React.FC<ClassAttendanceModalProps> = ({
             </div>
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex gap-3 md:gap-4">
             <div className="flex-1 bg-green-50 p-2 rounded-xl text-center border border-green-100">
-               <p className="text-[9px] font-black text-green-600 uppercase">Presentes</p>
-               <p className="text-lg font-black text-green-700">{presentCount}</p>
+               <p className="text-[8px] md:text-[9px] font-black text-green-600 uppercase">Presentes</p>
+               <p className="text-base md:text-lg font-black text-green-700">{presentCount}</p>
             </div>
             <div className="flex-1 bg-red-50 p-2 rounded-xl text-center border border-red-100">
-               <p className="text-[9px] font-black text-red-600 uppercase">Ausentes</p>
-               <p className="text-lg font-black text-red-700">{absentCount}</p>
+               <p className="text-[8px] md:text-[9px] font-black text-red-600 uppercase">Ausentes</p>
+               <p className="text-base md:text-lg font-black text-red-700">{absentCount}</p>
             </div>
           </div>
         </div>
 
         {/* Student List */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-2">
+        <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-3">
           {filteredMembers.sort((a,b) => a.nomeCompleto.localeCompare(b.nomeCompleto)).map((student) => {
             const entry = entries.find(e => e.studentId === student.id);
             const isPresent = entry?.status === 'present';
@@ -215,29 +215,29 @@ export const ClassAttendanceModal: React.FC<ClassAttendanceModalProps> = ({
             return (
               <div 
                 key={student.id} 
-                className={`flex items-center justify-between p-4 rounded-2xl border transition-all group ${
+                className={`flex items-center justify-between p-3 md:p-4 rounded-xl md:rounded-2xl border transition-all group ${
                   isPresent ? 'bg-white border-slate-100 hover:border-green-200' : 'bg-red-50/30 border-red-100'
                 } ${isLocked ? 'cursor-default opacity-80' : 'cursor-pointer'}`}
                 onClick={() => toggleStatus(student.id)}
               >
-                <div className="flex items-center gap-4">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-sm transition-colors shadow-sm ${
+                <div className="flex items-center gap-3 md:gap-4 flex-1 min-w-0">
+                  <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex-shrink-0 flex items-center justify-center font-black text-xs md:text-sm transition-colors shadow-sm ${
                     isPresent ? 'bg-green-100 text-green-700' : 'bg-red-600 text-white'
                   }`}>
                     {student.nomeCompleto.charAt(0)}
                   </div>
-                  <div>
-                    <p className={`font-bold transition-colors ${isPresent ? 'text-slate-800' : 'text-red-700'}`}>
+                  <div className="flex-1 min-w-0">
+                    <p className={`font-bold text-sm md:text-base transition-colors truncate ${isPresent ? 'text-slate-800' : 'text-red-700'}`}>
                       {student.nomeCompleto}
                     </p>
-                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                    <p className="text-[9px] md:text-[10px] text-slate-400 font-bold uppercase tracking-wider truncate">
                       {isPresent ? 'Presença Confirmada' : 'Falta Lançada'}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                   <div className={`px-4 py-2 rounded-xl font-black text-[10px] uppercase transition-all ${
+                <div className="flex-shrink-0 ml-2">
+                   <div className={`px-2 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-xl font-black text-[8px] md:text-[10px] uppercase transition-all ${
                      isPresent 
                        ? 'bg-green-600 text-white shadow-lg shadow-green-100' 
                        : 'bg-red-100 text-red-600'
@@ -250,43 +250,43 @@ export const ClassAttendanceModal: React.FC<ClassAttendanceModalProps> = ({
           })}
 
           {filteredMembers.length === 0 && (
-            <div className="py-20 text-center">
-              <Users className="w-12 h-12 text-slate-200 mx-auto mb-4" />
-              <p className="text-slate-400 italic">Nenhum catequisando encontrado.</p>
+            <div className="py-10 md:py-20 text-center">
+              <Users className="w-10 h-10 md:w-12 md:h-12 text-slate-200 mx-auto mb-4" />
+              <p className="text-slate-400 italic text-sm">Nenhum catequisando encontrado.</p>
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="p-8 border-t border-slate-100 bg-slate-50 flex justify-between items-center">
+        <div className="p-4 md:p-8 border-t border-slate-100 bg-slate-50 flex flex-col md:flex-row gap-4 justify-between items-center">
           <button 
             onClick={onClose}
-            className="px-6 py-3 text-slate-500 font-bold hover:bg-slate-200 rounded-xl transition-all"
+            className="w-full md:w-auto px-6 py-3 text-slate-500 font-bold hover:bg-slate-200 rounded-xl transition-all text-sm"
           >
             Fechar
           </button>
           
-          <div className="flex gap-3">
+          <div className="flex gap-2 md:gap-3 w-full md:w-auto">
             {!isLocked ? (
               <>
                 <button 
                   onClick={handleLock}
-                  className="flex items-center gap-2 px-6 py-4 bg-slate-200 text-slate-700 font-bold rounded-2xl hover:bg-slate-300 transition-all shadow-xl shadow-slate-100"
+                  className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 md:px-6 py-3 md:py-4 bg-slate-200 text-slate-700 font-bold rounded-xl md:rounded-2xl hover:bg-slate-300 transition-all shadow-lg shadow-slate-100 text-xs md:text-sm"
                 >
-                  <Lock className="w-5 h-5" />
-                  Trancar Chamada
+                  <Lock className="w-4 h-4 md:w-5 md:h-5" />
+                  Trancar
                 </button>
 
                 <button 
                   onClick={handleSave}
-                  className="flex items-center gap-2 px-10 py-4 bg-green-600 text-white font-bold rounded-2xl hover:bg-green-700 transition-all shadow-xl shadow-green-100"
+                  className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 md:px-10 py-3 md:py-4 bg-green-600 text-white font-bold rounded-xl md:rounded-2xl hover:bg-green-700 transition-all shadow-lg shadow-green-100 text-xs md:text-sm"
                 >
-                  <Save className="w-5 h-5" />
-                  Salvar Diário
+                  <Save className="w-4 h-4 md:w-5 md:h-5" />
+                  Salvar
                 </button>
               </>
             ) : (
-              <div className="flex items-center gap-2 px-8 py-4 bg-amber-50 text-amber-600 font-black rounded-2xl border border-amber-100 uppercase tracking-widest text-[10px]">
+              <div className="w-full md:w-auto flex items-center justify-center gap-2 px-8 py-4 bg-amber-50 text-amber-600 font-black rounded-2xl border border-amber-100 uppercase tracking-widest text-[10px]">
                 <Lock className="w-4 h-4" /> Chamada Trancada
               </div>
             )}
