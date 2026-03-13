@@ -28,33 +28,33 @@ export const FormationForm: React.FC<FormationFormProps> = ({ onSave, onCancel, 
   };
 
   return (
-    <div className="bg-white shadow-2xl rounded-3xl border border-slate-100 overflow-hidden mb-10 animate-in slide-in-from-bottom-4 duration-500">
-      <div className="bg-slate-900 p-8 relative">
-        <div className="flex items-center gap-4">
-          <div className="bg-indigo-600 p-3 rounded-2xl shadow-lg">
-            <GraduationCap className="text-white w-8 h-8" />
+    <div className="bg-white shadow-2xl rounded-[1.5rem] md:rounded-3xl border border-slate-100 overflow-hidden mb-10 animate-in slide-in-from-bottom-4 duration-500">
+      <div className="bg-slate-900 p-6 md:p-8 relative">
+        <div className="flex items-center gap-3 md:gap-4">
+          <div className="bg-indigo-600 p-2 md:p-3 rounded-xl md:rounded-2xl shadow-lg">
+            <GraduationCap className="text-white w-6 h-6 md:w-8 md:h-8" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-white tracking-tight">
+            <h2 className="text-lg md:text-2xl font-bold text-white tracking-tight">
               {initialData ? 'Editar Formação' : 'Nova Formação'}
             </h2>
-            <p className="text-slate-400 text-sm">Agendamento de treinamentos e retiros para o corpo docente.</p>
+            <p className="text-slate-400 text-[10px] md:text-sm">Agendamento de treinamentos e retiros para o corpo docente.</p>
           </div>
         </div>
         <button 
           onClick={onCancel}
-          className="absolute top-8 right-8 p-2 text-white/50 hover:text-white transition-colors"
+          className="absolute top-6 md:top-8 right-6 md:right-8 p-2 text-white/50 hover:text-white transition-colors"
           title="Fechar"
         >
-          <X className="w-6 h-6" />
+          <X className="w-5 h-5 md:w-6 md:h-6" />
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="p-8 md:p-12 space-y-8">
+      <form onSubmit={handleSubmit} className="p-6 md:p-12 space-y-8">
         <div className="space-y-6">
           <div className="flex items-center gap-2 mb-2">
             <div className="p-1.5 bg-indigo-100 rounded-lg"><BookOpen className="w-4 h-4 text-indigo-600" /></div>
-            <h4 className="font-black text-slate-800 uppercase tracking-wide text-xs">Pauta do Evento</h4>
+            <h4 className="font-black text-slate-800 uppercase tracking-wide text-[10px] md:text-xs">Pauta do Evento</h4>
           </div>
           
           <div>
@@ -69,11 +69,11 @@ export const FormationForm: React.FC<FormationFormProps> = ({ onSave, onCancel, 
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
+            <div className="bg-slate-50 p-4 md:p-6 rounded-2xl md:rounded-3xl border border-slate-100 space-y-3 md:space-y-4">
               <div className="flex items-center gap-2 text-indigo-600">
                 <Calendar className="w-4 h-4" />
-                <span className="text-[10px] font-black uppercase tracking-widest">Início</span>
+                <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest">Início</span>
               </div>
               <input 
                 required 
@@ -84,10 +84,10 @@ export const FormationForm: React.FC<FormationFormProps> = ({ onSave, onCancel, 
               />
             </div>
 
-            <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 space-y-4">
+            <div className="bg-slate-50 p-4 md:p-6 rounded-2xl md:rounded-3xl border border-slate-100 space-y-3 md:space-y-4">
               <div className="flex items-center gap-2 text-red-600">
                 <Clock className="w-4 h-4" />
-                <span className="text-[10px] font-black uppercase tracking-widest">Término</span>
+                <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest">Término</span>
               </div>
               <input 
                 required 
@@ -100,12 +100,12 @@ export const FormationForm: React.FC<FormationFormProps> = ({ onSave, onCancel, 
           </div>
         </div>
 
-        <div className="flex items-center justify-between pt-8 border-t border-slate-100">
-          <button type="button" onClick={onCancel} className="flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-slate-500 hover:bg-slate-100 transition-all">
+        <div className="flex flex-col sm:flex-row items-center justify-between pt-8 border-t border-slate-100 gap-3 md:gap-4">
+          <button type="button" onClick={onCancel} className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-xl md:rounded-2xl font-bold text-slate-500 hover:bg-slate-100 transition-all">
             <ArrowLeft className="w-5 h-5" /> Cancelar
           </button>
-          <button type="submit" className="flex items-center gap-2 px-10 py-4 rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-xl shadow-blue-200 transition-all transform hover:-translate-y-0.5">
-            <Save className="w-6 h-6" /> {initialData ? 'Atualizar Evento' : 'Salvar Formação'}
+          <button type="submit" className="w-full sm:w-auto flex items-center justify-center gap-2 px-10 py-3 md:py-4 rounded-xl md:rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-xl shadow-blue-200 transition-all transform hover:-translate-y-0.5 text-sm md:text-base">
+            <Save className="w-5 h-5 md:w-6 md:h-6" /> {initialData ? 'Atualizar Evento' : 'Salvar Formação'}
           </button>
         </div>
       </form>

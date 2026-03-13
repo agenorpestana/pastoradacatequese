@@ -618,34 +618,34 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
       )}
 
       {/* INTERFACE DO USUÁRIO */}
-      <div className="bg-white shadow-2xl rounded-[2.5rem] border border-slate-100 overflow-hidden no-print animate-in fade-in duration-500">
-        <div className="bg-slate-900 p-6 flex flex-col md:flex-row justify-between items-center gap-4 relative">
-          <div className="flex items-center gap-4">
-            <div className="bg-blue-600 p-3 rounded-2xl">
-              <UserPlus className="text-white w-6 h-6" />
+      <div className="bg-white shadow-2xl rounded-[1.5rem] md:rounded-[2.5rem] border border-slate-100 overflow-hidden no-print animate-in fade-in duration-500">
+        <div className="bg-slate-900 p-4 md:p-6 flex flex-col md:flex-row justify-between items-center gap-4 relative">
+          <div className="flex items-center gap-3 md:gap-4 w-full md:w-auto">
+            <div className="bg-blue-600 p-2 md:p-3 rounded-xl md:rounded-2xl shrink-0">
+              <UserPlus className="text-white w-5 h-5 md:w-6 md:h-6" />
             </div>
-            <div>
-              <h2 className="text-xl font-black text-white tracking-tight">Cadastro de Catequizando</h2>
-              <p className="text-slate-400 text-xs">{formData.matricula ? `Matrícula: ${formData.matricula}` : 'Nova Inscrição'}</p>
+            <div className="min-w-0">
+              <h2 className="text-base md:text-xl font-black text-white tracking-tight truncate">Cadastro de Catequizando</h2>
+              <p className="text-slate-400 text-[10px] md:text-xs">{formData.matricula ? `Matrícula: ${formData.matricula}` : 'Nova Inscrição'}</p>
             </div>
           </div>
           
-          <div className="flex gap-2 w-full md:w-auto pr-8">
-            <button type="button" onClick={() => window.print()} className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-slate-800 text-white px-4 py-2.5 rounded-xl font-bold text-xs hover:bg-slate-700 transition-all shadow-lg">
-              <Printer className="w-4 h-4" /> Imprimir
+          <div className="flex gap-2 w-full md:w-auto pr-0 md:pr-8">
+            <button type="button" onClick={() => window.print()} className="flex-1 md:flex-none flex items-center justify-center gap-1.5 md:gap-2 bg-slate-800 text-white px-3 md:px-4 py-2 md:py-2.5 rounded-xl font-bold text-[10px] md:text-xs hover:bg-slate-700 transition-all shadow-lg">
+              <Printer className="w-3.5 h-3.5 md:w-4 md:h-4" /> Imprimir
             </button>
-            <button type="button" onClick={handleFinalSave} className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold text-xs hover:bg-blue-700 transition-all shadow-xl shadow-blue-500/10">
-              <Save className="w-4 h-4" /> Salvar Tudo
+            <button type="button" onClick={handleFinalSave} className="flex-1 md:flex-none flex items-center justify-center gap-1.5 md:gap-2 bg-blue-600 text-white px-4 md:px-6 py-2 md:py-2.5 rounded-xl font-bold text-[10px] md:text-xs hover:bg-blue-700 transition-all shadow-xl shadow-blue-500/10">
+              <Save className="w-3.5 h-3.5 md:w-4 md:h-4" /> Salvar Tudo
             </button>
           </div>
 
           {onCancel && (
             <button 
               onClick={onCancel}
-              className="absolute top-6 right-6 text-white/50 hover:text-white transition-colors"
+              className="absolute top-4 md:top-6 right-4 md:right-6 text-white/50 hover:text-white transition-colors"
               title="Fechar"
             >
-              <X className="w-6 h-6" />
+              <X className="w-5 h-5 md:w-6 md:h-6" />
             </button>
           )}
         </div>
@@ -664,13 +664,12 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
           ))}
         </div>
 
-        <div className="p-6 md:p-10">
+        <div className="p-4 md:p-10">
           {activeTab === 'crismando' && (
             <div className="space-y-6 animate-in slide-in-from-left-4 duration-300">
-              {/* Form content omitted for brevity, same as original */}
-              <div className="flex flex-col md:flex-row gap-8">
+              <div className="flex flex-col md:flex-row gap-6 md:gap-8">
                 <div className="flex flex-col items-center gap-4">
-                  <div className="relative group w-40 h-48 rounded-3xl bg-slate-100 border-2 border-dashed border-slate-200 overflow-hidden flex items-center justify-center shadow-inner">
+                  <div className="relative group w-32 h-40 md:w-40 md:h-48 rounded-2xl md:rounded-3xl bg-slate-100 border-2 border-dashed border-slate-200 overflow-hidden flex items-center justify-center shadow-inner">
                     {isCameraActive ? (
                       <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover" />
                     ) : formData.foto ? (
@@ -1077,11 +1076,11 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
           )}
         </div>
 
-        <div className="bg-slate-50 p-6 border-t border-slate-100 flex justify-between items-center">
-           <button type="button" onClick={() => activeTab !== 'crismando' && setActiveTab(tabs[tabs.findIndex(t => t.id === activeTab) - 1].id)} className="flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-slate-500 hover:bg-white transition-all disabled:opacity-30" disabled={activeTab === 'crismando'}>
+        <div className="bg-slate-50 p-4 md:p-6 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-3">
+           <button type="button" onClick={() => activeTab !== 'crismando' && setActiveTab(tabs[tabs.findIndex(t => t.id === activeTab) - 1].id)} className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-slate-500 hover:bg-white transition-all disabled:opacity-30 text-[10px] md:text-xs uppercase tracking-widest" disabled={activeTab === 'crismando'}>
              <ArrowLeft size={16} /> Anterior
            </button>
-           <button type="button" onClick={() => activeTab !== 'celebracao' ? setActiveTab(tabs[tabs.findIndex(t => t.id === activeTab) + 1].id) : handleFinalSave()} className="flex items-center gap-2 px-6 py-2 rounded-xl font-black bg-blue-600 text-white hover:bg-blue-700 transition-all uppercase text-[10px] tracking-widest">
+           <button type="button" onClick={() => activeTab !== 'celebracao' ? setActiveTab(tabs[tabs.findIndex(t => t.id === activeTab) + 1].id) : handleFinalSave()} className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-black bg-blue-600 text-white hover:bg-blue-700 transition-all uppercase text-[10px] md:text-xs tracking-widest shadow-lg shadow-blue-100">
              {activeTab === 'celebracao' ? 'Finalizar Cadastro' : 'Próxima Etapa'} <ArrowRight size={16} />
            </button>
         </div>

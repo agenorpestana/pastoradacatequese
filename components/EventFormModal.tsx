@@ -44,111 +44,111 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({ onSave, onClose,
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
-      <div className="bg-white w-full max-w-xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
-        <div className="bg-slate-900 p-8 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <div className="bg-blue-600 p-3 rounded-2xl shadow-lg shadow-blue-500/20">
-              <CalendarDays className="text-white w-6 h-6" />
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-2 md:p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
+      <div className="bg-white w-full max-w-xl rounded-[1.5rem] md:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[98vh] md:max-h-none">
+        <div className="bg-slate-900 p-4 md:p-8 flex justify-between items-center shrink-0">
+          <div className="flex items-center gap-3 md:gap-4">
+            <div className="bg-blue-600 p-2 md:p-3 rounded-xl md:rounded-2xl shadow-lg shadow-blue-500/20">
+              <CalendarDays className="text-white w-5 h-5 md:w-6 md:h-6" />
             </div>
             <div>
-              <h2 className="text-xl font-black text-white">Agendar Evento</h2>
-              <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Preencha os detalhes do compromisso</p>
+              <h2 className="text-base md:text-xl font-black text-white leading-tight">Agendar Evento</h2>
+              <p className="text-[8px] md:text-xs text-slate-400 font-bold uppercase tracking-widest">Preencha os detalhes</p>
             </div>
           </div>
           <button 
             onClick={onClose}
-            className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all"
+            className="p-1.5 md:p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5 md:w-6 md:h-6" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-8 space-y-6">
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Título do Evento</label>
+        <form onSubmit={handleSubmit} className="p-4 md:p-8 space-y-4 md:space-y-6 overflow-y-auto custom-scrollbar">
+          <div className="space-y-1 md:space-y-1.5">
+            <label className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Título do Evento</label>
             <div className="relative">
-              <Bookmark className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 w-5 h-5" />
+              <Bookmark className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 w-4 h-4 md:w-5 md:h-5" />
               <input 
                 required
                 type="text" 
-                placeholder="Ex: Reunião de Pais, Encontro de Formação..."
+                placeholder="Ex: Reunião de Pais..."
                 value={formData.titulo}
                 onChange={e => setFormData({...formData, titulo: e.target.value})}
-                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-bold text-slate-700"
+                className="w-full pl-10 md:pl-12 pr-4 py-2.5 md:py-3.5 bg-slate-50 border border-slate-100 rounded-xl md:rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-bold text-slate-700 text-xs md:text-base"
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50/50 p-6 rounded-3xl border border-slate-100">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 bg-slate-50/50 p-4 md:p-6 rounded-2xl md:rounded-3xl border border-slate-100">
             {/* INÍCIO */}
-            <div className="space-y-4">
-              <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-blue-600 rounded-full"></div> Início
+            <div className="space-y-2 md:space-y-4">
+              <p className="text-[8px] md:text-[10px] font-black text-blue-600 uppercase tracking-widest flex items-center gap-2">
+                <div className="w-1 md:w-1.5 h-1 md:h-1.5 bg-blue-600 rounded-full"></div> Início
               </p>
-              <div className="space-y-3">
+              <div className="space-y-2 md:space-y-3">
                 <input 
                   required
                   type="date" 
                   value={formData.dataInicio}
                   onChange={e => setFormData({...formData, dataInicio: e.target.value})}
-                  className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition-all font-bold text-slate-700 text-sm"
+                  className="w-full px-3 md:px-4 py-2 md:py-2.5 bg-white border border-slate-200 rounded-lg md:rounded-xl outline-none focus:border-blue-500 transition-all font-bold text-slate-700 text-xs md:text-sm"
                 />
                 <input 
                   type="time" 
                   value={formData.horarioInicio}
                   onChange={e => setFormData({...formData, horarioInicio: e.target.value})}
-                  className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:border-blue-500 transition-all font-bold text-slate-700 text-sm"
+                  className="w-full px-3 md:px-4 py-2 md:py-2.5 bg-white border border-slate-200 rounded-lg md:rounded-xl outline-none focus:border-blue-500 transition-all font-bold text-slate-700 text-xs md:text-sm"
                 />
               </div>
             </div>
 
             {/* FIM */}
-            <div className="space-y-4">
-              <p className="text-[10px] font-black text-red-600 uppercase tracking-widest flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-red-600 rounded-full"></div> Encerramento
+            <div className="space-y-2 md:space-y-4">
+              <p className="text-[8px] md:text-[10px] font-black text-red-600 uppercase tracking-widest flex items-center gap-2">
+                <div className="w-1 md:w-1.5 h-1 md:h-1.5 bg-red-600 rounded-full"></div> Encerramento
               </p>
-              <div className="space-y-3">
+              <div className="space-y-2 md:space-y-3">
                 <input 
                   required
                   type="date" 
                   value={formData.dataFim}
                   onChange={e => setFormData({...formData, dataFim: e.target.value})}
-                  className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:border-red-500 transition-all font-bold text-slate-700 text-sm"
+                  className="w-full px-3 md:px-4 py-2 md:py-2.5 bg-white border border-slate-200 rounded-lg md:rounded-xl outline-none focus:border-red-500 transition-all font-bold text-slate-700 text-xs md:text-sm"
                 />
                 <input 
                   type="time" 
                   value={formData.horarioFim}
                   onChange={e => setFormData({...formData, horarioFim: e.target.value})}
-                  className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl outline-none focus:border-red-500 transition-all font-bold text-slate-700 text-sm"
+                  className="w-full px-3 md:px-4 py-2 md:py-2.5 bg-white border border-slate-200 rounded-lg md:rounded-xl outline-none focus:border-red-500 transition-all font-bold text-slate-700 text-xs md:text-sm"
                 />
               </div>
             </div>
           </div>
 
-          <div className="space-y-1.5">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Local</label>
+          <div className="space-y-1 md:space-y-1.5">
+            <label className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Local</label>
             <div className="relative">
-              <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 w-5 h-5" />
+              <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 w-4 h-4 md:w-5 md:h-5" />
               <input 
                 type="text" 
-                placeholder="Ex: Salão Paroquial, Igreja Matriz..."
+                placeholder="Ex: Salão Paroquial..."
                 value={formData.local}
                 onChange={e => setFormData({...formData, local: e.target.value})}
-                className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-bold text-slate-700"
+                className="w-full pl-10 md:pl-12 pr-4 py-2.5 md:py-3.5 bg-slate-50 border border-slate-100 rounded-xl md:rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-bold text-slate-700 text-xs md:text-base"
               />
             </div>
           </div>
 
-          <div className="space-y-4">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Tipo de Compromisso</label>
-            <div className="grid grid-cols-5 gap-2">
+          <div className="space-y-2 md:space-y-4">
+            <label className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Tipo de Compromisso</label>
+            <div className="grid grid-cols-3 md:grid-cols-5 gap-1.5 md:gap-2">
               {['Formação', 'Reunião', 'Celebração', 'Retiro', 'Outros'].map(type => (
                 <button
                   key={type}
                   type="button"
                   onClick={() => setFormData({...formData, tipo: type as any})}
-                  className={`py-2 rounded-xl text-[9px] font-black uppercase tracking-tighter border transition-all ${
+                  className={`py-1.5 md:py-2 rounded-lg md:rounded-xl text-[7px] md:text-[9px] font-black uppercase tracking-tighter border transition-all ${
                     formData.tipo === type 
                       ? 'bg-slate-900 border-slate-900 text-white shadow-lg' 
                       : 'bg-white border-slate-100 text-slate-400 hover:bg-slate-50'
@@ -163,28 +163,28 @@ export const EventFormModal: React.FC<EventFormModalProps> = ({ onSave, onClose,
               <div className="animate-in slide-in-from-top-2 duration-300">
                 <input 
                   type="text" 
-                  placeholder="Especifique o tipo (ex: Mutirão, Festa...)"
+                  placeholder="Especifique o tipo..."
                   value={formData.tipoCustomizado}
                   onChange={e => setFormData({...formData, tipoCustomizado: e.target.value})}
-                  className="w-full px-4 py-3 bg-blue-50 border border-blue-100 rounded-xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-bold text-blue-700 placeholder:text-blue-300 text-sm"
+                  className="w-full px-3 md:px-4 py-2 md:py-3 bg-blue-50 border border-blue-100 rounded-lg md:rounded-xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-bold text-blue-700 placeholder:text-blue-300 text-xs md:text-sm"
                 />
               </div>
             )}
           </div>
 
-          <div className="pt-4 flex gap-3">
+          <div className="pt-2 md:pt-4 flex gap-2 md:gap-3 shrink-0">
              <button 
                type="button"
                onClick={onClose}
-               className="flex-1 py-4 bg-slate-100 text-slate-500 font-black uppercase tracking-widest text-[10px] rounded-2xl hover:bg-slate-200 transition-all"
+               className="flex-1 py-3 md:py-4 bg-slate-100 text-slate-500 font-black uppercase tracking-widest text-[8px] md:text-[10px] rounded-xl md:rounded-2xl hover:bg-slate-200 transition-all"
              >
                Cancelar
              </button>
              <button 
                type="submit"
-               className="flex-[2] py-4 bg-blue-600 text-white font-black uppercase tracking-widest text-[10px] rounded-2xl hover:bg-blue-700 transition-all shadow-xl shadow-blue-100 flex items-center justify-center gap-2"
+               className="flex-[2] py-3 md:py-4 bg-blue-600 text-white font-black uppercase tracking-widest text-[8px] md:text-[10px] rounded-xl md:rounded-2xl hover:bg-blue-700 transition-all shadow-xl shadow-blue-100 flex items-center justify-center gap-1.5 md:gap-2"
              >
-               <Save className="w-4 h-4" /> Salvar na Agenda
+               <Save className="w-3.5 h-3.5 md:w-4 md:h-4" /> Salvar
              </button>
           </div>
         </form>

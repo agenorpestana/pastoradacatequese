@@ -249,30 +249,30 @@ export const UserForm: React.FC<UserFormProps> = ({ onSave, onCancel, initialDat
 
   return (
     <div className="max-w-5xl mx-auto animate-in slide-in-from-bottom-4 duration-500 pb-20">
-      <div className="bg-white shadow-2xl rounded-[2.5rem] border border-slate-100 overflow-hidden">
-        <div className="bg-slate-900 p-8 relative">
-          <div className="flex items-center gap-4">
-            <div className="bg-blue-600 p-3 rounded-2xl shadow-lg">
-              <Key className="text-white w-8 h-8" />
+      <div className="bg-white shadow-2xl rounded-[1.5rem] md:rounded-[2.5rem] border border-slate-100 overflow-hidden">
+        <div className="bg-slate-900 p-6 md:p-8 relative">
+          <div className="flex items-center gap-3 md:gap-4">
+            <div className="bg-blue-600 p-2 md:p-3 rounded-xl md:rounded-2xl shadow-lg">
+              <Key className="text-white w-6 h-6 md:w-8 md:h-8" />
             </div>
             <div>
-              <h2 className="text-2xl font-black text-white tracking-tight">
+              <h2 className="text-lg md:text-2xl font-black text-white tracking-tight">
                 {initialData ? 'Editar Usuário' : 'Novo Cadastro de Acesso'}
               </h2>
-              <p className="text-slate-400 text-sm">Defina exatamente o nível de hierarquia e o que este usuário poderá ver.</p>
+              <p className="text-slate-400 text-[10px] md:text-sm">Defina exatamente o nível de hierarquia e o que este usuário poderá ver.</p>
             </div>
           </div>
           <button 
             onClick={onCancel}
-            className="absolute top-8 right-8 p-2 text-white/50 hover:text-white transition-colors"
+            className="absolute top-6 md:top-8 right-6 md:right-8 p-1.5 md:p-2 text-white/50 hover:text-white transition-colors"
             title="Fechar"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5 md:w-6 md:h-6" />
           </button>
         </div>
 
         {/* Added autoComplete="off" to form and specific attributes to inputs to prevent browser autofill */}
-        <form onSubmit={handleSubmit} className="p-8 md:p-12 space-y-12" autoComplete="off">
+        <form onSubmit={handleSubmit} className="p-4 md:p-12 space-y-8 md:space-y-12" autoComplete="off">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
             {/* DADOS BÁSICOS */}
             <div className="md:col-span-5 space-y-6">
@@ -419,11 +419,11 @@ export const UserForm: React.FC<UserFormProps> = ({ onSave, onCancel, initialDat
             </div>
           </div>
 
-          <div className="flex items-center justify-between pt-8 border-t border-slate-100">
-            <button type="button" onClick={onCancel} className="flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-slate-500 hover:bg-slate-100 transition-all">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 md:pt-8 border-t border-slate-100">
+            <button type="button" onClick={onCancel} className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-2xl font-bold text-slate-500 hover:bg-slate-100 transition-all text-sm">
               <ArrowLeft className="w-5 h-5" /> Cancelar
             </button>
-            <button type="submit" className="flex items-center gap-2 px-12 py-4 rounded-2xl bg-blue-600 text-white font-black hover:bg-blue-700 shadow-xl shadow-blue-200 transition-all transform hover:-translate-y-0.5 uppercase tracking-widest text-xs">
+            <button type="submit" className="w-full sm:w-auto flex items-center justify-center gap-2 px-12 py-4 rounded-2xl bg-blue-600 text-white font-black hover:bg-blue-700 shadow-xl shadow-blue-200 transition-all transform hover:-translate-y-0.5 uppercase tracking-widest text-xs">
               <Save className="w-5 h-5" /> {initialData ? 'Atualizar Usuário' : 'Salvar Novo Usuário'}
             </button>
           </div>

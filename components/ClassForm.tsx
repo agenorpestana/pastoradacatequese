@@ -99,29 +99,29 @@ export const ClassForm: React.FC<ClassFormProps> = ({ onSave, onCancel, initialD
   );
 
   return (
-    <div className="bg-white shadow-2xl rounded-3xl border border-slate-100 overflow-hidden mb-10">
-      <div className="bg-slate-900 p-8 relative">
-        <div className="flex items-center gap-4">
-          <div className="bg-blue-600 p-3 rounded-2xl shadow-lg">
-            <BookOpen className="text-white w-8 h-8" />
+    <div className="bg-white shadow-2xl rounded-[1.5rem] md:rounded-3xl border border-slate-100 overflow-hidden mb-10">
+      <div className="bg-slate-900 p-6 md:p-8 relative">
+        <div className="flex items-center gap-3 md:gap-4">
+          <div className="bg-blue-600 p-2 md:p-3 rounded-xl md:rounded-2xl shadow-lg">
+            <BookOpen className="text-white w-6 h-6 md:w-8 md:h-8" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-white tracking-tight">
+            <h2 className="text-lg md:text-2xl font-bold text-white tracking-tight">
               {initialData ? 'Editar Turma' : 'Nova Turma'}
             </h2>
-            <p className="text-slate-400 text-sm">Configure os detalhes e a composição do grupo.</p>
+            <p className="text-slate-400 text-[10px] md:text-sm">Configure os detalhes e a composição do grupo.</p>
           </div>
         </div>
         <button 
           onClick={onCancel}
-          className="absolute top-8 right-8 p-2 text-white/50 hover:text-white transition-colors"
+          className="absolute top-6 md:top-8 right-6 md:right-8 p-1.5 md:p-2 text-white/50 hover:text-white transition-colors"
           title="Fechar"
         >
-          <X className="w-6 h-6" />
+          <X className="w-5 h-5 md:w-6 md:h-6" />
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="p-8 md:p-12 space-y-10">
+      <form onSubmit={handleSubmit} className="p-4 md:p-12 space-y-8 md:space-y-10">
         <div className="space-y-6">
           <div className="flex items-center gap-2 mb-2">
             <div className="p-1.5 bg-blue-100 rounded-lg"><BookOpen className="w-4 h-4 text-blue-600" /></div>
@@ -319,17 +319,17 @@ export const ClassForm: React.FC<ClassFormProps> = ({ onSave, onCancel, initialD
           </div>
         )}
 
-        <div className="flex items-center justify-between pt-8 border-t border-slate-100">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-slate-100">
           <button 
             type="button" 
             onClick={onCancel}
-            className="flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-slate-500 hover:bg-slate-100 transition-all border border-transparent"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-2xl font-bold text-slate-500 hover:bg-slate-100 transition-all border border-transparent text-sm"
           >
             <ArrowLeft className="w-5 h-5" /> Cancelar
           </button>
           <button 
             type="submit" 
-            className="flex items-center gap-2 px-10 py-4 rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-xl shadow-blue-200 transition-all transform hover:-translate-y-0.5"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-10 py-4 rounded-2xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-xl shadow-blue-200 transition-all transform hover:-translate-y-0.5 text-sm uppercase tracking-widest"
           >
             <Save className="w-6 h-6" /> Salvar Alterações
           </button>

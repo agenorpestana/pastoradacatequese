@@ -321,50 +321,52 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
         document.body
       )}
 
-      <div className="bg-white shadow-2xl rounded-[2.5rem] border border-sky-100 overflow-hidden mb-10 animate-in fade-in slide-in-from-bottom-4 duration-500 no-print">
-      <div className="bg-sky-600 p-8 relative overflow-hidden">
+      <div className="bg-white shadow-2xl rounded-[1.5rem] md:rounded-[2.5rem] border border-sky-100 overflow-hidden mb-10 animate-in fade-in slide-in-from-bottom-4 duration-500 no-print">
+      <div className="bg-sky-600 p-6 md:p-8 relative overflow-hidden">
         <div className="absolute top-0 right-0 p-4 opacity-10"><Sparkles size={120} className="text-white" /></div>
-        <div className="flex items-center gap-4 relative z-10">
-          <div className="bg-white/20 p-3 rounded-2xl shadow-lg backdrop-blur-md border border-white/20">
-            <UserCheck className="text-white w-8 h-8" />
+        <div className="flex flex-col md:flex-row md:items-center gap-4 relative z-10">
+          <div className="flex items-center gap-3 md:gap-4">
+            <div className="bg-white/20 p-2 md:p-3 rounded-xl md:rounded-2xl shadow-lg backdrop-blur-md border border-white/20">
+              <UserCheck className="text-white w-6 h-6 md:w-8 md:h-8" />
+            </div>
+            <div>
+              <h2 className="text-lg md:text-2xl font-black text-white tracking-tight">
+                {initialData ? 'Editar Catequista' : 'Novo Catequista'}
+              </h2>
+              <p className="text-sky-100 text-[10px] md:text-sm font-medium uppercase tracking-widest opacity-80">Cadastro de membros do corpo docente mariano</p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-2xl font-black text-white tracking-tight">
-              {initialData ? 'Editar Catequista' : 'Novo Catequista'}
-            </h2>
-            <p className="text-sky-100 text-sm font-medium uppercase tracking-widest opacity-80">Cadastro de membros do corpo docente mariano</p>
-          </div>
-          <div className="flex gap-2 w-full md:w-auto pr-8">
+          <div className="flex gap-2 w-full md:w-auto md:ml-auto md:pr-8">
             <button 
               type="button" 
               onClick={() => window.print()} 
-              className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-slate-800 text-white px-4 py-2.5 rounded-xl font-bold text-xs hover:bg-slate-700 transition-all shadow-lg"
+              className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-slate-800 text-white px-4 py-2.5 rounded-xl font-bold text-[10px] md:text-xs hover:bg-slate-700 transition-all shadow-lg"
             >
               <Printer className="w-4 h-4" /> Imprimir
             </button>
-            <button type="submit" form="catequista-form" className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-amber-400 text-white px-6 py-2.5 rounded-xl font-black text-xs hover:bg-amber-500 transition-all shadow-xl shadow-amber-100">
+            <button type="submit" form="catequista-form" className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-amber-400 text-white px-6 py-2.5 rounded-xl font-black text-[10px] md:text-xs hover:bg-amber-500 transition-all shadow-xl shadow-amber-100">
               <Save className="w-4 h-4" /> {initialData ? 'Atualizar' : 'Salvar'}
             </button>
           </div>
         </div>
         <button 
           onClick={onCancel}
-          className="absolute top-8 right-8 p-2 text-white/50 hover:text-white transition-colors z-20"
+          className="absolute top-6 md:top-8 right-6 md:right-8 p-2 text-white/50 hover:text-white transition-colors z-20"
           title="Fechar"
         >
-          <X className="w-6 h-6" />
+          <X className="w-5 h-5 md:w-6 md:h-6" />
         </button>
       </div>
 
-      <form id="catequista-form" onSubmit={handleSubmit} className="p-8 md:p-12 space-y-10">
+      <form id="catequista-form" onSubmit={handleSubmit} className="p-6 md:p-12 space-y-10">
         
-        <div className="bg-slate-50 border-b border-slate-100 flex overflow-x-auto scrollbar-hide -mx-8 md:-mx-12 -mt-8 md:-mt-12 mb-10">
+        <div className="bg-slate-50 border-b border-slate-100 flex overflow-x-auto scrollbar-hide -mx-6 md:-mx-12 -mt-6 md:-mt-12 mb-10">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-8 py-5 font-bold text-[10px] md:text-xs transition-all border-b-2 whitespace-nowrap uppercase tracking-widest ${
+              className={`flex items-center gap-2 px-6 md:px-8 py-4 md:py-5 font-bold text-[10px] md:text-xs transition-all border-b-2 whitespace-nowrap uppercase tracking-widest ${
                 activeTab === tab.id ? 'border-sky-600 text-sky-600 bg-white' : 'border-transparent text-slate-400 hover:text-slate-600'
               }`}
             >
@@ -377,10 +379,10 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
           <div className="space-y-6 animate-in slide-in-from-left-4 duration-300">
             <div className="flex items-center gap-2 mb-2">
               <div className="p-1.5 bg-sky-100 rounded-lg"><ShieldCheck className="w-4 h-4 text-sky-600" /></div>
-              <h4 className="font-black text-slate-800 uppercase tracking-wide text-xs">Identificação e Pessoal</h4>
+              <h4 className="font-black text-slate-800 uppercase tracking-wide text-[10px] md:text-xs">Identificação e Pessoal</h4>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">
               {/* FOTO E MATRÍCULA */}
               <div className="md:col-span-12 flex flex-col md:flex-row gap-6 items-center mb-4">
                 <div className="relative group w-32 h-32 rounded-3xl border-4 border-sky-100 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0">
@@ -457,10 +459,10 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
 
               {/* DADOS DO CÔNJUGE (CONDICIONAL) */}
               {formData.estadoCivil === 'Casado(a)' && (
-                <div className="md:col-span-12 bg-pink-50/50 border border-pink-100 rounded-2xl p-6 animate-in fade-in slide-in-from-top-4">
+                <div className="md:col-span-12 bg-pink-50/50 border border-pink-100 rounded-2xl p-4 md:p-6 animate-in fade-in slide-in-from-top-4">
                   <div className="flex items-center gap-2 mb-4">
                     <Heart className="w-4 h-4 text-pink-500" />
-                    <h5 className="text-xs font-black text-pink-700 uppercase tracking-widest">Dados do Cônjuge</h5>
+                    <h5 className="text-[10px] md:text-xs font-black text-pink-700 uppercase tracking-widest">Dados do Cônjuge</h5>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="md:col-span-1">
@@ -515,8 +517,8 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
               </div>
 
               <div className="md:col-span-12">
-                <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 space-y-6">
-                  <h4 className="text-sm font-black text-slate-800 uppercase flex items-center gap-2">
+                <div className="bg-slate-50 p-4 md:p-6 rounded-2xl md:rounded-3xl border border-slate-100 space-y-6">
+                  <h4 className="text-[10px] md:text-sm font-black text-slate-800 uppercase flex items-center gap-2">
                     <Users size={18} className="text-slate-600" /> Preferências de Atuação
                   </h4>
                   <div className="grid grid-cols-1 gap-4">
@@ -548,13 +550,13 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
         )}
 
         {activeTab === 'sacramentos' && (
-          <div className="space-y-10 animate-in slide-in-from-right-4 duration-300">
+          <div className="space-y-6 md:space-y-10 animate-in slide-in-from-right-4 duration-300">
             {/* BATISMO */}
-            <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">
-              <div className="flex items-center justify-between">
+            <div className="bg-white p-6 md:p-8 rounded-2xl md:rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-blue-50 rounded-2xl text-blue-600"><Droplets className="w-5 h-5" /></div>
-                  <h4 className="font-black text-slate-800 uppercase tracking-widest text-xs">Sacramento do Batismo</h4>
+                  <h4 className="font-black text-slate-800 uppercase tracking-widest text-[10px] md:text-xs">Sacramento do Batismo</h4>
                 </div>
                 <div className="flex items-center gap-2">
                   <input 
@@ -564,12 +566,12 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
                     className="w-5 h-5 rounded cursor-pointer accent-blue-600" 
                     id="chkBatismo" 
                   />
-                  <label htmlFor="chkBatismo" className="text-xs font-bold text-slate-600 cursor-pointer">Já é Batizado?</label>
+                  <label htmlFor="chkBatismo" className="text-[10px] md:text-xs font-bold text-slate-600 cursor-pointer">Já é Batizado?</label>
                 </div>
               </div>
 
               {formData.batizado && (
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-6 animate-in slide-in-from-top-2">
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 animate-in slide-in-from-top-2">
                   <div className="md:col-span-4">
                     <label className="label-style">Data do Batismo</label>
                     <input type="date" value={formData.batismoData || ''} onChange={e => setFormData({...formData, batismoData: e.target.value})} className="input-style" />
@@ -599,11 +601,11 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
             </div>
 
             {/* EUCARISTIA */}
-            <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">
-              <div className="flex items-center justify-between">
+            <div className="bg-white p-6 md:p-8 rounded-2xl md:rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-amber-50 rounded-2xl text-amber-600"><Wine className="w-5 h-5" /></div>
-                  <h4 className="font-black text-slate-800 uppercase tracking-widest text-xs">Sacramento da Eucaristia</h4>
+                  <h4 className="font-black text-slate-800 uppercase tracking-widest text-[10px] md:text-xs">Sacramento da Eucaristia</h4>
                 </div>
                 <div className="flex items-center gap-2">
                   <input 
@@ -613,12 +615,12 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
                     className="w-5 h-5 rounded cursor-pointer accent-amber-600" 
                     id="chkEucaristia" 
                   />
-                  <label htmlFor="chkEucaristia" className="text-xs font-bold text-slate-600 cursor-pointer">Fez 1ª Eucaristia?</label>
+                  <label htmlFor="chkEucaristia" className="text-[10px] md:text-xs font-bold text-slate-600 cursor-pointer">Fez 1ª Eucaristia?</label>
                 </div>
               </div>
 
               {formData.fezPrimeiraEucaristia && (
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-6 animate-in slide-in-from-top-2">
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 animate-in slide-in-from-top-2">
                   <div className="md:col-span-4">
                     <label className="label-style">Data da 1ª Eucaristia</label>
                     <input type="date" value={formData.eucaristiaData || ''} onChange={e => setFormData({...formData, eucaristiaData: e.target.value})} className="input-style" />
@@ -648,11 +650,11 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
             </div>
 
             {/* CRISMA */}
-            <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">
-              <div className="flex items-center justify-between">
+            <div className="bg-white p-6 md:p-8 rounded-2xl md:rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-indigo-50 rounded-2xl text-indigo-600"><ShieldCheck className="w-5 h-5" /></div>
-                  <h4 className="font-black text-slate-800 uppercase tracking-widest text-xs">Sacramento da Crisma</h4>
+                  <h4 className="font-black text-slate-800 uppercase tracking-widest text-[10px] md:text-xs">Sacramento da Crisma</h4>
                 </div>
                 <div className="flex items-center gap-2">
                   <input 
@@ -662,12 +664,12 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
                     className="w-5 h-5 rounded cursor-pointer accent-indigo-600" 
                     id="chkCrismaTab" 
                   />
-                  <label htmlFor="chkCrismaTab" className="text-xs font-bold text-slate-600 cursor-pointer">Já é Crismado?</label>
+                  <label htmlFor="chkCrismaTab" className="text-[10px] md:text-xs font-bold text-slate-600 cursor-pointer">Já é Crismado?</label>
                 </div>
               </div>
 
               {formData.temCrisma && (
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-6 animate-in slide-in-from-top-2">
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 animate-in slide-in-from-top-2">
                   <div className="md:col-span-4">
                     <label className="label-style">Data da Crisma</label>
                     <input type="date" value={formData.crismaData || ''} onChange={e => setFormData({...formData, crismaData: e.target.value})} className="input-style" />
@@ -697,9 +699,9 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="flex items-center gap-2 mb-2">
               <div className="p-1.5 bg-amber-100 rounded-lg"><Phone className="w-4 h-4 text-amber-600" /></div>
-              <h4 className="font-black text-slate-800 uppercase tracking-wide text-xs">Contatos e Comunicação</h4>
+              <h4 className="font-black text-slate-800 uppercase tracking-wide text-[10px] md:text-xs">Contatos e Comunicação</h4>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
               <div>
                 <label className="label-style">Telefone Fixo</label>
                 <div className="relative">
@@ -736,9 +738,9 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
             <div className="flex items-center gap-2 mb-2">
               <div className="p-1.5 bg-sky-50 rounded-lg"><MapPin className="w-4 h-4 text-sky-500" /></div>
-              <h4 className="font-black text-slate-800 uppercase tracking-wide text-xs">Endereço Residencial</h4>
+              <h4 className="font-black text-slate-800 uppercase tracking-wide text-[10px] md:text-xs">Endereço Residencial</h4>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">
               <div className="md:col-span-9">
                 <label className="label-style">Rua / Avenida</label>
                 <input type="text" value={formData.endereco || ''} onChange={e => setFormData({...formData, endereco: e.target.value})} className="input-style" placeholder="Endereço completo" />
@@ -767,12 +769,12 @@ export const CatequistaForm: React.FC<CatequistaFormProps> = ({ onSave, onCancel
           </div>
         )}
 
-        <div className="flex items-center justify-between pt-8 border-t border-sky-50">
-          <button type="button" onClick={() => activeTab !== 'pessoal' ? setActiveTab(tabs[tabs.findIndex(t => t.id === activeTab) - 1].id) : onCancel()} className="flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-slate-400 hover:bg-slate-100 transition-all">
+        <div className="flex flex-col sm:flex-row items-center justify-between pt-8 border-t border-sky-50 gap-4">
+          <button type="button" onClick={() => activeTab !== 'pessoal' ? setActiveTab(tabs[tabs.findIndex(t => t.id === activeTab) - 1].id) : onCancel()} className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-2xl font-bold text-slate-400 hover:bg-slate-100 transition-all">
             <ArrowLeft className="w-5 h-5" /> {activeTab === 'pessoal' ? 'Cancelar' : 'Anterior'}
           </button>
-          <button type="button" onClick={() => activeTab !== 'sacramentos' ? setActiveTab(tabs[tabs.findIndex(t => t.id === activeTab) + 1].id) : handleSubmit({ preventDefault: () => {} } as any)} className="flex items-center gap-2 px-12 py-4 rounded-2xl bg-amber-400 text-white font-black hover:bg-amber-500 shadow-xl shadow-amber-100 transition-all transform hover:-translate-y-0.5 uppercase tracking-widest text-xs">
-            {activeTab === 'sacramentos' ? (initialData ? 'Atualizar Cadastro' : 'Salvar Catequista') : 'Próxima Etapa'} <Save className="w-6 h-6" />
+          <button type="button" onClick={() => activeTab !== 'sacramentos' ? setActiveTab(tabs[tabs.findIndex(t => t.id === activeTab) + 1].id) : handleSubmit({ preventDefault: () => {} } as any)} className="w-full sm:w-auto flex items-center justify-center gap-2 px-12 py-4 rounded-2xl bg-amber-400 text-white font-black hover:bg-amber-500 shadow-xl shadow-amber-100 transition-all transform hover:-translate-y-0.5 uppercase tracking-widest text-[10px] md:text-xs">
+            {activeTab === 'sacramentos' ? (initialData ? 'Atualizar Cadastro' : 'Salvar Catequista') : 'Próxima Etapa'} <Save className="w-5 h-5 md:w-6 md:h-6" />
           </button>
         </div>
       </form>

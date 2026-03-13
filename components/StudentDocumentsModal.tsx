@@ -64,35 +64,37 @@ export const StudentDocumentsModal: React.FC<DocumentsModalProps> = ({ entity, o
   );
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
-      <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[85vh]">
-        <div className="bg-slate-900 p-8 flex justify-between items-center shrink-0">
-          <div className="flex items-center gap-4">
-            <div className="bg-blue-600 p-3 rounded-2xl shadow-lg">
-              <FileText className="text-white w-6 h-6" />
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-2 md:p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
+      <div className="bg-white w-full max-w-2xl rounded-[1.5rem] md:rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[98vh] md:max-h-[85vh]">
+        <div className="bg-slate-900 p-4 md:p-8 flex justify-between items-center shrink-0">
+          <div className="flex items-center gap-3 md:gap-4">
+            <div className="bg-blue-600 p-2 md:p-3 rounded-xl md:rounded-2xl shadow-lg">
+              <FileText className="text-white w-5 h-5 md:w-6 md:h-6" />
             </div>
             <div>
-              <h2 className="text-xl font-black text-white">Documentos em Anexo</h2>
-              <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">{entityName}</p>
+              <h2 className="text-base md:text-xl font-black text-white">Documentos em Anexo</h2>
+              <p className="text-[9px] md:text-xs text-slate-400 font-bold uppercase tracking-widest truncate max-w-[150px] md:max-w-none">{entityName}</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all"><X /></button>
+          <button onClick={onClose} className="p-1.5 md:p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all">
+            <X className="w-5 h-5 md:w-6 md:h-6" />
+          </button>
         </div>
 
-        <div className="p-6 bg-slate-50 border-b border-slate-100 flex flex-col sm:flex-row gap-4 shrink-0">
+        <div className="p-3 md:p-6 bg-slate-50 border-b border-slate-100 flex flex-col sm:flex-row gap-3 md:gap-4 shrink-0">
           <div className="flex-1 relative">
             <input 
               type="text" 
               placeholder="Buscar documento..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="w-full pl-5 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:ring-4 focus:ring-blue-500/10 transition-all font-medium"
+              className="w-full pl-5 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs md:text-sm outline-none focus:ring-4 focus:ring-blue-500/10 transition-all font-medium"
             />
           </div>
           <button 
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploading}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl flex items-center justify-center gap-2 font-black text-[10px] uppercase tracking-widest shadow-lg shadow-blue-500/20 transition-all disabled:opacity-50"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl flex items-center justify-center gap-2 font-black text-[9px] md:text-[10px] uppercase tracking-widest shadow-lg shadow-blue-500/20 transition-all disabled:opacity-50"
           >
             {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
             Anexar Arquivo
@@ -100,17 +102,17 @@ export const StudentDocumentsModal: React.FC<DocumentsModalProps> = ({ entity, o
           <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileChange} />
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 space-y-3 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-3 custom-scrollbar">
           {filteredDocs.length > 0 ? (
             filteredDocs.map(doc => (
-              <div key={doc.id} className="flex items-center justify-between p-4 bg-white rounded-2xl border border-slate-100 hover:border-blue-200 transition-all group shadow-sm">
-                <div className="flex items-center gap-4 truncate">
-                  <div className="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
-                    <File size={24} />
+              <div key={doc.id} className="flex items-center justify-between p-3 md:p-4 bg-white rounded-xl md:rounded-2xl border border-slate-100 hover:border-blue-200 transition-all group shadow-sm">
+                <div className="flex items-center gap-3 md:gap-4 truncate">
+                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors">
+                    <File size={20} className="md:w-6 md:h-6" />
                   </div>
                   <div className="truncate">
-                    <p className="font-bold text-slate-800 text-sm truncate">{doc.nome}</p>
-                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">
+                    <p className="font-bold text-slate-800 text-xs md:text-sm truncate">{doc.nome}</p>
+                    <p className="text-[8px] md:text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">
                       Enviado em: {new Date(doc.dataUpload).toLocaleDateString('pt-BR')}
                     </p>
                   </div>
@@ -119,28 +121,28 @@ export const StudentDocumentsModal: React.FC<DocumentsModalProps> = ({ entity, o
                 <div className="flex items-center gap-1">
                   <button 
                     onClick={() => handleView(doc)}
-                    className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
+                    className="p-2 md:p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
                     title="Visualizar"
                   >
-                    <Eye size={18} />
+                    <Eye size={16} className="md:w-[18px] md:h-[18px]" />
                   </button>
                   <button 
                     onClick={() => handleDelete(doc.id)}
-                    className="p-2.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
+                    className="p-2 md:p-2.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
                     title="Excluir"
                   >
-                    <Trash2 size={18} />
+                    <Trash2 size={16} className="md:w-[18px] md:h-[18px]" />
                   </button>
                 </div>
               </div>
             ))
           ) : (
-            <div className="py-20 text-center bg-slate-50/50 rounded-3xl border-2 border-dashed border-slate-200">
-               <FileText className="w-12 h-12 mx-auto mb-4 text-slate-200" />
-               <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Nenhum documento anexado</p>
+            <div className="py-10 md:py-20 text-center bg-slate-50/50 rounded-2xl md:rounded-3xl border-2 border-dashed border-slate-200">
+               <FileText className="w-10 h-10 md:w-12 md:h-12 mx-auto mb-4 text-slate-200" />
+               <p className="text-xs md:text-sm font-bold text-slate-400 uppercase tracking-widest">Nenhum documento anexado</p>
                <button 
                  onClick={() => fileInputRef.current?.click()}
-                 className="mt-4 text-blue-600 text-xs font-black uppercase tracking-widest hover:underline"
+                 className="mt-4 text-blue-600 text-[10px] md:text-xs font-black uppercase tracking-widest hover:underline"
                >
                  Clique para enviar o primeiro arquivo
                </button>
@@ -148,10 +150,10 @@ export const StudentDocumentsModal: React.FC<DocumentsModalProps> = ({ entity, o
           )}
         </div>
 
-        <div className="p-8 border-t border-slate-100 bg-slate-50 flex justify-end shrink-0">
+        <div className="p-4 md:p-8 border-t border-slate-100 bg-slate-50 flex justify-end shrink-0">
           <button 
             onClick={onClose}
-            className="px-10 py-3 bg-slate-900 text-white font-black rounded-2xl hover:bg-slate-800 transition-all shadow-xl shadow-slate-200 uppercase tracking-widest text-[10px]"
+            className="w-full sm:w-auto px-10 py-3 bg-slate-900 text-white font-black rounded-xl md:rounded-2xl hover:bg-slate-800 transition-all shadow-xl shadow-slate-200 uppercase tracking-widest text-[10px]"
           >
             Fechar
           </button>
