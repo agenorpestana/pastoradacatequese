@@ -7,7 +7,7 @@ interface CalendarViewProps {
   events: ParishEvent[];
   selectedDate: string;
   onDateChange: (date: string) => void;
-  onAddEvent: (date?: string) => void;
+  onAddEvent?: (date?: string) => void;
 }
 
 export const CalendarView: React.FC<CalendarViewProps> = ({ 
@@ -113,12 +113,14 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
           })}
         </div>
 
-        <button 
-          onClick={() => onAddEvent(selectedDate)}
-          className="w-full mt-4 flex items-center justify-center gap-2 py-2 bg-slate-50 hover:bg-blue-50 text-slate-400 hover:text-blue-600 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all border border-slate-100 border-dashed"
-        >
-          <Plus size={12} /> Novo Evento
-        </button>
+        {onAddEvent && (
+          <button 
+            onClick={() => onAddEvent(selectedDate)}
+            className="w-full mt-4 flex items-center justify-center gap-2 py-2 bg-slate-50 hover:bg-blue-50 text-slate-400 hover:text-blue-600 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all border border-slate-100 border-dashed"
+          >
+            <Plus size={12} /> Novo Evento
+          </button>
+        )}
       </div>
     </div>
   );

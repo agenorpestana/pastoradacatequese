@@ -73,7 +73,8 @@ export const ClassTable: React.FC<ClassTableProps> = ({
       </div>
 
       <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-100">
@@ -184,6 +185,93 @@ export const ClassTable: React.FC<ClassTableProps> = ({
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile Card View */}
+        <div className="md:hidden divide-y divide-slate-100">
+          {paginatedClasses.length > 0 ? (
+            paginatedClasses.map((turma) => (
+              <div key={turma.id} className="p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-indigo-100 flex items-center justify-center text-indigo-700 shadow-sm">
+                      <BookOpen className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-800 text-lg">{turma.nome}</p>
+                      <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">{turma.comunidade || 'Paróquia Central'}</p>
+                    </div>
+                  </div>
+                  <span className="inline-flex items-center px-3 py-1 rounded-xl text-[10px] font-black bg-blue-100 text-blue-700 uppercase tracking-widest border border-blue-200">
+                    {turma.nivel}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 py-4 border-y border-slate-50">
+                  <div className="space-y-1">
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Catequista</p>
+                    <div className="flex items-center gap-2 text-xs text-slate-700 font-bold truncate">
+                      <User className="w-3.5 h-3.5 text-indigo-400" />
+                      {turma.catequista}
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Horário</p>
+                    <div className="flex items-center gap-2 text-xs text-slate-700 font-bold">
+                      <Clock className="w-3.5 h-3.5 text-slate-300" />
+                      {turma.diaSemana}, {turma.horario}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
+                  <button 
+                    onClick={() => onTakeAttendance(turma)}
+                    className="flex-1 p-3 text-green-600 bg-green-50 rounded-xl border border-green-100 flex items-center justify-center gap-2 font-bold text-[10px] uppercase tracking-widest"
+                  >
+                    <ClipboardCheck className="w-4 h-4" /> Chamada
+                  </button>
+                  <button 
+                    onClick={() => onViewHistory(turma)}
+                    className="flex-1 p-3 text-amber-600 bg-amber-50 rounded-xl border border-amber-100 flex items-center justify-center gap-2 font-bold text-[10px] uppercase tracking-widest"
+                  >
+                    <FileSpreadsheet className="w-4 h-4" /> Diário
+                  </button>
+                  <button 
+                    onClick={() => onViewMembers(turma)}
+                    className="flex-1 p-3 text-indigo-600 bg-indigo-50 rounded-xl border border-indigo-100 flex items-center justify-center gap-2 font-bold text-[10px] uppercase tracking-widest"
+                  >
+                    <Users className="w-4 h-4" /> Membros
+                  </button>
+                  
+                  <div className="flex gap-2 w-full sm:w-auto justify-center">
+                    {(currentUser.role === 'coordenador_paroquial' || currentUser.permissions.students_edit) && (
+                      <button 
+                        onClick={() => onEdit(turma)}
+                        className="p-3 text-slate-500 bg-slate-50 rounded-xl border border-slate-100"
+                        title="Editar Turma"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                    )}
+                    {currentUser.role === 'coordenador_paroquial' && (
+                      <button 
+                        onClick={() => onDelete(turma.id)}
+                        className="p-3 text-slate-500 bg-slate-50 rounded-xl border border-slate-100"
+                        title="Excluir Turma"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="py-20 text-center text-slate-400 italic">
+              Nenhuma turma cadastrada.
+            </div>
+          )}
         </div>
         <Pagination 
           currentPage={currentPage}

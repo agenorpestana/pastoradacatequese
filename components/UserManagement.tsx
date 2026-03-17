@@ -47,8 +47,8 @@ export const UserList: React.FC<UserListProps> = ({ users, onEdit, onDelete, onC
           <h2 className="text-2xl font-black text-slate-800 tracking-tight">Gestão de Usuários</h2>
           <p className="text-slate-500 text-sm">Controle de acessos e níveis de hierarquia da pastoral.</p>
         </div>
-        <div className="flex items-center gap-4 w-full md:w-auto">
-          <div className="relative flex-1 md:w-64">
+        <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+          <div className="relative w-full sm:w-64">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
             <input 
               type="text"
@@ -60,7 +60,7 @@ export const UserList: React.FC<UserListProps> = ({ users, onEdit, onDelete, onC
           </div>
           <button 
             onClick={onCreateNew}
-            className="bg-slate-900 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 shadow-lg hover:bg-slate-800 transition-all whitespace-nowrap"
+            className="w-full sm:w-auto bg-slate-900 text-white px-6 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg hover:bg-slate-800 transition-all whitespace-nowrap"
           >
             <UserPlus className="w-5 h-5" /> Novo Cadastro
           </button>

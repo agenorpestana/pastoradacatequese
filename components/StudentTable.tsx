@@ -133,9 +133,9 @@ export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses
           </div>
         </div>
       </div>
-
       <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50/50 border-b border-slate-100">
@@ -257,6 +257,96 @@ export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses
             </tbody>
           </table>
         </div>
+
+        {/* Mobile Card View */}
+        <div className="md:hidden divide-y divide-slate-100">
+          {paginatedStudents.length > 0 ? (
+            paginatedStudents.map((student) => (
+              <div 
+                key={student.id} 
+                className="p-4 space-y-4 active:bg-slate-50 transition-colors"
+                onClick={() => onView(student)}
+              >
+                <div className="flex items-center gap-4">
+                  <div className={`w-14 h-14 rounded-2xl flex flex-col items-center justify-center shadow-sm border-2 border-white overflow-hidden shrink-0 ${
+                    student.foto ? '' :
+                    student.status === 'Concluido' ? 'bg-indigo-100 text-indigo-700' :
+                    student.status === 'Inativo' ? 'bg-slate-100 text-slate-500' :
+                    'bg-blue-100 text-blue-700'
+                  }`}>
+                    {student.foto ? (
+                      <img src={student.foto} className="w-full h-full object-cover" alt="" />
+                    ) : (
+                      <>
+                        <span className="text-[8px] font-black leading-none mb-1">#{student.matricula || '---'}</span>
+                        <span className="font-bold uppercase text-xl leading-none">{(student.nomeCompleto || '?').charAt(0)}</span>
+                      </>
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold text-slate-800 text-base break-words">{student.nomeCompleto}</p>
+                    <div className="flex flex-wrap items-center gap-2 mt-1">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[9px] font-black bg-slate-100 text-slate-500 uppercase tracking-widest border border-slate-200">
+                        {student.turma || 'Sem Turma'}
+                      </span>
+                      {student.status === 'Concluido' ? (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[9px] font-black bg-indigo-50 text-indigo-600 border border-indigo-100 uppercase tracking-widest">
+                          Crismado
+                        </span>
+                      ) : student.status === 'Inativo' ? (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[9px] font-black bg-red-50 text-red-600 border border-red-100 uppercase tracking-widest">
+                          Inativo
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[9px] font-black bg-green-50 text-green-600 border border-green-100 uppercase tracking-widest">
+                          Ativo
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-2 border-t border-slate-50" onClick={(e) => e.stopPropagation()}>
+                  <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    <Fingerprint className="w-3 h-3" /> {student.matricula || '---'}
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button 
+                      onClick={() => onView(student)}
+                      className="p-2.5 text-slate-400 hover:text-blue-600 bg-slate-50 rounded-xl border border-slate-100"
+                    >
+                      <Eye className="w-4.5 h-4.5" />
+                    </button>
+                    <button 
+                      onClick={() => onManageDocuments(student)}
+                      className="p-2.5 text-slate-400 hover:text-blue-600 bg-slate-50 rounded-xl border border-slate-100"
+                    >
+                      <FileText className="w-4.5 h-4.5" />
+                    </button>
+                    <button 
+                      onClick={() => onEdit(student)}
+                      className="p-2.5 text-slate-400 hover:text-indigo-600 bg-slate-50 rounded-xl border border-slate-100"
+                    >
+                      <Edit className="w-4.5 h-4.5" />
+                    </button>
+                    <button 
+                      onClick={() => onDelete(student.id)}
+                      className="p-2.5 text-slate-400 hover:text-red-600 bg-slate-50 rounded-xl border border-slate-100"
+                    >
+                      <Trash2 className="w-4.5 h-4.5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="py-20 text-center">
+              <Search className="w-12 h-12 text-slate-200 mx-auto mb-4" />
+              <p className="text-slate-400 italic text-sm">Nenhum catequizando encontrado.</p>
+            </div>
+          )}
+        </div>
+
         <Pagination 
           currentPage={currentPage}
           totalPages={totalPages}

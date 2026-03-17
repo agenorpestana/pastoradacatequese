@@ -82,7 +82,8 @@ export const CatequistaTable: React.FC<CatequistaTableProps> = ({ catequistas, o
       </div>
 
       <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-sky-50/50 border-b border-sky-50">
@@ -175,6 +176,89 @@ export const CatequistaTable: React.FC<CatequistaTableProps> = ({ catequistas, o
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile Card View */}
+        <div className="md:hidden divide-y divide-sky-50">
+          {paginatedItems.length > 0 ? (
+            paginatedItems.map((c) => (
+              <div key={c.id} className="p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-sky-100 flex items-center justify-center text-sky-600 font-black uppercase text-lg border-2 border-white shadow-sm overflow-hidden">
+                      {c.foto ? (
+                        <img src={c.foto} className="w-full h-full object-cover" alt={c.nome} />
+                      ) : (
+                        c.nome.charAt(0)
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-800 text-lg">{c.nome}</p>
+                      <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">{c.comunidade || 'Paróquia Central'}</p>
+                    </div>
+                  </div>
+                  <span className={`inline-flex items-center px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-widest border ${
+                    c.status === 'Ativo' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-slate-50 text-slate-400 border-slate-100'
+                  }`}>
+                    {c.status || 'Ativo'}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 py-4 border-y border-sky-50">
+                  <div className="space-y-1">
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Contatos</p>
+                    <div className="flex items-center gap-2 text-xs text-slate-700 font-bold truncate">
+                      <MessageCircle className="w-3.5 h-3.5 text-green-500" />
+                      {c.whatsapp || 'N/A'}
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Desde</p>
+                    <div className="flex items-center gap-2 text-xs text-slate-700 font-bold">
+                      <Calendar className="w-3.5 h-3.5 text-sky-400" />
+                      {c.desde ? new Date(c.desde).getFullYear() : 'N/A'}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
+                  <button 
+                    onClick={() => onViewHistory(c)} 
+                    className="flex-1 p-3 text-sky-600 bg-sky-50 rounded-xl border border-sky-100 flex items-center justify-center gap-2 font-bold text-[10px] uppercase tracking-widest"
+                  >
+                    <History className="w-4 h-4" /> Histórico
+                  </button>
+                  <button 
+                    onClick={() => onManageDocuments(c)} 
+                    className="flex-1 p-3 text-indigo-600 bg-indigo-50 rounded-xl border border-indigo-100 flex items-center justify-center gap-2 font-bold text-[10px] uppercase tracking-widest"
+                  >
+                    <FileText className="w-4 h-4" /> Docs
+                  </button>
+                  
+                  <div className="flex gap-2 w-full sm:w-auto justify-center">
+                    <button 
+                      onClick={() => onEdit(c)} 
+                      className="p-3 text-amber-500 bg-amber-50 rounded-xl border border-amber-100"
+                      title="Editar"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </button>
+                    <button 
+                      onClick={() => onDelete(c.id)} 
+                      className="p-3 text-red-600 bg-red-50 rounded-xl border border-red-100"
+                      title="Excluir"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="py-20 text-center text-slate-400 italic">
+              Nenhum catequista encontrado.
+            </div>
+          )}
         </div>
         <Pagination 
           currentPage={currentPage}

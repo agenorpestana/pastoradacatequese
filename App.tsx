@@ -165,7 +165,7 @@ const DashboardContent = React.memo(({ events, students, classes, catequistas, s
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
              <div className="xl:col-span-4 flex flex-col gap-6">
                 <div className="h-auto bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden">
-                   <CalendarView events={events} selectedDate={suggestedDate} onDateChange={onDateChange} onAddEvent={null} />
+                   <CalendarView events={events} selectedDate={suggestedDate} onDateChange={onDateChange} onAddEvent={undefined} />
                 </div>
                 
                 {/* Eventos do Dia Selecionado */}
@@ -994,7 +994,7 @@ const App: React.FC = () => {
     );
   }
 
-  if (!user) {
+  if (!user || !currentUser) {
     return (
       <>
         <Login onLogin={async (u, p) => await onLoginSubmit(u, p)} />
@@ -1201,23 +1201,6 @@ const App: React.FC = () => {
         {renderContent()}
 
         {/* Modals */}
-        {viewingStudent && (
-          <StudentDetailsModal 
-            student={viewingStudent} 
-            attendanceSessions={attendanceSessions} 
-            classes={classes} 
-            onClose={() => setViewingStudent(null)} 
-            onEdit={(s) => {
-              setViewingStudent(null);
-              setEditingStudent(s);
-              setView('register');
-            }}
-            config={parishConfig}
-            allStudents={viewingClassMembers ? students.filter(s => s.turma === viewingClassMembers.nome) : undefined}
-            onSelectStudent={(s) => setViewingStudent(s)}
-          />
-        )}
-
         {managingDocumentsStudent && (
           <StudentDocumentsModal 
             entity={managingDocumentsStudent}
@@ -1241,6 +1224,24 @@ const App: React.FC = () => {
             onClose={() => setViewingClassMembers(null)}
             onViewStudent={(s) => { setViewingStudent(s); }}
             config={parishConfig}
+          />
+        )}
+
+        {viewingStudent && (
+          <StudentDetailsModal 
+            student={viewingStudent} 
+            attendanceSessions={attendanceSessions} 
+            classes={classes} 
+            onClose={() => setViewingStudent(null)} 
+            onEdit={currentUser.permissions.students_edit ? (s) => {
+              setViewingStudent(null);
+              setViewingClassMembers(null);
+              setEditingStudent(s);
+              setView('register');
+            } : undefined}
+            config={parishConfig}
+            allStudents={viewingClassMembers ? students.filter(s => s.turma === viewingClassMembers.nome) : undefined}
+            onSelectStudent={(s) => setViewingStudent(s)}
           />
         )}
 

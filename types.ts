@@ -287,6 +287,7 @@ export interface Student {
   fimPreparacao: string;
   comunidade: string;
   turma: string;
+  nivel?: string;
   catequistas: string;
   dataCadastro: string;
   documentos?: StudentDocument[];

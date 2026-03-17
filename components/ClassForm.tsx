@@ -369,7 +369,7 @@ export const ClassForm: React.FC<ClassFormProps> = ({ onSave, onCancel, initialD
             <div className="flex-1 overflow-y-auto p-4 space-y-2">
               {filteredStudents.map(student => {
                 const isSelected = selectedStudentIds.includes(student.id);
-                const isOtherClass = student.turma && student.turma !== formData.nome;
+                const isOtherClass = !!student.turma && student.turma !== formData.nome;
                 
                 return (
                   <button
