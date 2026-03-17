@@ -1,6 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
-import { BarChart3, Calendar, School, UserCheck, TrendingUp, Search, FileSpreadsheet } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { BarChart3, Calendar, Printer, School, UserCheck, TrendingUp, Search, FileSpreadsheet } from 'lucide-react';
 import { Turma, AttendanceSession, Catequista, ParishConfig, Student } from '../types';
 import { Pagination } from './Pagination';
 
