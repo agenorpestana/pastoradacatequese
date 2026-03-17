@@ -19,6 +19,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { LibraryFile } from '../types';
+import { Pagination } from './Pagination';
 
 interface LibraryViewProps {
   files: LibraryFile[];
@@ -37,6 +38,8 @@ export const LibraryView: React.FC<LibraryViewProps> = ({ files, onUpload, onDel
   const [selectedCategory, setSelectedCategory] = useState<typeof CATEGORIES[number] | 'Todas'>('Todas');
   const [isUploading, setIsUploading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [newFile, setNewFile] = useState<{
@@ -128,6 +131,17 @@ export const LibraryView: React.FC<LibraryViewProps> = ({ files, onUpload, onDel
     return matchesSearch && matchesCategory;
   }).sort((a, b) => new Date(b.uploadDate).getTime() - new Date(a.uploadDate).getTime());
 
+  const totalPages = Math.ceil(filteredFiles.length / itemsPerPage);
+  const paginatedFiles = filteredFiles.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case 'Livro': return <Book className="w-5 h-5" />;
@@ -195,8 +209,8 @@ export const LibraryView: React.FC<LibraryViewProps> = ({ files, onUpload, onDel
 
       {/* LISTAGEM */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredFiles.length > 0 ? (
-          filteredFiles.map(file => (
+        {paginatedFiles.length > 0 ? (
+          paginatedFiles.map(file => (
             <div key={file.id} className="group bg-white rounded-[2rem] border border-slate-100 shadow-sm p-6 hover:shadow-xl transition-all relative overflow-hidden flex flex-col justify-between h-48">
               <div className="flex justify-between items-start">
                 <div className={`p-4 rounded-2xl ${file.category === 'Livro' ? 'bg-indigo-50 text-indigo-600' : 'bg-blue-50 text-blue-600'}`}>
@@ -236,6 +250,18 @@ export const LibraryView: React.FC<LibraryViewProps> = ({ files, onUpload, onDel
           </div>
         )}
       </div>
+
+      {filteredFiles.length > itemsPerPage && (
+        <div className="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden mt-8">
+          <Pagination 
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            totalItems={filteredFiles.length}
+            itemsPerPage={itemsPerPage}
+          />
+        </div>
+      )}
 
       {/* MODAL UPLOAD */}
       {isUploading && canUpload && (

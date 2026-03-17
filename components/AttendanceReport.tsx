@@ -1,7 +1,6 @@
 
 import React, { useState, useMemo } from 'react';
-import { createPortal } from 'react-dom';
-import { BarChart3, Calendar, Printer, School, UserCheck, TrendingUp, Search, ArrowLeft, FileSpreadsheet } from 'lucide-react';
+import { BarChart3, Calendar, School, UserCheck, TrendingUp, Search, FileSpreadsheet } from 'lucide-react';
 import { Turma, AttendanceSession, Catequista, ParishConfig, Student } from '../types';
 import { Pagination } from './Pagination';
 
@@ -11,12 +10,19 @@ interface AttendanceReportProps {
   catequistas: Catequista[];
   config: ParishConfig;
   students: Student[];
+  onViewHistory: (turma: Turma) => void;
 }
 
-export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, attendanceSessions, catequistas, config, students }) => {
+export const AttendanceReport: React.FC<AttendanceReportProps> = ({ 
+  classes, 
+  attendanceSessions, 
+  catequistas, 
+  config, 
+  students,
+  onViewHistory
+}) => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedClassForDiary, setSelectedClassForDiary] = useState<string | null>(null);
   const [currentClassPage, setCurrentClassPage] = useState(1);
   const itemsPerPage = 10;
 
@@ -87,220 +93,6 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
     (currentClassPage - 1) * itemsPerPage,
     currentClassPage * itemsPerPage
   );
-
-  const renderDiary = () => {
-    if (!selectedClassForDiary) return null;
-
-    const turma = classes.find(c => c.id === selectedClassForDiary);
-    if (!turma) return null;
-
-    const classStudents = students
-      .filter(s => s.turma === turma.nome && s.status === 'Ativo')
-      .sort((a, b) => a.nomeCompleto.localeCompare(b.nomeCompleto));
-
-    const classSessions = attendanceSessions
-      .filter(s => s.turmaId === turma.id) // Removed year filter to show all sessions chronologically
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-
-    // Group sessions by year and month for chronological display
-    const sessionsByYearMonth = classSessions.reduce((acc, session) => {
-      const dateParts = session.date.split('-');
-      let year, month;
-      if (dateParts.length >= 3) {
-        year = parseInt(dateParts[0]);
-        month = parseInt(dateParts[1]) - 1;
-      } else {
-        const d = new Date(session.date);
-        year = d.getFullYear();
-        month = d.getMonth();
-      }
-      
-      const key = `${year}-${month}`;
-      if (!acc[key]) acc[key] = { year, month, sessions: [] };
-      acc[key].sessions.push(session);
-      return acc;
-    }, {} as Record<string, { year: number, month: number, sessions: AttendanceSession[] }>);
-
-    const sortedKeys = Object.keys(sessionsByYearMonth).sort((a, b) => {
-      const [yA, mA] = a.split('-').map(Number);
-      const [yB, mB] = b.split('-').map(Number);
-      return yA !== yB ? yA - yB : mA - mB;
-    });
-
-    const monthNames = [
-      'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
-      'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'
-    ];
-
-    return (
-      <div className="bg-white min-h-screen">
-        {/* Controls */}
-        <div className="no-print p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-          <button 
-            onClick={() => setSelectedClassForDiary(null)}
-            className="flex items-center gap-2 text-slate-600 hover:text-slate-900 font-bold"
-          >
-            <ArrowLeft className="w-4 h-4" /> Voltar
-          </button>
-          <div className="flex gap-2">
-             <button 
-              onClick={() => window.print()}
-              className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white font-bold rounded-lg hover:bg-slate-800"
-            >
-              <Printer className="w-4 h-4" /> Imprimir Diário
-            </button>
-          </div>
-        </div>
-
-        {/* Print Content */}
-        {createPortal(
-          <div className="print-attendance-diary p-8 w-full bg-white text-slate-900 font-sans absolute inset-0 z-[100] hidden">
-            <style>{`
-              @media print {
-                @page { size: landscape; margin: 10mm; }
-                body { -webkit-print-color-adjust: exact; margin: 0; background: white !important; }
-                #root, .no-print { display: none !important; }
-                .print-attendance-diary { 
-                  display: block !important; 
-                  position: absolute !important;
-                  top: 0;
-                  left: 0;
-                  width: 100%;
-                  background: white;
-                  z-index: 99999;
-                }
-                /* Ocultar outros modais de impressão */
-                .print-student-ficha, .print-class-members, .print-attendance-report, .print-class-history { display: none !important; }
-              }
-            `}</style>
-
-            {/* Header */}
-          <div className="border border-black mb-4">
-            <div className="bg-slate-100 border-b border-black p-2 text-center font-black uppercase text-sm">
-               {config.pastoralName}
-            </div>
-            <div className="flex text-xs font-bold uppercase">
-              <div className="flex-1 p-2 border-r border-black">
-                {config.parishName} - {config.dioceseName}
-              </div>
-              <div className="flex-1 p-2">
-                <span>{turma.nome} - {turma.comunidade || '---'}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Matrix Table */}
-          <table className="w-full border-collapse border border-black text-[9px]">
-            <thead>
-              {/* Year Row */}
-              <tr>
-                <th className="border border-black p-1 w-8 text-center bg-slate-50" rowSpan={3}>Nº</th>
-                <th className="border border-black p-1 text-left bg-slate-50 min-w-[180px]" rowSpan={3}>CATEQUIZANDO</th>
-                {sortedKeys.map(key => (
-                  <th 
-                    key={`year-${key}`} 
-                    colSpan={sessionsByYearMonth[key].sessions.length} 
-                    className="border border-black p-0.5 text-center bg-slate-200 text-[8px]"
-                  >
-                    {sessionsByYearMonth[key].year}
-                  </th>
-                ))}
-              </tr>
-              {/* Month Row */}
-              <tr>
-                {sortedKeys.map(key => (
-                  <th 
-                    key={`month-${key}`} 
-                    colSpan={sessionsByYearMonth[key].sessions.length} 
-                    className="border border-black p-1 text-center bg-slate-100 uppercase"
-                  >
-                    {monthNames[sessionsByYearMonth[key].month]}
-                  </th>
-                ))}
-              </tr>
-              {/* Day Row */}
-              <tr>
-                {sortedKeys.map(key => (
-                  sessionsByYearMonth[key].sessions.map(session => {
-                    let day = '00';
-                    const parts = session.date.split('-');
-                    if (parts.length >= 3) {
-                        day = parts[2].substring(0, 2);
-                    } else {
-                        day = new Date(session.date).getDate().toString().padStart(2, '0');
-                    }
-                    
-                    return (
-                      <th key={session.id} className="border border-black p-1 text-center w-6">
-                        {day}
-                      </th>
-                    );
-                  })
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {classStudents.map((student, index) => (
-                <tr key={student.id}>
-                  <td className="border border-black p-1 text-center font-bold">{index + 1}</td>
-                  <td className="border border-black p-1 font-medium truncate max-w-[180px]">{student.nomeCompleto}</td>
-                  {sortedKeys.map(key => (
-                    sessionsByYearMonth[key].sessions.map(session => {
-                      const entry = session.entries.find(e => e.studentId === student.id);
-                      const isPresent = entry?.status === 'present';
-                      const isAbsent = entry?.status === 'absent';
-                      
-                      return (
-                        <td key={`${student.id}-${session.id}`} className="border border-black p-1 text-center font-bold">
-                          {isPresent && <span className="text-green-600">P</span>}
-                          {isAbsent && <span className="text-red-600">F</span>}
-                          {!entry && <span className="text-slate-300">-</span>}
-                        </td>
-                      );
-                    })
-                  ))}
-                </tr>
-              ))}
-              {classStudents.length === 0 && (
-                <tr>
-                  <td colSpan={2 + classSessions.length} className="border border-black p-4 text-center italic text-slate-500">
-                    Nenhum aluno ativo nesta turma.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-          
-          <div className="mt-4 text-[10px] text-slate-500 flex justify-between">
-             <span>Gerado em {new Date().toLocaleDateString('pt-BR')}</span>
-             <span>Legenda: P = Presente, F = Falta</span>
-          </div>
-
-          <div className="border-t border-black pt-2 mt-4 text-center hidden print:block">
-            <p className="text-[8px] font-bold uppercase">
-              {config.address} - {config.city}/{config.state}
-            </p>
-            <div className="flex justify-center gap-4 mt-1 text-[8px] font-bold uppercase">
-              {config.phone && <span>Tel: {config.phone}</span>}
-              {config.whatsapp && <span>Zap: {config.whatsapp}</span>}
-              {config.email && <span>Email: {config.email}</span>}
-            </div>
-            <div className="flex justify-center gap-4 mt-0.5 text-[8px] font-bold uppercase text-slate-600">
-              {config.instagram && <span>Insta: {config.instagram}</span>}
-              {config.facebook && <span>Face: {config.facebook}</span>}
-              {config.website && <span>Site: {config.website}</span>}
-            </div>
-            </div>
-          </div>,
-          document.body
-        )}
-      </div>
-    );
-  };
-
-  if (selectedClassForDiary) {
-    return renderDiary();
-  }
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -482,7 +274,10 @@ export const AttendanceReport: React.FC<AttendanceReportProps> = ({ classes, att
                         {c.attendanceRate.toFixed(0)}%
                       </span>
                       <button 
-                        onClick={() => setSelectedClassForDiary(c.id)}
+                        onClick={() => {
+                          const turma = classes.find(cl => cl.id === c.id);
+                          if (turma) onViewHistory(turma);
+                        }}
                         className="text-[10px] flex items-center gap-1 bg-slate-900 text-white px-2 py-1 rounded-lg hover:bg-slate-700 transition-colors"
                       >
                         <FileSpreadsheet className="w-3 h-3" /> Diário

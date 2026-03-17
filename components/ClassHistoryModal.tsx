@@ -334,12 +334,6 @@ export const ClassHistoryModal: React.FC<ClassHistoryModalProps> = ({ turma, ses
           <p className="text-[10px] md:text-xs text-slate-400 font-bold uppercase tracking-widest">Total de Encontros: {sortedSessions.length}</p>
           <div className="flex gap-2 md:gap-3 w-full sm:w-auto">
              <button 
-               onClick={handlePrint} 
-               className="flex-1 sm:flex-none px-4 md:px-6 py-3 md:py-4 bg-slate-100 text-slate-700 font-black rounded-xl md:rounded-2xl hover:bg-slate-200 transition-all flex items-center justify-center gap-2 uppercase tracking-widest text-[10px] md:text-xs"
-             >
-               <Printer className="w-3.5 h-3.5 md:w-4 md:h-4" /> Imprimir Diário
-             </button>
-             <button 
                onClick={onClose} 
                className="flex-1 sm:flex-none px-6 md:px-10 py-3 md:py-4 bg-slate-900 text-white font-black rounded-xl md:rounded-2xl hover:bg-slate-800 transition-all shadow-xl shadow-slate-200 uppercase tracking-widest text-[10px] md:text-xs"
              >

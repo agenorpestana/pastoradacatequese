@@ -5,7 +5,8 @@ import {
   X, Printer, Sparkles, Loader2, Quote, User, Phone, 
   MapPin, Church, Users, Wine, BookOpen, Fingerprint, 
   CheckCircle, XCircle, BarChart, Calendar, BookOpenText,
-  Award, FileBadge, Waves, ArrowLeft, ChevronLeft, ChevronRight
+  Award, FileBadge, Waves, ArrowLeft, ChevronLeft, ChevronRight,
+  Edit
 } from 'lucide-react';
 import { Student, AttendanceSession, Turma, ParishConfig } from '../types';
 import { generateSpiritualGoal } from '../services/geminiService';
@@ -15,6 +16,7 @@ interface StudentDetailsModalProps {
   attendanceSessions: AttendanceSession[];
   classes: Turma[];
   onClose: () => void;
+  onEdit?: (student: Student) => void;
   onGenerateCertificate?: (student: Student) => void;
   config: ParishConfig;
   allStudents?: Student[];
@@ -26,6 +28,7 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
   attendanceSessions, 
   classes,
   onClose,
+  onEdit,
   onGenerateCertificate,
   config,
   allStudents,
@@ -396,6 +399,15 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
               </div>
               
               <div className="flex gap-2 w-full md:w-auto">
+                {onEdit && (
+                  <button 
+                    onClick={() => onEdit(student)}
+                    className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 md:px-6 py-2.5 md:py-3 bg-blue-600 text-white text-[9px] md:text-xs font-bold rounded-xl md:rounded-2xl shadow-lg hover:bg-blue-700 transition-all active:scale-95"
+                  >
+                    <Edit size={14} className="md:w-4 md:h-4" /> 
+                    <span className="uppercase tracking-widest">Editar</span>
+                  </button>
+                )}
                 <button 
                   onClick={handlePrint} 
                   className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 md:px-6 py-2.5 md:py-3 bg-slate-900 text-white text-[9px] md:text-xs font-bold rounded-xl md:rounded-2xl shadow-lg hover:bg-slate-800 transition-all active:scale-95"

@@ -18,6 +18,7 @@ import {
   Edit
 } from 'lucide-react';
 import { GalleryImage, Turma } from '../types';
+import { Pagination } from './Pagination';
 
 interface GalleryViewProps {
   images: GalleryImage[];
@@ -39,6 +40,8 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ images, onUpload, onEd
   
   // State for Editing
   const [editingImage, setEditingImage] = useState<GalleryImage | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [newImageTitle, setNewImageTitle] = useState('');
@@ -175,6 +178,17 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ images, onUpload, onEd
     img.title.toLowerCase().includes(searchTerm.toLowerCase())
   ).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
+  const totalPages = Math.ceil(filteredImages.length / itemsPerPage);
+  const paginatedImages = filteredImages.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-10">
       {/* HEADER MARIANO */}
@@ -233,8 +247,8 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ images, onUpload, onEd
 
       {/* GRID DE IMAGENS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {filteredImages.length > 0 ? (
-          filteredImages.map(img => {
+        {paginatedImages.length > 0 ? (
+          paginatedImages.map(img => {
             const isSelected = selectedIds.includes(img.id);
             const turmaName = getTurmaName(img.turmaId);
             
@@ -343,6 +357,18 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ images, onUpload, onEd
           </div>
         )}
       </div>
+
+      {filteredImages.length > itemsPerPage && (
+        <div className="bg-white rounded-[2rem] border border-sky-100 shadow-sm overflow-hidden mt-8">
+          <Pagination 
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            totalItems={filteredImages.length}
+            itemsPerPage={itemsPerPage}
+          />
+        </div>
+      )}
 
       {/* MODAL UPLOAD / EDIT MARIANO */}
       {isUploading && canUpload && (

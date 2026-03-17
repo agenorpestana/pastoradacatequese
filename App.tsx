@@ -1011,7 +1011,7 @@ const App: React.FC = () => {
       case 'reports':
         return <Reports students={students} classes={classes} attendanceSessions={attendanceSessions} />;
       case 'attendance_report':
-        return <AttendanceReport classes={classes} attendanceSessions={attendanceSessions} catequistas={catequistas} config={parishConfig} students={students} />;
+        return <AttendanceReport classes={classes} attendanceSessions={attendanceSessions} catequistas={catequistas} config={parishConfig} students={students} onViewHistory={(t) => setViewingClassHistory(t)} />;
       case 'certificates':
         return <CertificateGenerator students={visibleStudents} config={parishConfig} />;
       case 'profile':
@@ -1083,6 +1083,11 @@ const App: React.FC = () => {
             attendanceSessions={attendanceSessions} 
             classes={classes} 
             onClose={() => setViewingStudent(null)} 
+            onEdit={(s) => {
+              setViewingStudent(null);
+              setEditingStudent(s);
+              setView('register');
+            }}
             config={parishConfig}
             allStudents={viewingClassMembers ? students.filter(s => s.turma === viewingClassMembers.nome) : undefined}
             onSelectStudent={(s) => setViewingStudent(s)}
