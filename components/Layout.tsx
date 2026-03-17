@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   LayoutDashboard, 
   Users, 
@@ -18,7 +18,7 @@ import {
   Camera,
   UserPlus,
   CalendarDays,
-  Image as ImageIcon,
+  ImageIcon,
   Plus,
   ShieldCheck,
   UserCheck,
@@ -27,7 +27,7 @@ import {
   BarChart3,
   Archive
 } from 'lucide-react';
-import { AppView, User, ParishConfig, UserRole } from '../types';
+import { AppView, User, ParishConfig, UserRole, UserPermissions } from '../types';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -56,7 +56,46 @@ export const Layout: React.FC<LayoutProps> = ({
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
-  const perms = currentUser.permissions;
+  const perms = useMemo(() => {
+    // Super user or Admin always have full permissions
+    const isAdmin = currentUser.role === 'coordenador_paroquial' || 
+                    currentUser.email === 'suporte@unityautomacoes.com.br' ||
+                    currentUser.email === 'agenor.tec.info@gmail.com';
+    
+    if (isAdmin) {
+      return {
+        dashboard: true,
+        students_view: true,
+        students_create: true,
+        students_edit: true,
+        students_delete: true,
+        students_print: true,
+        students_confirmed_view: true,
+        students_confirmed_manage: true,
+        classes: true,
+        catequistas: true,
+        formations: true,
+        niveis_etapas: true,
+        reports: true,
+        attendance_report: true,
+        certificates: true,
+        attendance: true,
+        users_management: true,
+        library_view: true,
+        library_upload: true,
+        library_delete: true,
+        gallery_view: true,
+        gallery_upload: true,
+        gallery_delete: true,
+        archive_view: true,
+        archive_upload: true,
+        archive_delete: true,
+        allowedClassIds: []
+      } as UserPermissions;
+    }
+    return currentUser.permissions;
+  }, [currentUser]);
+
   const isRestrictedRole = currentUser.role === 'catequista' || currentUser.role === 'catequista_auxiliar';
   const isLinked = !!currentUser.linkedCatequistaId;
 

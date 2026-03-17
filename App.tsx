@@ -959,7 +959,52 @@ const App: React.FC = () => {
     );
   }
 
+  // Ensure admins and super users always have all permissions
+  const currentUser = useMemo(() => {
+    if (!user) return null;
+    const isAdmin = user.role === 'coordenador_paroquial' || 
+                    user.email === 'suporte@unityautomacoes.com.br' ||
+                    user.email === 'agenor.tec.info@gmail.com';
+    
+    if (isAdmin) {
+      return {
+        ...user,
+        permissions: {
+          dashboard: true,
+          students_view: true,
+          students_create: true,
+          students_edit: true,
+          students_delete: true,
+          students_print: true,
+          students_confirmed_view: true,
+          students_confirmed_manage: true,
+          classes: true,
+          catequistas: true,
+          formations: true,
+          niveis_etapas: true,
+          reports: true,
+          attendance_report: true,
+          certificates: true,
+          attendance: true,
+          users_management: true,
+          library_view: true,
+          library_upload: true,
+          library_delete: true,
+          gallery_view: true,
+          gallery_upload: true,
+          gallery_delete: true,
+          archive_view: true,
+          archive_upload: true,
+          archive_delete: true,
+          allowedClassIds: user.permissions?.allowedClassIds || []
+        }
+      } as User;
+    }
+    return user;
+  }, [user]);
+
   const renderContent = () => {
+    if (!currentUser) return null;
     if (isInitialDataLoading && view === 'dashboard') {
       return (
         <div className="flex-1 flex items-center justify-center bg-slate-50 min-h-[60vh]">
@@ -975,9 +1020,9 @@ const App: React.FC = () => {
     let visibleClasses = classes;
     let visibleStudents = students;
 
-    if (user.role === 'catequista' || user.role === 'catequista_auxiliar') {
-      if (user.linkedCatequistaId) {
-        const linkedCat = catequistas.find(c => c.id === user.linkedCatequistaId);
+    if (currentUser.role === 'catequista' || currentUser.role === 'catequista_auxiliar') {
+      if (currentUser.linkedCatequistaId) {
+        const linkedCat = catequistas.find(c => c.id === currentUser.linkedCatequistaId);
         if (linkedCat) {
           visibleClasses = classes.filter(c => c.catequista.includes(linkedCat.nome));
           // visibleStudents = students; // Dashboard and Student List should show all
@@ -999,7 +1044,7 @@ const App: React.FC = () => {
                   suggestedDate={selectedDate}
                   onDateChange={setSelectedDate}
                   onAddEvent={handleAddEvent}
-                  user={user}
+                  user={currentUser}
                   onTakeEventAttendance={setTakingEventAttendance}
                   onEditEvent={handleEditEvent}
                   onDeleteEvent={handleDeleteEvent}
@@ -1019,11 +1064,11 @@ const App: React.FC = () => {
                   students={visibleStudents}
                   allClasses={classes}
                   niveis={niveisEtapas}
-                  onDelete={user.permissions.students_delete ? handleDeleteStudent : () => alert('Sem permissão')}
-                  onEdit={user.permissions.students_edit ? (s) => { setEditingStudent(s); setView('register'); } : () => alert('Sem permissão')}
+                  onDelete={currentUser.permissions.students_delete ? handleDeleteStudent : () => alert('Sem permissão')}
+                  onEdit={currentUser.permissions.students_edit ? (s) => { setEditingStudent(s); setView('register'); } : () => alert('Sem permissão')}
                   onView={(s) => setViewingStudent(s)}
                   onManageDocuments={(s) => setManagingDocumentsStudent(s)}
-                  onAddNew={user.permissions.students_create ? () => { setEditingStudent(null); setView('register'); } : undefined}
+                  onAddNew={currentUser.permissions.students_create ? () => { setEditingStudent(null); setView('register'); } : undefined}
                />;
       case 'classes_list':
         return <ClassTable 
@@ -1033,8 +1078,8 @@ const App: React.FC = () => {
                   onViewMembers={(c) => setViewingClassMembers(c)}
                   onTakeAttendance={(c) => setTakingAttendanceClass(c)}
                   onViewHistory={(c) => setViewingClassHistory(c)}
-                  onAddNew={user.role === 'coordenador_paroquial' ? () => { setEditingClass(null); setView('classes_create'); } : undefined}
-                  currentUser={user}
+                  onAddNew={currentUser.role === 'coordenador_paroquial' ? () => { setEditingClass(null); setView('classes_create'); } : undefined}
+                  currentUser={currentUser}
                />;
       case 'classes_create':
         return <ClassForm 
@@ -1058,7 +1103,7 @@ const App: React.FC = () => {
                   onEdit={(c) => { setEditingCatequista(c); setView('catequista_create'); }}
                   onViewHistory={(c) => setViewingCatequistaHistory(c)}
                   onManageDocuments={(c) => setManagingDocumentsCatequista(c)}
-                  onAddNew={user.permissions.catequistas ? () => { setEditingCatequista(null); setView('catequista_create'); } : undefined}
+                  onAddNew={currentUser.permissions.catequistas ? () => { setEditingCatequista(null); setView('catequista_create'); } : undefined}
                />;
       case 'catequista_create':
         return <CatequistaForm 
@@ -1087,14 +1132,14 @@ const App: React.FC = () => {
       case 'certificates':
         return <CertificateGenerator students={visibleStudents} config={parishConfig} />;
       case 'profile':
-        return <ProfileForm currentUser={user} onSave={handleUpdateProfile} onCancel={() => setView('dashboard')} />;
+        return <ProfileForm currentUser={currentUser} onSave={handleUpdateProfile} onCancel={() => setView('dashboard')} />;
       case 'users_list':
         return <UserList 
                   users={users} 
                   onEdit={(u) => { setEditingUser(u); setView('users_create'); }}
                   onDelete={handleDeleteUser}
                   onCreateNew={() => { setEditingUser(null); setView('users_create'); }}
-                  currentUser={user}
+                  currentUser={currentUser}
                />;
       case 'users_create':
         return <UserForm 
@@ -1111,8 +1156,8 @@ const App: React.FC = () => {
                   onEdit={handleEditImage}
                   onDelete={handleDeleteImage}
                   onDeleteMultiple={handleDeleteMultipleImages}
-                  canUpload={user.permissions.gallery_upload}
-                  canDelete={user.permissions.gallery_delete}
+                  canUpload={currentUser.permissions.gallery_upload}
+                  canDelete={currentUser.permissions.gallery_delete}
                   availableClasses={visibleClasses}
                />;
       case 'library':
@@ -1120,15 +1165,15 @@ const App: React.FC = () => {
                   files={libraryFiles}
                   onUpload={handleUploadFile}
                   onDelete={handleDeleteFile}
-                  canUpload={user.permissions.library_upload}
-                  canDelete={user.permissions.library_delete}
+                  canUpload={currentUser.permissions.library_upload}
+                  canDelete={currentUser.permissions.library_delete}
                />;
       case 'archive':
         return <ArchiveView 
                   files={archiveFiles}
                   onUpload={handleUploadArchive}
                   onDelete={handleDeleteArchive}
-                  user={user}
+                  user={currentUser}
                />;
       case 'config':
         return <ConfigForm config={parishConfig} onSave={handleSaveConfig} />;
@@ -1141,7 +1186,7 @@ const App: React.FC = () => {
                   suggestedDate={selectedDate}
                   onDateChange={setSelectedDate}
                   onAddEvent={handleAddEvent}
-                  user={user}
+                  user={currentUser}
                   onTakeEventAttendance={setTakingEventAttendance}
                   onEditEvent={handleEditEvent}
                   onDeleteEvent={handleDeleteEvent}
@@ -1152,7 +1197,7 @@ const App: React.FC = () => {
 
   return (
     <>
-      <Layout currentView={view} setView={setView} currentUser={user} onLogout={handleLogout} parishConfig={parishConfig}>
+      <Layout currentView={view} setView={setView} currentUser={currentUser} onLogout={handleLogout} parishConfig={parishConfig}>
         {renderContent()}
 
         {/* Modals */}
