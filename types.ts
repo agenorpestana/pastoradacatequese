@@ -51,6 +51,9 @@ export interface UserPermissions {
   gallery_view: boolean;
   gallery_upload: boolean;
   gallery_delete: boolean;
+  archive_view: boolean;
+  archive_upload: boolean;
+  archive_delete: boolean;
   allowedClassIds?: string[];
 }
 
@@ -295,4 +298,13 @@ export interface NivelEtapa {
   categoria?: 'CRISMA' | 'EUCARISTIA' | 'PRÉ-EUCARISTIA' | 'OUTROS';
 }
 
-export type AppView = 'dashboard' | 'register' | 'list' | 'classes_list' | 'classes_create' | 'catequista_list' | 'catequista_create' | 'niveis_list' | 'formation_list' | 'formation_create' | 'reports' | 'attendance_report' | 'certificates' | 'attendance_quick' | 'profile' | 'users_list' | 'users_create' | 'gallery' | 'library' | 'config';
+export interface ArchiveFile {
+  id: string;
+  name: string;
+  description?: string;
+  url: string;
+  type: string;
+  uploadDate: string;
+}
+
+export type AppView = 'dashboard' | 'register' | 'list' | 'classes_list' | 'classes_create' | 'catequista_list' | 'catequista_create' | 'niveis_list' | 'formation_list' | 'formation_create' | 'reports' | 'attendance_report' | 'certificates' | 'attendance_quick' | 'profile' | 'users_list' | 'users_create' | 'gallery' | 'library' | 'config' | 'archive';

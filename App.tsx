@@ -25,6 +25,7 @@ import { ProfileForm } from './components/ProfileForm';
 import { UserList, UserForm } from './components/UserManagement';
 import { GalleryView } from './components/GalleryView';
 import { LibraryView } from './components/LibraryView';
+import { ArchiveView } from './components/ArchiveView';
 import { ConfigForm } from './components/ConfigForm';
 import { StudentDocumentsModal } from './components/StudentDocumentsModal';
 import { CalendarView } from './components/CalendarView';
@@ -33,7 +34,7 @@ import { NiveisList } from './components/NiveisList';
 import { api } from './services/api';
 import { 
   AppView, User, Student, Turma, Catequista, FormationEvent, 
-  ParishEvent, GalleryImage, LibraryFile, AttendanceSession, 
+  ParishEvent, GalleryImage, LibraryFile, ArchiveFile, AttendanceSession, 
   ParishConfig, StudentDocument, NivelEtapa
 } from './types';
 import { 
@@ -514,6 +515,7 @@ const App: React.FC = () => {
   const [attendanceSessions, setAttendanceSessions] = useState<AttendanceSession[]>([]);
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
   const [libraryFiles, setLibraryFiles] = useState<LibraryFile[]>([]);
+  const [archiveFiles, setArchiveFiles] = useState<ArchiveFile[]>([]);
   const [niveisEtapas, setNiveisEtapas] = useState<NivelEtapa[]>([]);
   const [parishConfig, setParishConfig] = useState<ParishConfig>({
     pastoralName: 'Pastoral da Catequese',
@@ -598,12 +600,13 @@ const App: React.FC = () => {
       setIsInitialDataLoading(false);
 
       // 2. Secondary data in background
-      const [u, f, att, gal, lib] = await Promise.all([
+      const [u, f, att, gal, lib, arch] = await Promise.all([
         api.get('users'),
         api.get('formations'),
         api.get('attendance_sessions'),
         api.get('gallery'),
-        api.get('library')
+        api.get('library'),
+        api.get('archive')
       ]);
 
       setUsers(u);
@@ -611,6 +614,7 @@ const App: React.FC = () => {
       setAttendanceSessions(att);
       setGalleryImages(gal);
       setLibraryFiles(lib);
+      setArchiveFiles(arch || []);
     } catch (err) {
       console.error("Error fetching data:", err);
       setIsInitialDataLoading(false);
@@ -883,6 +887,20 @@ const App: React.FC = () => {
     }
   };
 
+  const handleUploadArchive = async (file: ArchiveFile) => {
+    try {
+      const res = await api.post('archive', file);
+      setArchiveFiles(prev => [...prev, { ...file, id: res.id }]);
+    } catch (e) { alert(e); }
+  };
+
+  const handleDeleteArchive = async (id: string) => {
+    if (confirm('Excluir arquivo?')) {
+      await api.delete('archive', id);
+      setArchiveFiles(prev => prev.filter(f => f.id !== id));
+    }
+  };
+
   // Users
   const handleSaveUser = async (u: User) => {
     try {
@@ -1104,6 +1122,13 @@ const App: React.FC = () => {
                   onDelete={handleDeleteFile}
                   canUpload={user.permissions.library_upload}
                   canDelete={user.permissions.library_delete}
+               />;
+      case 'archive':
+        return <ArchiveView 
+                  files={archiveFiles}
+                  onUpload={handleUploadArchive}
+                  onDelete={handleDeleteArchive}
+                  user={user}
                />;
       case 'config':
         return <ConfigForm config={parishConfig} onSave={handleSaveConfig} />;

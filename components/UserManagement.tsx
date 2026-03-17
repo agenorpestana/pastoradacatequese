@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Users, UserPlus, Shield, ShieldCheck, Mail, Lock, Edit, Trash2, CheckCircle2, ArrowLeft, Save, ShieldAlert, Key, BookOpen, Check, UserCircle, X, Link } from 'lucide-react';
+import { Users, UserPlus, Shield, ShieldCheck, Mail, Lock, Edit, Trash2, CheckCircle2, ArrowLeft, Save, ShieldAlert, Key, BookOpen, Check, UserCircle, X, Link, Search } from 'lucide-react';
 import { User, UserPermissions, Turma, UserRole, Catequista } from '../types';
 import { Pagination } from './Pagination';
 
@@ -21,9 +21,14 @@ const roleLabels: Record<UserRole, string> = {
 
 export const UserList: React.FC<UserListProps> = ({ users, onEdit, onDelete, onCreateNew, currentUser }) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
   const itemsPerPage = 10;
 
-  const filteredUsers = users.filter(u => u.email !== 'suporte@unityautomacoes.com.br');
+  const filteredUsers = users.filter(u => 
+    u.email !== 'suporte@unityautomacoes.com.br' &&
+    (u.nome.toLowerCase().includes(searchTerm.toLowerCase()) || 
+     u.email.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
   const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
   const paginatedUsers = filteredUsers.slice(
     (currentPage - 1) * itemsPerPage,
@@ -37,17 +42,29 @@ export const UserList: React.FC<UserListProps> = ({ users, onEdit, onDelete, onC
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
-      <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm flex justify-between items-center">
+      <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
         <div>
           <h2 className="text-2xl font-black text-slate-800 tracking-tight">Gestão de Usuários</h2>
           <p className="text-slate-500 text-sm">Controle de acessos e níveis de hierarquia da pastoral.</p>
         </div>
-        <button 
-          onClick={onCreateNew}
-          className="bg-slate-900 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 shadow-lg hover:bg-slate-800 transition-all"
-        >
-          <UserPlus className="w-5 h-5" /> Novo Cadastro
-        </button>
+        <div className="flex items-center gap-4 w-full md:w-auto">
+          <div className="relative flex-1 md:w-64">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+            <input 
+              type="text"
+              placeholder="Buscar usuário..."
+              value={searchTerm}
+              onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+              className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm font-medium"
+            />
+          </div>
+          <button 
+            onClick={onCreateNew}
+            className="bg-slate-900 text-white px-6 py-3 rounded-2xl font-bold flex items-center gap-2 shadow-lg hover:bg-slate-800 transition-all whitespace-nowrap"
+          >
+            <UserPlus className="w-5 h-5" /> Novo Cadastro
+          </button>
+        </div>
       </div>
 
       <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
@@ -161,6 +178,9 @@ export const UserForm: React.FC<UserFormProps> = ({ onSave, onCancel, initialDat
       gallery_view: true,
       gallery_upload: false,
       gallery_delete: false,
+      archive_view: true,
+      archive_upload: false,
+      archive_delete: false,
       allowedClassIds: []
     }
   });
@@ -184,6 +204,7 @@ export const UserForm: React.FC<UserFormProps> = ({ onSave, onCancel, initialDat
         attendance: true, users_management: true, attendance_report: true,
         library_view: true, library_upload: true, library_delete: true,
         gallery_view: true, gallery_upload: true, gallery_delete: true,
+        archive_view: true, archive_upload: true, archive_delete: true,
         allowedClassIds: []
       } : {
         ...formData.permissions,
@@ -241,6 +262,9 @@ export const UserForm: React.FC<UserFormProps> = ({ onSave, onCancel, initialDat
       { k: 'gallery_view', l: 'Ver Galeria de Momentos' },
       { k: 'gallery_upload', l: 'Anexar Fotos na Galeria' },
       { k: 'gallery_delete', l: 'Excluir Fotos da Galeria' },
+      { k: 'archive_view', l: 'Ver Arquivo Morto' },
+      { k: 'archive_upload', l: 'Anexar Documentos no Arquivo Morto' },
+      { k: 'archive_delete', l: 'Excluir Documentos do Arquivo Morto' },
       { k: 'users_management', l: 'Gerenciar Outros Usuários' },
     ]}
   ];

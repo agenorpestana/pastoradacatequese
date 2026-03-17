@@ -24,7 +24,8 @@ import {
   UserCheck,
   Library,
   UserCircle,
-  BarChart3
+  BarChart3,
+  Archive
 } from 'lucide-react';
 import { AppView, User, ParishConfig, UserRole } from '../types';
 
@@ -204,6 +205,16 @@ export const Layout: React.FC<LayoutProps> = ({
                   </button>
                 )}
 
+                {perms.archive_view && (
+                  <button 
+                    onClick={() => handleNavClick('archive')} 
+                    className={`flex items-center gap-4 p-4 rounded-2xl transition-all ${currentView === 'archive' ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-slate-600 bg-slate-50 hover:bg-slate-100'}`}
+                  >
+                    <Archive className="w-5 h-5" />
+                    <span className="text-sm font-bold uppercase tracking-tight">Arquivo Morto</span>
+                  </button>
+                )}
+
                 <button 
                   onClick={() => handleNavClick('gallery')} 
                   className={`flex items-center gap-4 p-4 rounded-2xl transition-all ${currentView === 'gallery' ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'text-slate-600 bg-slate-50 hover:bg-slate-100'}`}
@@ -345,6 +356,16 @@ export const Layout: React.FC<LayoutProps> = ({
             >
               <FileText className={`transition-transform duration-300 ${isCollapsed ? 'w-6 h-6' : 'w-5 h-5 group-hover:scale-110'}`} />
               {!isCollapsed && <span className="font-bold text-sm tracking-tight">Relatórios</span>}
+            </button>
+          )}
+
+          {perms.archive_view && (
+            <button
+              onClick={() => setView('archive')}
+              className={`w-full flex items-center transition-all duration-300 rounded-2xl group ${isCollapsed ? 'justify-center p-4' : 'gap-4 px-5 py-3.5'} ${currentView === 'archive' ? 'bg-blue-600 text-white shadow-xl shadow-blue-200' : 'text-slate-500 hover:bg-white'}`}
+            >
+              <Archive className={`transition-transform duration-300 ${isCollapsed ? 'w-6 h-6' : 'w-5 h-5 group-hover:scale-110'}`} />
+              {!isCollapsed && <span className="font-bold text-sm tracking-tight">Arquivo Morto</span>}
             </button>
           )}
 
