@@ -103,6 +103,24 @@ const runMigrations = async () => {
             console.log("✅ Migration Successful: Column added to attendance_sessions.");
         }
 
+        // Migration 6: archive table
+        try {
+            await conn.query(`
+                CREATE TABLE IF NOT EXISTS archive (
+                    id VARCHAR(50) PRIMARY KEY,
+                    name VARCHAR(255) NOT NULL,
+                    description TEXT,
+                    url LONGTEXT NOT NULL,
+                    type VARCHAR(50),
+                    upload_date DATETIME,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            `);
+            console.log("✅ Database Schema Check: 'archive' table is ready.");
+        } catch (e) {
+            console.error("❌ Failed to create 'archive' table:", e.message);
+        }
+
     } catch (err) {
         console.error("❌ Migration Failed:", err.message);
         // Don't crash, purely log the error as it might be a connection issue handled later
@@ -123,7 +141,7 @@ pool.getConnection()
         console.error("Error Code:", err.code);
     });
 
-const ALLOWED_TABLES = ['users', 'turmas', 'catequistas', 'students', 'attendance_sessions', 'events', 'gallery', 'library', 'formations', 'parish_config', 'niveis_etapas'];
+const ALLOWED_TABLES = ['users', 'turmas', 'catequistas', 'students', 'attendance_sessions', 'events', 'gallery', 'library', 'formations', 'parish_config', 'niveis_etapas', 'archive'];
 
 const parseRow = (row) => {
   if (!row) return row;
@@ -266,6 +284,10 @@ app.post('/api/:resource', async (req, res) => {
         query = 'INSERT INTO niveis_etapas (id, nome, categoria) VALUES (?, ?, ?)';
         params = [data.id, data.nome, data.categoria || 'OUTROS'];
         break;
+      case 'archive':
+        query = 'INSERT INTO archive (id, name, description, url, type, upload_date) VALUES (?, ?, ?, ?, ?, ?)';
+        params = [data.id, data.name, data.description || null, data.url, data.type, data.uploadDate || new Date()];
+        break;
     }
 
     if (query) {
@@ -328,6 +350,10 @@ app.put('/api/:resource/:id', async (req, res) => {
         case 'niveis_etapas':
           query = 'UPDATE niveis_etapas SET nome=?, categoria=? WHERE id=?';
           params = [data.nome, data.categoria || 'OUTROS', id];
+          break;
+        case 'archive':
+          query = 'UPDATE archive SET name=?, description=?, url=?, type=?, upload_date=? WHERE id=?';
+          params = [data.name, data.description || null, data.url, data.type, data.uploadDate || new Date(), id];
           break;
     }
 

@@ -114,6 +114,16 @@ CREATE TABLE IF NOT EXISTS library (
     upload_date DATETIME
 );
 
+CREATE TABLE IF NOT EXISTS archive (
+    id VARCHAR(50) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    url LONGTEXT NOT NULL,
+    type VARCHAR(50),
+    upload_date DATETIME,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Inserir SUPER USUÁRIO DA UNITY AUTOMACÕES
 INSERT IGNORE INTO users (id, nome, email, senha, role, permissions) VALUES 
-('adm-unity', 'Suporte Unity', 'suporte@unityautomacoes.com.br', '200616', 'coordenador_paroquial', '{"dashboard": true, "students_view": true, "students_create": true, "students_edit": true, "students_delete": true, "students_print": true, "students_confirmed_view": true, "students_confirmed_manage": true, "classes": true, "catequistas": true, "formations": true, "reports": true, "attendance_report": true, "certificates": true, "attendance": true, "users_management": true, "library_view": true, "library_upload": true, "library_delete": true, "gallery_view": true, "gallery_upload": true, "gallery_delete": true}');
+('adm-unity', 'Suporte Unity', 'suporte@unityautomacoes.com.br', '200616', 'coordenador_paroquial', '{"dashboard": true, "students_view": true, "students_create": true, "students_edit": true, "students_delete": true, "students_print": true, "students_confirmed_view": true, "students_confirmed_manage": true, "classes": true, "catequistas": true, "formations": true, "reports": true, "attendance_report": true, "certificates": true, "attendance": true, "users_management": true, "library_view": true, "library_upload": true, "library_delete": true, "gallery_view": true, "gallery_upload": true, "gallery_delete": true, "archive_view": true, "archive_upload": true, "archive_delete": true}');
