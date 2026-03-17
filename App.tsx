@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Layout } from './components/Layout';
 import { Login } from './components/Login';
 import { RegistrationForm } from './components/RegistrationForm';
@@ -43,57 +43,103 @@ import {
 } from 'lucide-react';
 
 // DashboardContent Component
-const DashboardContent = ({ events, students, classes, catequistas, suggestedDate, onDateChange, onAddEvent, user, onTakeEventAttendance, onEditEvent, onDeleteEvent, niveis }: any) => {
+const DashboardContent = React.memo(({ events, students, classes, catequistas, suggestedDate, onDateChange, onAddEvent, user, onTakeEventAttendance, onEditEvent, onDeleteEvent, niveis }: any) => {
     const isRestrictedUser = user?.role === 'catequista' || user?.role === 'catequista_auxiliar';
 
     // Eventos do dia selecionado
-    const selectedDayEvents = events.filter((e: any) => e.dataInicio === suggestedDate);
-    const dateObj = new Date(suggestedDate + 'T00:00:00');
-    const dayName = dateObj.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' });
+    const selectedDayEvents = useMemo(() => 
+      events.filter((e: any) => e.dataInicio === suggestedDate),
+      [events, suggestedDate]
+    );
+
+    const dateObj = useMemo(() => new Date(suggestedDate + 'T00:00:00'), [suggestedDate]);
+    const dayName = useMemo(() => 
+      dateObj.toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' }),
+      [dateObj]
+    );
     
     // Eventos Futuros (A partir de hoje)
     const now = new Date();
     const todayStr = now.toISOString().split('T')[0];
     
-    const futureEvents = events
+    const futureEvents = useMemo(() => 
+      events
         .filter((e: any) => e.dataInicio >= todayStr)
         .sort((a: any, b: any) => {
             const dateA = new Date(a.dataInicio + 'T' + (a.horarioInicio || '00:00'));
             const dateB = new Date(b.dataInicio + 'T' + (b.horarioInicio || '00:00'));
             return dateA.getTime() - dateB.getTime();
         })
-        .slice(0, 10);
+        .slice(0, 10),
+      [events, todayStr]
+    );
 
-    const isEventExpired = (event: any) => {
+    const isEventExpired = useCallback((event: any) => {
         if (!event.dataFim || !event.horarioFim) return false;
         const endDateTime = new Date(`${event.dataFim}T${event.horarioFim}`);
         return now > endDateTime;
-    };
+    }, [now]);
 
     // Statistics Calculations
-    const totalStudents = students.length;
-    const activeStudents = students.filter((s:any) => s.status === 'Ativo');
-    const inactiveStudentsCount = students.filter((s:any) => s.status === 'Inativo').length;
-    const concludedStudentsCount = students.filter((s:any) => s.status === 'Concluido').length;
+    const stats = useMemo(() => {
+      const totalStudents = students.length;
+      const activeStudents = students.filter((s:any) => s.status === 'Ativo');
+      const inactiveStudentsCount = students.filter((s:any) => s.status === 'Inativo').length;
+      const concludedStudentsCount = students.filter((s:any) => s.status === 'Concluido').length;
 
-    const totalClasses = classes.length;
-    
-    const totalCatequistas = catequistas.length;
-    const activeCatequistasCount = catequistas.filter((c:any) => c.status === 'Ativo').length;
-    const inactiveCatequistasCount = totalCatequistas - activeCatequistasCount;
+      const totalClasses = classes.length;
+      
+      const totalCatequistas = catequistas.length;
+      const activeCatequistasCount = catequistas.filter((c:any) => c.status === 'Ativo').length;
+      const inactiveCatequistasCount = totalCatequistas - activeCatequistasCount;
 
-    const activeBatizadosCount = activeStudents.filter((s:any) => s.batizado).length;
-    const activeSemBatismoCount = activeStudents.length - activeBatizadosCount;
+      const activeBatizadosCount = activeStudents.filter((s:any) => s.batizado).length;
+      const activeSemBatismoCount = activeStudents.length - activeBatizadosCount;
 
-    const activeEucaristiaCount = activeStudents.filter((s:any) => s.fezPrimeiraEucaristia).length;
-    const activeSemEucaristiaCount = activeStudents.length - activeEucaristiaCount;
+      const activeEucaristiaCount = activeStudents.filter((s:any) => s.fezPrimeiraEucaristia).length;
+      const activeSemEucaristiaCount = activeStudents.length - activeEucaristiaCount;
 
-    // Logic for Crisma preparation stats
-    const crismaClasses = classes.filter((c: any) => {
-        const nivelObj = niveis.find((n: any) => n.nome === c.nivel);
-        return nivelObj?.categoria === 'CRISMA';
-    });
-    const studentsInCrismaPrep = activeStudents.filter((s:any) => !!s.inicioPreparacao).length;
+      // Logic for Crisma preparation stats
+      const crismaClasses = classes.filter((c: any) => {
+          const nivelObj = niveis.find((n: any) => n.nome === c.nivel);
+          return nivelObj?.categoria === 'CRISMA';
+      });
+      const studentsInCrismaPrep = activeStudents.filter((s:any) => !!s.inicioPreparacao).length;
+
+      return {
+        totalStudents,
+        activeStudents,
+        inactiveStudentsCount,
+        concludedStudentsCount,
+        totalClasses,
+        totalCatequistas,
+        activeCatequistasCount,
+        inactiveCatequistasCount,
+        activeBatizadosCount,
+        activeSemBatismoCount,
+        activeEucaristiaCount,
+        activeSemEucaristiaCount,
+        crismaClasses,
+        studentsInCrismaPrep
+      };
+    }, [students, classes, catequistas, niveis]);
+
+    const {
+      totalStudents,
+      activeStudents,
+      inactiveStudentsCount,
+      concludedStudentsCount,
+      totalClasses,
+      totalCatequistas,
+      activeCatequistasCount,
+      inactiveCatequistasCount,
+      activeBatizadosCount,
+      activeSemBatismoCount,
+      activeEucaristiaCount,
+      activeSemEucaristiaCount,
+      crismaClasses,
+      studentsInCrismaPrep
+    } = stats;
 
     const isLinked = !!user?.linkedCatequistaId;
 
@@ -449,7 +495,7 @@ const DashboardContent = ({ events, students, classes, catequistas, suggestedDat
         </div>
       </div>
     );
-};
+});
 
 // App Component
 const App: React.FC = () => {
@@ -531,32 +577,40 @@ const App: React.FC = () => {
   const fetchData = useCallback(async () => {
     if (!user) return;
     try {
-      const [s, c, cat, u, e, f, att, gal, lib, conf, n] = await Promise.all([
+      // 1. Critical data for Dashboard
+      const [s, c, cat, e, n, conf] = await Promise.all([
         api.get('students'),
         api.get('turmas'),
         api.get('catequistas'),
-        api.get('users'),
         api.get('events'),
-        api.get('formations'),
-        api.get('attendance_sessions'),
-        api.get('gallery'),
-        api.get('library'),
-        api.get('parish_config'),
-        api.get('niveis_etapas')
+        api.get('niveis_etapas'),
+        api.get('parish_config')
       ]);
 
       setStudents(s);
       setClasses(c);
       setCatequistas(cat);
-      setUsers(u);
       setEvents(e);
+      setNiveisEtapas(n);
+      if (conf && conf.pastoralName) setParishConfig(conf);
+      
+      // Dashboard is ready to be shown
+      setIsInitialDataLoading(false);
+
+      // 2. Secondary data in background
+      const [u, f, att, gal, lib] = await Promise.all([
+        api.get('users'),
+        api.get('formations'),
+        api.get('attendance_sessions'),
+        api.get('gallery'),
+        api.get('library')
+      ]);
+
+      setUsers(u);
       setFormations(f);
       setAttendanceSessions(att);
       setGalleryImages(gal);
       setLibraryFiles(lib);
-      setNiveisEtapas(n);
-      if (conf && conf.pastoralName) setParishConfig(conf);
-      setIsInitialDataLoading(false);
     } catch (err) {
       console.error("Error fetching data:", err);
       setIsInitialDataLoading(false);
