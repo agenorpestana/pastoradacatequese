@@ -68,65 +68,115 @@ export const UserList: React.FC<UserListProps> = ({ users, onEdit, onDelete, onC
       </div>
 
       <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-slate-50 border-b border-slate-100">
-              <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Usuário</th>
-              <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Nível de Hierarquia</th>
-              <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Ações Permitidas</th>
-              <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Ações</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {paginatedUsers.map(u => (
-              <tr key={u.id} className="hover:bg-slate-50/50 transition-all group">
-                <td className="px-8 py-5">
-                  <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-lg ${u.role === 'coordenador_paroquial' ? 'bg-slate-900 text-white' : 'bg-blue-100 text-blue-600'}`}>
-                      {u.nome.charAt(0)}
-                    </div>
-                    <div>
-                      <p className="font-bold text-slate-800">{u.nome}</p>
-                      <p className="text-xs text-slate-400">{u.email}</p>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-8 py-5">
-                  <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest ${u.role === 'coordenador_paroquial' ? 'bg-amber-50 text-amber-700 border border-amber-100' : 'bg-blue-50 text-blue-700 border border-blue-100'}`}>
-                    {u.role === 'coordenador_paroquial' ? <ShieldCheck className="w-3 h-3" /> : <UserCircle className="w-3 h-3" />}
-                    {roleLabels[u.role] || u.role}
-                  </span>
-                </td>
-                <td className="px-8 py-5">
-                   <div className="flex flex-wrap gap-1 max-w-xs">
-                     {u.role === 'coordenador_paroquial' ? (
-                       <span className="bg-slate-900 text-white text-[8px] px-2 py-0.5 rounded-md font-black uppercase tracking-widest">Acesso Total</span>
-                     ) : (
-                       <>
-                         {Object.entries(u.permissions).filter(([k,v]) => v && k !== 'allowedClassIds').slice(0, 4).map(([key]) => (
-                           <span key={key} className="bg-slate-100 text-slate-500 text-[8px] px-2 py-0.5 rounded-md font-black uppercase tracking-tighter">
-                             {key.replace('_', ' ')}
-                           </span>
-                         ))}
-                         {Object.values(u.permissions).filter((v, i) => v && Object.keys(u.permissions)[i] !== 'allowedClassIds').length > 4 && (
-                           <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest">+{Object.values(u.permissions).filter((v, i) => v && Object.keys(u.permissions)[i] !== 'allowedClassIds').length - 4} mais</span>
-                         )}
-                       </>
-                     )}
-                   </div>
-                </td>
-                <td className="px-8 py-5 text-right">
-                  <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
-                    <button onClick={() => onEdit(u)} className="p-2.5 bg-white text-slate-400 hover:text-blue-600 rounded-xl transition-all border border-slate-100 shadow-sm"><Edit className="w-4 h-4" /></button>
-                    {u.id !== currentUser.id && (
-                      <button onClick={() => onDelete(u.id)} className="p-2.5 bg-white text-slate-400 hover:text-red-600 rounded-xl transition-all border border-slate-100 shadow-sm"><Trash2 className="w-4 h-4" /></button>
-                    )}
-                  </div>
-                </td>
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-slate-50 border-b border-slate-100">
+                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Usuário</th>
+                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Nível de Hierarquia</th>
+                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Ações Permitidas</th>
+                <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Ações</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {paginatedUsers.map(u => (
+                <tr key={u.id} className="hover:bg-slate-50/50 transition-all group">
+                  <td className="px-8 py-5">
+                    <div className="flex items-center gap-4">
+                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-lg ${u.role === 'coordenador_paroquial' ? 'bg-slate-900 text-white' : 'bg-blue-100 text-blue-600'}`}>
+                        {u.nome.charAt(0)}
+                      </div>
+                      <div>
+                        <p className="font-bold text-slate-800">{u.nome}</p>
+                        <p className="text-xs text-slate-400">{u.email}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-8 py-5">
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest ${u.role === 'coordenador_paroquial' ? 'bg-amber-50 text-amber-700 border border-amber-100' : 'bg-blue-50 text-blue-700 border border-blue-100'}`}>
+                      {u.role === 'coordenador_paroquial' ? <ShieldCheck className="w-3 h-3" /> : <UserCircle className="w-3 h-3" />}
+                      {roleLabels[u.role] || u.role}
+                    </span>
+                  </td>
+                  <td className="px-8 py-5">
+                     <div className="flex flex-wrap gap-1 max-w-xs">
+                       {u.role === 'coordenador_paroquial' ? (
+                         <span className="bg-slate-900 text-white text-[8px] px-2 py-0.5 rounded-md font-black uppercase tracking-widest">Acesso Total</span>
+                       ) : (
+                         <>
+                           {Object.entries(u.permissions).filter(([k,v]) => v && k !== 'allowedClassIds').slice(0, 4).map(([key]) => (
+                             <span key={key} className="bg-slate-100 text-slate-500 text-[8px] px-2 py-0.5 rounded-md font-black uppercase tracking-tighter">
+                               {key.replace('_', ' ')}
+                             </span>
+                           ))}
+                           {Object.values(u.permissions).filter((v, i) => v && Object.keys(u.permissions)[i] !== 'allowedClassIds').length > 4 && (
+                             <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest">+{Object.values(u.permissions).filter((v, i) => v && Object.keys(u.permissions)[i] !== 'allowedClassIds').length - 4} mais</span>
+                           )}
+                         </>
+                       )}
+                     </div>
+                  </td>
+                  <td className="px-8 py-5 text-right">
+                    <div className="flex items-center justify-end gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all">
+                      <button onClick={() => onEdit(u)} className="p-2.5 bg-white text-slate-400 hover:text-blue-600 rounded-xl transition-all border border-slate-100 shadow-sm"><Edit className="w-4 h-4" /></button>
+                      {u.id !== currentUser.id && (
+                        <button onClick={() => onDelete(u.id)} className="p-2.5 bg-white text-slate-400 hover:text-red-600 rounded-xl transition-all border border-slate-100 shadow-sm"><Trash2 className="w-4 h-4" /></button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Mobile Card View */}
+        <div className="md:hidden divide-y divide-slate-100">
+          {paginatedUsers.map(u => (
+            <div key={u.id} className="p-6 space-y-4">
+              <div className="flex items-center gap-4">
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-lg shrink-0 ${u.role === 'coordenador_paroquial' ? 'bg-slate-900 text-white' : 'bg-blue-100 text-blue-600'}`}>
+                  {u.nome.charAt(0)}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-bold text-slate-800 truncate">{u.nome}</p>
+                  <p className="text-xs text-slate-400 truncate">{u.email}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button onClick={() => onEdit(u)} className="p-2.5 bg-white text-slate-400 hover:text-blue-600 rounded-xl border border-slate-100 shadow-sm"><Edit className="w-4 h-4" /></button>
+                  {u.id !== currentUser.id && (
+                    <button onClick={() => onDelete(u.id)} className="p-2.5 bg-white text-slate-400 hover:text-red-600 rounded-xl border border-slate-100 shadow-sm"><Trash2 className="w-4 h-4" /></button>
+                  )}
+                </div>
+              </div>
+              
+              <div className="flex flex-wrap items-center gap-2">
+                <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest ${u.role === 'coordenador_paroquial' ? 'bg-amber-50 text-amber-700 border border-amber-100' : 'bg-blue-50 text-blue-700 border border-blue-100'}`}>
+                  {u.role === 'coordenador_paroquial' ? <ShieldCheck className="w-3 h-3" /> : <UserCircle className="w-3 h-3" />}
+                  {roleLabels[u.role] || u.role}
+                </span>
+                
+                <div className="flex flex-wrap gap-1">
+                  {u.role === 'coordenador_paroquial' ? (
+                    <span className="bg-slate-900 text-white text-[8px] px-2 py-0.5 rounded-md font-black uppercase tracking-widest">Acesso Total</span>
+                  ) : (
+                    <>
+                      {Object.entries(u.permissions).filter(([k,v]) => v && k !== 'allowedClassIds').slice(0, 3).map(([key]) => (
+                        <span key={key} className="bg-slate-100 text-slate-500 text-[8px] px-2 py-0.5 rounded-md font-black uppercase tracking-tighter">
+                          {key.replace('_', ' ')}
+                        </span>
+                      ))}
+                      {Object.values(u.permissions).filter((v, i) => v && Object.keys(u.permissions)[i] !== 'allowedClassIds').length > 3 && (
+                        <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest">+{Object.values(u.permissions).filter((v, i) => v && Object.keys(u.permissions)[i] !== 'allowedClassIds').length - 3}</span>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
         <Pagination 
           currentPage={currentPage}
           totalPages={totalPages}

@@ -207,7 +207,7 @@ export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses
                       </span>
                     </td>
                     <td className="px-8 py-5 text-right" onClick={(e) => e.stopPropagation()}>
-                      <div className="flex items-center justify-end gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-all transform sm:translate-x-2 sm:group-hover:translate-x-0">
+                      <div className="flex items-center justify-end gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all transform md:translate-x-2 md:group-hover:translate-x-0">
                         <button 
                           onClick={() => onView(student)}
                           className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-white rounded-xl transition-all border border-transparent hover:border-slate-100 shadow-sm sm:shadow-none hover:shadow-sm bg-slate-50 sm:bg-transparent"

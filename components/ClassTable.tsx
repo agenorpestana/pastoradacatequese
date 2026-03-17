@@ -130,7 +130,7 @@ export const ClassTable: React.FC<ClassTableProps> = ({
                       </div>
                     </td>
                     <td className="px-8 py-5 text-right">
-                      <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
+                      <div className="flex items-center justify-end gap-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-all md:translate-x-4 md:group-hover:translate-x-0">
                         <button 
                           onClick={() => onTakeAttendance(turma)}
                           className="p-2.5 text-green-600 hover:bg-green-50 rounded-xl border border-transparent hover:border-green-200 transition-all"
