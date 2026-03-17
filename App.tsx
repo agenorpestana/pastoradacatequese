@@ -939,26 +939,6 @@ const App: React.FC = () => {
     } catch (e) { alert(e); }
   };
 
-  if (isLoadingAuth) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="flex flex-col items-center gap-4">
-          <div className="animate-spin text-blue-600"><Loader2 className="w-10 h-10" /></div>
-          <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Carregando Sistema...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return (
-      <>
-        <Login onLogin={async (u, p) => await onLoginSubmit(u, p)} />
-        <PwaInstallPrompt />
-      </>
-    );
-  }
-
   // Ensure admins and super users always have all permissions
   const currentUser = useMemo(() => {
     if (!user) return null;
@@ -1002,6 +982,26 @@ const App: React.FC = () => {
     }
     return user;
   }, [user]);
+
+  if (isLoadingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin text-blue-600"><Loader2 className="w-10 h-10" /></div>
+          <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Carregando Sistema...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <>
+        <Login onLogin={async (u, p) => await onLoginSubmit(u, p)} />
+        <PwaInstallPrompt />
+      </>
+    );
+  }
 
   const renderContent = () => {
     if (!currentUser) return null;
