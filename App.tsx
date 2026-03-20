@@ -983,6 +983,40 @@ const App: React.FC = () => {
     return user;
   }, [user]);
 
+  const visibleClasses = useMemo(() => {
+    if (!currentUser) return [];
+    if (currentUser.role === 'coordenador_paroquial') return classes;
+    
+    if (currentUser.role === 'catequista' || currentUser.role === 'catequista_auxiliar') {
+      let linkedClasses: Turma[] = [];
+      if (currentUser.linkedCatequistaId) {
+        const linkedCat = catequistas.find(c => c.id === currentUser.linkedCatequistaId);
+        if (linkedCat) {
+          linkedClasses = classes.filter(c => c.catequista.includes(linkedCat.nome));
+        }
+      }
+      
+      let manualClasses: Turma[] = [];
+      if (currentUser.permissions.allowedClassIds && currentUser.permissions.allowedClassIds.length > 0) {
+        manualClasses = classes.filter(c => currentUser.permissions.allowedClassIds?.includes(c.id));
+      }
+      
+      const allAllowed = [...linkedClasses, ...manualClasses];
+      return allAllowed.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i);
+    }
+    
+    // Para outros papéis (ex: coordenador_comunidade), se tiver turmas permitidas explícitas, restringir a elas
+    if (currentUser.permissions.allowedClassIds && currentUser.permissions.allowedClassIds.length > 0) {
+      return classes.filter(c => currentUser.permissions.allowedClassIds?.includes(c.id));
+    }
+    
+    return classes;
+  }, [currentUser, classes, catequistas]);
+
+  const visibleStudents = useMemo(() => {
+    return students;
+  }, [students]);
+
   if (isLoadingAuth) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -1014,24 +1048,6 @@ const App: React.FC = () => {
           </div>
         </div>
       );
-    }
-
-    // Filter classes and students based on user role and linked catequista
-    let visibleClasses = classes;
-    let visibleStudents = students;
-
-    if (currentUser.role === 'catequista' || currentUser.role === 'catequista_auxiliar') {
-      if (currentUser.linkedCatequistaId) {
-        const linkedCat = catequistas.find(c => c.id === currentUser.linkedCatequistaId);
-        if (linkedCat) {
-          visibleClasses = classes.filter(c => c.catequista.includes(linkedCat.nome));
-          // visibleStudents = students; // Dashboard and Student List should show all
-        } else {
-          visibleClasses = [];
-        }
-      } else {
-        visibleClasses = [];
-      }
     }
 
     switch (view) {
@@ -1069,6 +1085,8 @@ const App: React.FC = () => {
                   onView={(s) => setViewingStudent(s)}
                   onManageDocuments={(s) => setManagingDocumentsStudent(s)}
                   onAddNew={currentUser.permissions.students_create ? () => { setEditingStudent(null); setView('register'); } : undefined}
+                  currentUser={currentUser}
+                  allowedClasses={visibleClasses}
                />;
       case 'classes_list':
         return <ClassTable 
@@ -1242,6 +1260,8 @@ const App: React.FC = () => {
             config={parishConfig}
             allStudents={viewingClassMembers ? students.filter(s => s.turma === viewingClassMembers.nome) : undefined}
             onSelectStudent={(s) => setViewingStudent(s)}
+            currentUser={currentUser}
+            allowedClasses={visibleClasses}
           />
         )}
 

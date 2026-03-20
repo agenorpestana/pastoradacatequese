@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Search, Filter, MoreHorizontal, Eye, Trash2, Calendar, Phone, MapPin, Edit, UserCheck, UserX, GraduationCap, Fingerprint, UserPlus, BookOpen, FileText, Users, Sparkles } from 'lucide-react';
-import { Student, TurmaLevel, Turma, NivelEtapa } from '../types';
+import { Student, TurmaLevel, Turma, NivelEtapa, User } from '../types';
 import { Pagination } from './Pagination';
 
 interface StudentTableProps {
@@ -13,9 +13,22 @@ interface StudentTableProps {
   onEdit: (student: Student) => void;
   onManageDocuments: (student: Student) => void;
   onAddNew?: () => void;
+  currentUser: User;
+  allowedClasses: Turma[];
 }
 
-export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses, niveis, onDelete, onView, onEdit, onManageDocuments, onAddNew }) => {
+export const StudentTable: React.FC<StudentTableProps> = ({ 
+  students, 
+  allClasses, 
+  niveis, 
+  onDelete, 
+  onView, 
+  onEdit, 
+  onManageDocuments, 
+  onAddNew,
+  currentUser,
+  allowedClasses
+}) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTurma, setSelectedTurma] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<'all' | 'Ativo' | 'Inativo' | 'Concluido'>('all');
@@ -57,6 +70,44 @@ export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const canEditStudent = (student: Student) => {
+    if (currentUser.role === 'coordenador_paroquial') return true;
+    if (!currentUser.permissions.students_edit) return false;
+    
+    // Se o usuário tiver turmas permitidas explícitas (via vínculo ou manual), restringir a elas
+    if (allowedClasses && allowedClasses.length > 0) {
+      if (!student.turma) return false;
+      return allowedClasses.some(c => 
+        c.nome.trim().toLowerCase() === student.turma.trim().toLowerCase()
+      );
+    }
+    
+    // Se for catequista e não tiver turmas permitidas, não pode editar ninguém (segurança)
+    if (currentUser.role === 'catequista' || currentUser.role === 'catequista_auxiliar') {
+       return false;
+    }
+
+    return true;
+  };
+
+  const canDeleteStudent = (student: Student) => {
+    if (currentUser.role === 'coordenador_paroquial') return true;
+    if (!currentUser.permissions.students_delete) return false;
+    
+    if (allowedClasses && allowedClasses.length > 0) {
+      if (!student.turma) return false;
+      return allowedClasses.some(c => 
+        c.nome.trim().toLowerCase() === student.turma.trim().toLowerCase()
+      );
+    }
+    
+    if (currentUser.role === 'catequista' || currentUser.role === 'catequista_auxiliar') {
+       return false;
+    }
+
+    return true;
   };
 
   return (
@@ -222,20 +273,24 @@ export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses
                         >
                           <FileText className="w-4.5 h-4.5" />
                         </button>
-                        <button 
-                          onClick={() => onEdit(student)}
-                          className="p-2.5 text-slate-400 hover:text-indigo-600 hover:bg-white rounded-xl transition-all border border-transparent hover:border-slate-100 shadow-sm sm:shadow-none hover:shadow-sm bg-slate-50 sm:bg-transparent"
-                          title="Editar Cadastro"
-                        >
-                          <Edit className="w-4.5 h-4.5" />
-                        </button>
-                        <button 
-                          onClick={() => onDelete(student.id)}
-                          className="p-2.5 text-slate-400 hover:text-red-600 hover:bg-white rounded-xl transition-all border border-transparent hover:border-slate-100 shadow-sm sm:shadow-none hover:shadow-sm bg-slate-50 sm:bg-transparent"
-                          title="Excluir"
-                        >
-                          <Trash2 className="w-4.5 h-4.5" />
-                        </button>
+                        {canEditStudent(student) && (
+                          <button 
+                            onClick={() => onEdit(student)}
+                            className="p-2.5 text-slate-400 hover:text-indigo-600 hover:bg-white rounded-xl transition-all border border-transparent hover:border-slate-100 shadow-sm sm:shadow-none hover:shadow-sm bg-slate-50 sm:bg-transparent"
+                            title="Editar Cadastro"
+                          >
+                            <Edit className="w-4.5 h-4.5" />
+                          </button>
+                        )}
+                        {canDeleteStudent(student) && (
+                          <button 
+                            onClick={() => onDelete(student.id)}
+                            className="p-2.5 text-slate-400 hover:text-red-600 hover:bg-white rounded-xl transition-all border border-transparent hover:border-slate-100 shadow-sm sm:shadow-none hover:shadow-sm bg-slate-50 sm:bg-transparent"
+                            title="Excluir"
+                          >
+                            <Trash2 className="w-4.5 h-4.5" />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -323,18 +378,22 @@ export const StudentTable: React.FC<StudentTableProps> = ({ students, allClasses
                     >
                       <FileText className="w-4.5 h-4.5" />
                     </button>
-                    <button 
-                      onClick={() => onEdit(student)}
-                      className="p-2.5 text-slate-400 hover:text-indigo-600 bg-slate-50 rounded-xl border border-slate-100"
-                    >
-                      <Edit className="w-4.5 h-4.5" />
-                    </button>
-                    <button 
-                      onClick={() => onDelete(student.id)}
-                      className="p-2.5 text-slate-400 hover:text-red-600 bg-slate-50 rounded-xl border border-slate-100"
-                    >
-                      <Trash2 className="w-4.5 h-4.5" />
-                    </button>
+                    {canEditStudent(student) && (
+                      <button 
+                        onClick={() => onEdit(student)}
+                        className="p-2.5 text-slate-400 hover:text-indigo-600 bg-slate-50 rounded-xl border border-slate-100"
+                      >
+                        <Edit className="w-4.5 h-4.5" />
+                      </button>
+                    )}
+                    {canDeleteStudent(student) && (
+                      <button 
+                        onClick={() => onDelete(student.id)}
+                        className="p-2.5 text-slate-400 hover:text-red-600 bg-slate-50 rounded-xl border border-slate-100"
+                      >
+                        <Trash2 className="w-4.5 h-4.5" />
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

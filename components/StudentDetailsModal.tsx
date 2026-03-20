@@ -2,13 +2,13 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { 
-  X, Printer, Sparkles, Loader2, Quote, User, Phone, 
+  X, Printer, Sparkles, Loader2, Quote, User as UserIcon, Phone, 
   MapPin, Church, Users, Wine, BookOpen, Fingerprint, 
   CheckCircle, XCircle, BarChart, Calendar, BookOpenText,
   Award, FileBadge, Waves, ArrowLeft, ChevronLeft, ChevronRight,
   Edit
 } from 'lucide-react';
-import { Student, AttendanceSession, Turma, ParishConfig } from '../types';
+import { Student, AttendanceSession, Turma, ParishConfig, User } from '../types';
 import { generateSpiritualGoal } from '../services/geminiService';
 
 interface StudentDetailsModalProps {
@@ -21,6 +21,8 @@ interface StudentDetailsModalProps {
   config: ParishConfig;
   allStudents?: Student[];
   onSelectStudent?: (student: Student) => void;
+  currentUser: User;
+  allowedClasses: Turma[];
 }
 
 export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({ 
@@ -32,7 +34,9 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
   onGenerateCertificate,
   config,
   allStudents,
-  onSelectStudent
+  onSelectStudent,
+  currentUser,
+  allowedClasses
 }) => {
   const [goal, setGoal] = useState<string | null>(null);
   const [loadingGoal, setLoadingGoal] = useState(false);
@@ -70,6 +74,26 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
   
   const presenceRate = totalSessions > 0 ? ((presentSessions / totalSessions) * 100).toFixed(0) : '0';
   const absenceRate = totalSessions > 0 ? ((absentSessions / totalSessions) * 100).toFixed(0) : '0';
+
+  const canEditStudent = () => {
+    if (currentUser.role === 'coordenador_paroquial') return true;
+    if (!currentUser.permissions.students_edit) return false;
+    
+    // Se o usuário tiver turmas permitidas explícitas (via vínculo ou manual), restringir a elas
+    if (allowedClasses && allowedClasses.length > 0) {
+      if (!student.turma) return false;
+      return allowedClasses.some(c => 
+        c.nome.trim().toLowerCase() === student.turma.trim().toLowerCase()
+      );
+    }
+    
+    // Se for catequista e não tiver turmas permitidas, não pode editar ninguém (segurança)
+    if (currentUser.role === 'catequista' || currentUser.role === 'catequista_auxiliar') {
+       return false;
+    }
+
+    return true;
+  };
 
   const formatDate = (dateStr: string | undefined) => {
     if (!dateStr) return '---';
@@ -113,15 +137,25 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
                 top: 0;
                 left: 0;
                 width: 100%;
+                height: 100%;
                 background: white;
                 z-index: 99999;
+              }
+              .print-container {
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+              }
+              .print-container table {
+                flex: 1;
+                height: 100%;
               }
               /* Garantir que outros modais de impressão não apareçam */
               .print-class-members, .print-attendance-report, .print-attendance-diary, .print-class-history { display: none !important; }
             }
           `}</style>
           <div className="print-container">
-            <table>
+            <table className="w-full h-full">
               <thead>
                 <tr>
                   <td>
@@ -284,7 +318,7 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
                         </div>
                       </section>
 
-                      <div className="mt-12 grid grid-cols-2 gap-12">
+                      <div className="mt-24 grid grid-cols-2 gap-12">
                         <div className="text-center">
                           <div className="border-t border-slate-900 pt-1 text-[11px] font-bold uppercase">Assinatura do Responsável</div>
                         </div>
@@ -398,7 +432,7 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
               </div>
               
               <div className="flex gap-2 w-full md:w-auto">
-                {onEdit && (
+                {onEdit && canEditStudent() && (
                   <button 
                     onClick={() => onEdit(student)}
                     className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 md:px-6 py-2.5 md:py-3 bg-blue-600 text-white text-[9px] md:text-xs font-bold rounded-xl md:rounded-2xl shadow-lg hover:bg-blue-700 transition-all active:scale-95"

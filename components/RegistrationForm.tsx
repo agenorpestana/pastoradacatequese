@@ -398,15 +398,25 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                 top: 0;
                 left: 0;
                 width: 100%;
+                height: 100%;
                 background: white;
                 z-index: 99999;
+              }
+              .print-container {
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+              }
+              .print-container table {
+                flex: 1;
+                height: 100%;
               }
               /* Garantir que outros modais de impressão não apareçam */
               .print-class-members, .print-attendance-report, .print-attendance-diary, .print-class-history { display: none !important; }
             }
           `}</style>
           <div className="print-container">
-            <table className="w-full">
+            <table className="w-full h-full">
               <thead>
                 <tr>
                   <td>
@@ -569,7 +579,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                         </div>
                       </section>
 
-                      <div className="mt-12 grid grid-cols-2 gap-12">
+                      <div className="mt-24 grid grid-cols-2 gap-12">
                         <div className="text-center">
                           <div className="border-t border-slate-900 pt-1 text-[11px] font-bold uppercase">Assinatura do Responsável</div>
                         </div>
