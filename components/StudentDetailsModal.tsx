@@ -146,16 +146,20 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
                 display: flex;
                 flex-direction: column;
               }
-              .print-container table {
-                flex: 1;
-                height: 100%;
+              .print-content {
+                flex-grow: 1;
+              }
+              .print-footer {
+                margin-top: auto;
+                page-break-inside: avoid;
               }
               /* Garantir que outros modais de impressão não apareçam */
               .print-class-members, .print-attendance-report, .print-attendance-diary, .print-class-history { display: none !important; }
             }
           `}</style>
           <div className="print-container">
-            <table className="w-full h-full">
+            <div className="print-content">
+              <table className="w-full">
               <thead>
                 <tr>
                   <td>
@@ -318,7 +322,7 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
                         </div>
                       </section>
 
-                      <div className="mt-24 grid grid-cols-2 gap-12">
+                      <div className="mt-40 grid grid-cols-2 gap-12">
                         <div className="text-center">
                           <div className="border-t border-slate-900 pt-1 text-[11px] font-bold uppercase">Assinatura do Responsável</div>
                         </div>
@@ -330,31 +334,25 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
                   </td>
                 </tr>
               </tbody>
-
-              <tfoot>
-                <tr>
-                  <td>
-                    {/* Footer */}
-                    <div className="p-5 border-t-2 border-slate-900 text-center bg-white">
-                      <p className="text-[10px] font-bold uppercase">
-                        {config.address} - {config.city}/{config.state}
-                      </p>
-                      <div className="flex justify-center gap-4 mt-1 text-[10px] font-bold uppercase">
-                        {config.phone && <span>Tel: {config.phone}</span>}
-                        {config.whatsapp && <span>Zap: {config.whatsapp}</span>}
-                        {config.email && <span>Email: {config.email}</span>}
-                      </div>
-                      <div className="flex justify-center gap-4 mt-0.5 text-[10px] font-bold uppercase text-slate-600">
-                        {config.instagram && <span>Insta: {config.instagram}</span>}
-                        {config.facebook && <span>Face: {config.facebook}</span>}
-                        {config.website && <span>Site: {config.website}</span>}
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              </tfoot>
             </table>
           </div>
+
+          <div className="print-footer p-5 border-t-2 border-slate-900 text-center bg-white">
+            <p className="text-[10px] font-bold uppercase">
+              {config.address} - {config.city}/{config.state}
+            </p>
+            <div className="flex justify-center gap-4 mt-1 text-[10px] font-bold uppercase">
+              {config.phone && <span>Tel: {config.phone}</span>}
+              {config.whatsapp && <span>Zap: {config.whatsapp}</span>}
+              {config.email && <span>Email: {config.email}</span>}
+            </div>
+            <div className="flex justify-center gap-4 mt-0.5 text-[10px] font-bold uppercase text-slate-600">
+              {config.instagram && <span>Insta: {config.instagram}</span>}
+              {config.facebook && <span>Face: {config.facebook}</span>}
+              {config.website && <span>Site: {config.website}</span>}
+            </div>
+          </div>
+        </div>
         </div>,
         document.body
       )}

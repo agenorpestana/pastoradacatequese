@@ -1014,8 +1014,25 @@ const App: React.FC = () => {
   }, [currentUser, classes, catequistas]);
 
   const visibleStudents = useMemo(() => {
+    if (!currentUser) return [];
+    
+    // Coordenador paroquial vê todos
+    if (currentUser.role === 'coordenador_paroquial') return students;
+    
+    // Se o usuário tiver turmas permitidas (via vínculo ou manual), filtrar estudantes por essas turmas
+    if (visibleClasses.length > 0) {
+      const allowedClassNames = visibleClasses.map(c => c.nome.trim().toLowerCase());
+      return students.filter(s => s.turma && allowedClassNames.includes(s.turma.trim().toLowerCase()));
+    }
+    
+    // Se for catequista ou auxiliar e não tiver turmas vinculadas, não vê ninguém (segurança)
+    if (currentUser.role === 'catequista' || currentUser.role === 'catequista_auxiliar') {
+      return [];
+    }
+    
+    // Para outros papéis sem restrição explícita, vê todos (ou você pode decidir restringir por padrão)
     return students;
-  }, [students]);
+  }, [currentUser, students, visibleClasses]);
 
   if (isLoadingAuth) {
     return (
