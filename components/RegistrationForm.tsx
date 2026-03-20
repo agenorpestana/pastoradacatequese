@@ -393,75 +393,79 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
               body { -webkit-print-color-adjust: exact; margin: 0; background: white !important; }
               body > *:not(.print-student-ficha) { display: none !important; }
               .print-student-ficha { 
-                display: flex !important; 
-                flex-direction: column;
-                position: absolute !important;
+                display: block !important; 
+                background: white;
+                width: 100%;
+              }
+              .print-header {
+                position: fixed;
                 top: 0;
                 left: 0;
-                width: 100%;
-                min-height: 297mm;
+                right: 0;
+                height: 140px;
                 background: white;
-                z-index: 99999;
-              }
-              .print-container {
-                flex: 1;
+                z-index: 10000;
+                border-bottom: 2px solid #0f172a;
+                padding: 0 10mm;
                 display: flex;
-                flex-direction: column;
-                padding: 0;
-              }
-              .print-content {
-                flex: 1;
+                align-items: center;
               }
               .print-footer {
-                page-break-inside: avoid;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 100px;
+                background: white;
                 border-top: 2px solid #0f172a;
-                padding: 20px 0;
-                margin-top: auto;
+                text-align: center;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                z-index: 10000;
+                padding: 0 10mm;
+              }
+              .print-main {
+                padding: 150px 10mm 110px 10mm;
+                width: 100%;
+              }
+              .signature-spacer {
+                height: 120px;
               }
               /* Garantir que outros modais de impressão não apareçam */
               .print-class-members, .print-attendance-report, .print-attendance-diary, .print-class-history { display: none !important; }
             }
           `}</style>
-          <div className="print-container">
-            <div className="print-content">
-              <table className="w-full">
-              <thead>
-                <tr>
-                  <td>
-                    {/* Header */}
-                    <div className="p-5 border-b-2 border-slate-900 flex justify-between items-center bg-white">
-                      <div className="flex items-center gap-3">
-                        {config.logo ? (
-                          <img src={config.logo} className="w-16 h-16 object-contain" referrerPolicy="no-referrer" />
-                        ) : (
-                          <Church className="w-10 h-10" />
-                        )}
-                        <div>
-                          <h1 className="text-xl font-black uppercase tracking-tighter">Ficha de Inscrição Catequizando</h1>
-                          <div className="text-[12px] font-bold uppercase mt-1">
-                            <p>{config.parishName}</p>
-                            <p>{config.dioceseName}</p>
-                            <p>{config.city}-{config.state}</p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-[10px] font-bold uppercase">Matrícula</p>
-                        <p className="text-lg font-black">{formData.matricula || '________'}</p>
-                        <p className="text-[9px] uppercase font-bold text-slate-400 mt-0.5">
-                          Data: {formatDate(formData.dataCadastro)}
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              </thead>
+          <div className="print-header">
+            <div className="w-full flex justify-between items-center bg-white">
+              <div className="flex items-center gap-3">
+                {config.logo ? (
+                  <img src={config.logo} className="w-16 h-16 object-contain" referrerPolicy="no-referrer" />
+                ) : (
+                  <Church className="w-10 h-10" />
+                )}
+                <div>
+                  <h1 className="text-xl font-black uppercase tracking-tighter">Ficha de Inscrição Catequizando</h1>
+                  <div className="text-[12px] font-bold uppercase mt-1">
+                    <p>{config.parishName}</p>
+                    <p>{config.dioceseName}</p>
+                    <p>{config.city}-{config.state}</p>
+                  </div>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">Matrícula</p>
+                <p className="text-xl font-black text-slate-900">{formData.matricula || '---'}</p>
+                <p className="text-[9px] uppercase font-bold text-slate-400 mt-1">
+                  Data: {formatDate(formData.dataCadastro)}
+                </p>
+              </div>
+            </div>
+          </div>
 
-              <tbody>
-                <tr>
-                  <td>
-                    {/* Content */}
-                    <div className="p-5 space-y-4">
+          <div className="print-main">
+            <div className="space-y-6">
+
                       <section className="relative">
                         {formData.foto && (
                           <div className="absolute top-0 right-0 w-24 h-28 border border-slate-900 overflow-hidden bg-white">
@@ -587,7 +591,9 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                         </div>
                       </section>
 
-                      <div className="mt-80 grid grid-cols-2 gap-12">
+                      <div className="signature-spacer"></div>
+
+                      <div className="grid grid-cols-2 gap-12">
                         <div className="text-center">
                           <div className="border-t border-slate-900 pt-1 text-[11px] font-bold uppercase">Assinatura do Responsável</div>
                         </div>
@@ -595,14 +601,10 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                           <div className="border-t border-slate-900 pt-1 text-[11px] font-bold uppercase">Assinatura Catequista</div>
                         </div>
                       </div>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            </div>
           </div>
 
-          <div className="print-footer text-center bg-white">
+          <div className="print-footer bg-white">
             <p className="text-[10px] font-bold uppercase">
               {config.address} - {config.city}/{config.state}
             </p>
@@ -617,7 +619,6 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
               {config.website && <span>Site: {config.website}</span>}
             </div>
           </div>
-        </div>
         </div>,
         document.body
       )}
