@@ -132,28 +132,30 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
               body { -webkit-print-color-adjust: exact; margin: 0; background: white !important; }
               #root, .no-print { display: none !important; }
               .print-student-ficha { 
-                display: block !important; 
+                display: flex !important; 
+                flex-direction: column;
                 position: absolute !important;
                 top: 0;
                 left: 0;
                 width: 100%;
-                height: 100%;
+                min-height: 297mm;
                 background: white;
                 z-index: 99999;
               }
               .print-container {
-                min-height: 277mm;
+                flex: 1;
                 display: flex;
                 flex-direction: column;
+                padding: 0;
               }
               .print-content {
-                flex-grow: 1;
+                flex: 1;
               }
               .print-footer {
-                margin-top: auto;
                 page-break-inside: avoid;
                 border-top: 2px solid #0f172a;
                 padding: 20px 0;
+                margin-top: auto;
               }
               /* Garantir que outros modais de impressão não apareçam */
               .print-class-members, .print-attendance-report, .print-attendance-diary, .print-class-history { display: none !important; }
@@ -324,7 +326,7 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
                         </div>
                       </section>
 
-                      <div className="mt-60 grid grid-cols-2 gap-12">
+                      <div className="mt-80 grid grid-cols-2 gap-12">
                         <div className="text-center">
                           <div className="border-t border-slate-900 pt-1 text-[11px] font-bold uppercase">Assinatura do Responsável</div>
                         </div>
