@@ -136,18 +136,38 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
                 background: white;
                 width: 100%;
               }
-              .print-header-content {
-                width: 100%;
+              .print-header-fixed {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 140px;
+                background: white;
+                z-index: 10000;
                 border-bottom: 2px solid #0f172a;
+                padding: 0 10mm;
+                display: flex;
+                align-items: center;
               }
-              .print-footer-content {
-                width: 100%;
+              .print-footer-fixed {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 100px;
+                background: white;
                 border-top: 2px solid #0f172a;
                 text-align: center;
-                padding: 10px 0;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                z-index: 10000;
+                padding: 0 10mm;
               }
+              .header-spacer { height: 140px; }
+              .footer-spacer { height: 100px; }
               .print-main-content {
-                padding: 20px 0;
+                padding: 0;
               }
               .signature-spacer {
                 height: 120px;
@@ -158,34 +178,54 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
               .print-class-members, .print-attendance-report, .print-attendance-diary, .print-class-history { display: none !important; }
             }
           `}</style>
+          <div className="print-header-fixed">
+            <div className="w-full flex justify-between items-center bg-white">
+              <div className="flex items-center gap-3">
+                {config.logo ? (
+                  <img src={config.logo} className="w-16 h-16 object-contain" referrerPolicy="no-referrer" />
+                ) : (
+                  <Church className="w-10 h-10" />
+                )}
+                <div>
+                  <h1 className="text-xl font-black uppercase tracking-tighter">Ficha de Inscrição Catequizando</h1>
+                  <div className="text-[12px] font-bold uppercase mt-1">
+                    <p>{config.parishName}</p>
+                    <p>{config.dioceseName}</p>
+                    <p>{config.city}-{config.state}</p>
+                  </div>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">Matrícula</p>
+                <p className="text-xl font-black text-slate-900">{student.matricula || '---'}</p>
+                <p className="text-[9px] uppercase font-bold text-slate-400 mt-1">
+                  Data: {formatDate(student.dataCadastro)}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="print-footer-fixed">
+            <p className="text-[10px] font-bold uppercase">
+              {config.address} - {config.city}/{config.state}
+            </p>
+            <div className="flex justify-center gap-4 mt-1 text-[10px] font-bold uppercase">
+              {config.phone && <span>Tel: {config.phone}</span>}
+              {config.whatsapp && <span>Zap: {config.whatsapp}</span>}
+              {config.email && <span>Email: {config.email}</span>}
+            </div>
+            <div className="flex justify-center gap-4 mt-0.5 text-[10px] font-bold uppercase text-slate-600">
+              {config.instagram && <span>Insta: {config.instagram}</span>}
+              {config.facebook && <span>Face: {config.facebook}</span>}
+              {config.website && <span>Site: {config.website}</span>}
+            </div>
+          </div>
+
           <table className="w-full border-collapse">
             <thead>
               <tr>
                 <td>
-                  <div className="print-header-content p-5 flex justify-between items-center bg-white">
-                    <div className="flex items-center gap-3">
-                      {config.logo ? (
-                        <img src={config.logo} className="w-16 h-16 object-contain" referrerPolicy="no-referrer" />
-                      ) : (
-                        <Church className="w-10 h-10" />
-                      )}
-                      <div>
-                        <h1 className="text-xl font-black uppercase tracking-tighter">Ficha de Inscrição Catequizando</h1>
-                        <div className="text-[12px] font-bold uppercase mt-1">
-                          <p>{config.parishName}</p>
-                          <p>{config.dioceseName}</p>
-                          <p>{config.city}-{config.state}</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">Matrícula</p>
-                      <p className="text-xl font-black text-slate-900">{student.matricula || '---'}</p>
-                      <p className="text-[9px] uppercase font-bold text-slate-400 mt-1">
-                        Data: {formatDate(student.dataCadastro)}
-                      </p>
-                    </div>
-                  </div>
+                  <div className="header-spacer"></div>
                 </td>
               </tr>
             </thead>
@@ -335,21 +375,7 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
             <tfoot>
               <tr>
                 <td>
-                  <div className="print-footer-content bg-white">
-                    <p className="text-[10px] font-bold uppercase">
-                      {config.address} - {config.city}/{config.state}
-                    </p>
-                    <div className="flex justify-center gap-4 mt-1 text-[10px] font-bold uppercase">
-                      {config.phone && <span>Tel: {config.phone}</span>}
-                      {config.whatsapp && <span>Zap: {config.whatsapp}</span>}
-                      {config.email && <span>Email: {config.email}</span>}
-                    </div>
-                    <div className="flex justify-center gap-4 mt-0.5 text-[10px] font-bold uppercase text-slate-600">
-                      {config.instagram && <span>Insta: {config.instagram}</span>}
-                      {config.facebook && <span>Face: {config.facebook}</span>}
-                      {config.website && <span>Site: {config.website}</span>}
-                    </div>
-                  </div>
+                  <div className="footer-spacer"></div>
                 </td>
               </tr>
             </tfoot>
