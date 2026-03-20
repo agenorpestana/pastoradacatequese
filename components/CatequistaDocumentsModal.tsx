@@ -13,6 +13,7 @@ export const CatequistaDocumentsModal: React.FC<CatequistaDocumentsModalProps> =
   const [documents, setDocuments] = useState<StudentDocument[]>(catequista.documentos || []);
   const [isUploading, setIsUploading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [customFileName, setCustomFileName] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -23,7 +24,7 @@ export const CatequistaDocumentsModal: React.FC<CatequistaDocumentsModalProps> =
       reader.onloadend = () => {
         const newDoc: StudentDocument = {
           id: Math.random().toString(36).substr(2, 9),
-          nome: file.name,
+          nome: customFileName.trim() || file.name,
           url: reader.result as string,
           tipo: file.type,
           dataUpload: new Date().toISOString()
@@ -31,6 +32,7 @@ export const CatequistaDocumentsModal: React.FC<CatequistaDocumentsModalProps> =
         const updatedDocs = [...documents, newDoc];
         setDocuments(updatedDocs);
         onUpdateDocuments(updatedDocs);
+        setCustomFileName('');
         setIsUploading(false);
         if (fileInputRef.current) fileInputRef.current.value = '';
       };
@@ -75,7 +77,7 @@ export const CatequistaDocumentsModal: React.FC<CatequistaDocumentsModalProps> =
           </button>
         </div>
 
-        <div className="p-4 md:p-6 bg-slate-50 border-b border-slate-100 flex flex-col sm:flex-row gap-3 md:gap-4 shrink-0">
+        <div className="p-3 md:p-6 bg-slate-50 border-b border-slate-100 space-y-3 md:space-y-4 shrink-0">
           <div className="flex-1 relative">
             <input 
               type="text" 
@@ -85,14 +87,27 @@ export const CatequistaDocumentsModal: React.FC<CatequistaDocumentsModalProps> =
               className="w-full pl-5 pr-4 py-2 md:py-2.5 bg-white border border-slate-200 rounded-xl text-xs md:text-sm outline-none focus:ring-4 focus:ring-amber-500/10 transition-all font-medium"
             />
           </div>
-          <button 
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isUploading}
-            className="bg-amber-600 hover:bg-amber-700 text-white px-4 md:px-6 py-2.5 rounded-xl flex items-center justify-center gap-2 font-black text-[9px] md:text-[10px] uppercase tracking-widest shadow-lg shadow-amber-500/20 transition-all disabled:opacity-50"
-          >
-            {isUploading ? <Loader2 className="w-3.5 h-3.5 md:w-4 md:h-4 animate-spin" /> : <Plus className="w-3.5 h-3.5 md:w-4 md:h-4" />}
-            Anexar Arquivo
-          </button>
+          
+          <div className="flex flex-col sm:flex-row gap-3 md:gap-4 items-end">
+            <div className="flex-1 w-full">
+              <label className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block ml-1">Nome para o novo anexo (opcional)</label>
+              <input 
+                type="text" 
+                placeholder="Ex: Certidão de Nascimento"
+                value={customFileName}
+                onChange={e => setCustomFileName(e.target.value)}
+                className="w-full px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs md:text-sm outline-none focus:ring-4 focus:ring-amber-500/10 transition-all font-medium"
+              />
+            </div>
+            <button 
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploading}
+              className="w-full sm:w-auto bg-amber-600 hover:bg-amber-700 text-white px-6 py-2.5 rounded-xl flex items-center justify-center gap-2 font-black text-[9px] md:text-[10px] uppercase tracking-widest shadow-lg shadow-amber-500/20 transition-all disabled:opacity-50 h-[42px]"
+            >
+              {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+              Anexar Arquivo
+            </button>
+          </div>
           <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileChange} />
         </div>
 

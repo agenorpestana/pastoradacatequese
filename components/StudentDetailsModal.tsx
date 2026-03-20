@@ -134,7 +134,7 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
                           <Church className="w-10 h-10" />
                         )}
                         <div>
-                          <h1 className="text-xl font-black uppercase tracking-tighter">Ficha de Inscrição Catequética</h1>
+                          <h1 className="text-xl font-black uppercase tracking-tighter">Ficha de Inscrição Catequizando</h1>
                           <div className="text-[12px] font-bold uppercase mt-1">
                             <p>{config.parishName}</p>
                             <p>{config.dioceseName}</p>
@@ -259,8 +259,7 @@ export const StudentDetailsModal: React.FC<StudentDetailsModalProps> = ({
                                 <p><strong>Data:</strong> {formatDate(student.dataCelebracao)}</p>
                                 <p><strong>Local:</strong> {student.localCelebracao || '---'}</p>
                                 <p className="col-span-2"><strong>Celebrante:</strong> {student.celebrante || '---'}</p>
-                                <p className="col-span-2"><strong>Diocese:</strong> {student.dioceseCelebracao || '---'} | <strong>UF:</strong> {student.ufCelebracao || '---'}</p>
-                                <p><strong>Livro:</strong> {student.livro || '--'} | <strong>Folha:</strong> {student.folha || '--'} | <strong>Registro:</strong> {student.numeroRegistro || '--'}</p>
+                                <p className="col-span-2"><strong>Diocese:</strong> {student.dioceseCelebracao || '---'} | <strong>Cidade:</strong> {student.cidade || '---'} | <strong>UF:</strong> {student.ufCelebracao || '---'}</p>
                               </div>
                             </div>
                           )}

@@ -419,7 +419,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                           <Church className="w-10 h-10" />
                         )}
                         <div>
-                          <h1 className="text-xl font-black uppercase tracking-tighter">Ficha de Inscrição Catequética</h1>
+                          <h1 className="text-xl font-black uppercase tracking-tighter">Ficha de Inscrição Catequizando</h1>
                           <div className="text-[12px] font-bold uppercase mt-1">
                             <p>{config.parishName}</p>
                             <p>{config.dioceseName}</p>
@@ -544,8 +544,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                                 <p><strong>Data:</strong> {formatDate(formData.dataCelebracao)}</p>
                                 <p><strong>Local:</strong> {formData.localCelebracao || '---'}</p>
                                 <p className="col-span-2"><strong>Celebrante:</strong> {formData.celebrante || '---'}</p>
-                                <p className="col-span-2"><strong>Diocese:</strong> {formData.dioceseCelebracao || '---'} | <strong>UF:</strong> {formData.ufCelebracao || '---'}</p>
-                                <p><strong>Livro:</strong> {formData.livro || '--'} | <strong>Folha:</strong> {formData.folha || '--'} | <strong>Registro:</strong> {formData.numeroRegistro || '--'}</p>
+                                <p className="col-span-2"><strong>Diocese:</strong> {formData.dioceseCelebracao || '---'} | <strong>Cidade:</strong> {formData.cidade || '---'} | <strong>UF:</strong> {formData.ufCelebracao || '---'}</p>
                               </div>
                             </div>
                           )}
