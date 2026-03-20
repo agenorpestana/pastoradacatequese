@@ -1071,7 +1071,7 @@ const App: React.FC = () => {
       case 'dashboard':
         return <DashboardContent 
                   events={events} 
-                  students={visibleStudents} 
+                  students={students} 
                   classes={classes} 
                   catequistas={catequistas}
                   suggestedDate={selectedDate}

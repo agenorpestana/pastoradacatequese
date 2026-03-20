@@ -403,7 +403,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                 z-index: 99999;
               }
               .print-container {
-                min-height: 100vh;
+                min-height: 277mm;
                 display: flex;
                 flex-direction: column;
               }
@@ -413,6 +413,8 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
               .print-footer {
                 margin-top: auto;
                 page-break-inside: avoid;
+                border-top: 2px solid #0f172a;
+                padding: 20px 0;
               }
               /* Garantir que outros modais de impressão não apareçam */
               .print-class-members, .print-attendance-report, .print-attendance-diary, .print-class-history { display: none !important; }
@@ -583,7 +585,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
                         </div>
                       </section>
 
-                      <div className="mt-40 grid grid-cols-2 gap-12">
+                      <div className="mt-60 grid grid-cols-2 gap-12">
                         <div className="text-center">
                           <div className="border-t border-slate-900 pt-1 text-[11px] font-bold uppercase">Assinatura do Responsável</div>
                         </div>
@@ -598,7 +600,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ onSave, onCa
             </table>
           </div>
 
-          <div className="print-footer p-5 border-t-2 border-slate-900 text-center bg-white">
+          <div className="print-footer text-center bg-white">
             <p className="text-[10px] font-bold uppercase">
               {config.address} - {config.city}/{config.state}
             </p>
