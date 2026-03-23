@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Search, Edit, Trash2, Calendar, Phone, Mail, UserCheck, History, MapPin, UserPlus, MessageCircle, UsersRound, Sparkles, FileText } from 'lucide-react';
-import { Catequista } from '../types';
+import { Catequista, User, Turma } from '../types';
 import { Pagination } from './Pagination';
 
 interface CatequistaTableProps {
@@ -11,9 +11,20 @@ interface CatequistaTableProps {
   onViewHistory: (catequista: Catequista) => void;
   onManageDocuments: (catequista: Catequista) => void;
   onAddNew?: () => void;
+  currentUser: User;
+  allowedClasses: Turma[];
 }
 
-export const CatequistaTable: React.FC<CatequistaTableProps> = ({ catequistas, onDelete, onEdit, onViewHistory, onManageDocuments, onAddNew }) => {
+export const CatequistaTable: React.FC<CatequistaTableProps> = ({ 
+  catequistas, 
+  onDelete, 
+  onEdit, 
+  onViewHistory, 
+  onManageDocuments, 
+  onAddNew,
+  currentUser,
+  allowedClasses
+}) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -39,6 +50,34 @@ export const CatequistaTable: React.FC<CatequistaTableProps> = ({ catequistas, o
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const canEditCatequista = (catequista: Catequista) => {
+    if (currentUser.role === 'coordenador_paroquial') return true;
+    if (!currentUser.permissions.catequistas) return false;
+    
+    // Se for o próprio perfil, permitir editar
+    if (currentUser.linkedCatequistaId === catequista.id) return true;
+
+    // Se o usuário tiver turmas permitidas, permitir editar catequistas vinculados a essas turmas
+    if (allowedClasses && allowedClasses.length > 0) {
+      return allowedClasses.some(c => 
+        c.catequista.includes(catequista.nome)
+      );
+    }
+    
+    // Se for catequista e não tiver turmas permitidas, não pode editar ninguém (segurança)
+    if (currentUser.role === 'catequista' || currentUser.role === 'catequista_auxiliar') {
+       return false;
+    }
+
+    return true;
+  };
+
+  const canDeleteCatequista = (catequista: Catequista) => {
+    if (currentUser.role === 'coordenador_paroquial') return true;
+    // Apenas coordenador paroquial pode excluir catequistas por padrão
+    return false;
   };
 
   return (
@@ -154,12 +193,16 @@ export const CatequistaTable: React.FC<CatequistaTableProps> = ({ catequistas, o
                         >
                           <FileText className="w-4.5 h-4.5" />
                         </button>
-                        <button onClick={() => onEdit(c)} className="p-2.5 bg-white text-slate-400 hover:text-amber-500 rounded-xl border border-sky-50 shadow-sm transition-all">
-                          <Edit className="w-4.5 h-4.5" />
-                        </button>
-                        <button onClick={() => onDelete(c.id)} className="p-2.5 bg-white text-slate-400 hover:text-red-600 rounded-xl border border-sky-50 shadow-sm transition-all">
-                          <Trash2 className="w-4.5 h-4.5" />
-                        </button>
+                        {canEditCatequista(c) && (
+                          <button onClick={() => onEdit(c)} className="p-2.5 bg-white text-slate-400 hover:text-amber-500 rounded-xl border border-sky-50 shadow-sm transition-all">
+                            <Edit className="w-4.5 h-4.5" />
+                          </button>
+                        )}
+                        {canDeleteCatequista(c) && (
+                          <button onClick={() => onDelete(c.id)} className="p-2.5 bg-white text-slate-400 hover:text-red-600 rounded-xl border border-sky-50 shadow-sm transition-all">
+                            <Trash2 className="w-4.5 h-4.5" />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -236,20 +279,24 @@ export const CatequistaTable: React.FC<CatequistaTableProps> = ({ catequistas, o
                   </button>
                   
                   <div className="flex gap-2 w-full sm:w-auto justify-center">
-                    <button 
-                      onClick={() => onEdit(c)} 
-                      className="p-3 text-amber-500 bg-amber-50 rounded-xl border border-amber-100"
-                      title="Editar"
-                    >
-                      <Edit className="w-4 h-4" />
-                    </button>
-                    <button 
-                      onClick={() => onDelete(c.id)} 
-                      className="p-3 text-red-600 bg-red-50 rounded-xl border border-red-100"
-                      title="Excluir"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    {canEditCatequista(c) && (
+                      <button 
+                        onClick={() => onEdit(c)} 
+                        className="p-3 text-amber-500 bg-amber-50 rounded-xl border border-amber-100"
+                        title="Editar"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                    )}
+                    {canDeleteCatequista(c) && (
+                      <button 
+                        onClick={() => onDelete(c.id)} 
+                        className="p-3 text-red-600 bg-red-50 rounded-xl border border-red-100"
+                        title="Excluir"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

@@ -1016,8 +1016,8 @@ const App: React.FC = () => {
   const visibleStudents = useMemo(() => {
     if (!currentUser) return [];
     
-    // Coordenador paroquial vê todos
-    if (currentUser.role === 'coordenador_paroquial') return students;
+    // Coordenador paroquial vê todos ou se tiver permissão explícita de ver lista
+    if (currentUser.role === 'coordenador_paroquial' || currentUser.permissions.students_view) return students;
     
     // Se o usuário tiver turmas permitidas (via vínculo ou manual), filtrar estudantes por essas turmas
     if (visibleClasses.length > 0) {
@@ -1071,8 +1071,8 @@ const App: React.FC = () => {
       case 'dashboard':
         return <DashboardContent 
                   events={events} 
-                  students={students} 
-                  classes={classes} 
+                  students={visibleStudents} 
+                  classes={visibleClasses} 
                   catequistas={catequistas}
                   suggestedDate={selectedDate}
                   onDateChange={setSelectedDate}
@@ -1139,6 +1139,8 @@ const App: React.FC = () => {
                   onViewHistory={(c) => setViewingCatequistaHistory(c)}
                   onManageDocuments={(c) => setManagingDocumentsCatequista(c)}
                   onAddNew={currentUser.permissions.catequistas ? () => { setEditingCatequista(null); setView('catequista_create'); } : undefined}
+                  currentUser={currentUser}
+                  allowedClasses={visibleClasses}
                />;
       case 'catequista_create':
         return <CatequistaForm 
