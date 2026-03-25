@@ -480,8 +480,11 @@ export const GalleryView: React.FC<GalleryViewProps> = ({ images, onUpload, onEd
           className="fixed inset-0 z-[110] bg-sky-950/95 backdrop-blur-2xl flex items-center justify-center p-4 md:p-12 animate-in fade-in duration-500"
           onClick={() => setPreviewImage(null)}
         >
-          <button className="absolute top-8 right-8 text-white hover:scale-125 transition-all bg-white/10 p-4 rounded-full border border-white/10 shadow-2xl">
-            <X size={32} />
+          <button 
+            onClick={() => setPreviewImage(null)}
+            className="absolute top-4 right-4 md:top-8 md:right-8 text-white hover:scale-125 transition-all bg-white/20 p-3 md:p-4 rounded-full border border-white/20 shadow-2xl z-[120]"
+          >
+            <X className="w-6 h-6 md:w-8 md:h-8" />
           </button>
           <div className="max-w-6xl w-full h-full flex flex-col items-center justify-center gap-10" onClick={e => e.stopPropagation()}>
             <div className="w-full h-[70vh] flex items-center justify-center relative">
